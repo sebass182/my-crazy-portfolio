@@ -13,7 +13,7 @@ export type Project = {
 // cover · laptop mockup · context · objectives · 3 detail slides
 export const SLIDES_PER_PROJECT = 7
 
-export const slideSrc = (n: number) => `/work/t${String(n).padStart(2, '0')}.png`
+export const slideSrc = (n: number) => `${import.meta.env.BASE_URL}work/t${String(n).padStart(2, '0')}.png`
 export const mockupOf = (p: Project) => slideSrc(p.cover + 1)
 // The cover slide (logo + title) is skipped here: the overlay header already shows the name and summary
 export const slidesOf = (p: Project) =>

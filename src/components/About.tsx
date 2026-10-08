@@ -83,7 +83,7 @@ export default function About() {
           <p className="about__text">{bio}</p>
         </div>
         <figure className="about__photo">
-          <img src="/me.png" alt="Sébastien Lemyre" />
+          <img src={`${import.meta.env.BASE_URL}me.png`} alt="Sébastien Lemyre" />
         </figure>
       </div>
 
