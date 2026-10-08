@@ -165,9 +165,9 @@ img { display: block; max-width: 100%; }
 .about__photo { overflow: hidden; border-radius: var(--radius); aspect-ratio: 4 / 5; position: sticky; top: 12vh; }
 .about__photo img { width: 100%; height: 115%; object-fit: cover; }
 .about__cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; }
-.about__col { border-top: 1px solid var(--ink); padding-top: 1rem; }
-.about__col ul { list-style: none; margin-top: 1.4rem; display: grid; gap: 0.55rem; font-size: 1.05rem; line-height: 1.35; }
-.xp .label { display: block; padding-bottom: 1rem; border-bottom: 1px solid var(--ink); }
+.about__col { padding-top: 0; }
+.about__col ul { list-style: none; margin-top: 1.2rem; display: grid; gap: 0.55rem; font-size: 1.05rem; line-height: 1.35; }
+.xp .label, .about__col .label { display: block; padding-bottom: 1rem; border-bottom: 1px solid var(--ink); } /* same underline under every About heading */
 .xp__row { display: grid; grid-template-columns: 1fr 2fr 2fr; gap: 1.5rem; align-items: baseline; padding: 1.4rem 0; border-bottom: 1px solid var(--muted); transition: padding 0.4s cubic-bezier(0.19, 1, 0.22, 1); }
 .xp__row:hover { padding-left: 1.2rem; }
 .xp__row span:first-child { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.1em; }
@@ -274,7 +274,7 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
   visibility: hidden; /* GSAP fades it in once the preloader hands over */
 }
 .nav a { font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; }
-.nav nav { display: flex; gap: clamp(0.25rem, 2vw, 1.5rem); }
+.nav nav { display: flex; gap: clamp(0.25rem, 2vw, 1.5rem); margin-right: calc(-0.6rem - 0.14em); } /* link text (not its 44px hit area) lines up with the page margin, mirroring the icon on the left */
 .nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.6rem; }
 .nav nav a { position: relative; }
 .nav nav a::after { content: ''; position: absolute; left: 0.6rem; right: 0.6rem; bottom: 8px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1); }
