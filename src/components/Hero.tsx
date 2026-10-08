@@ -36,7 +36,7 @@ export default function Hero({ ready }: { ready: boolean }) {
       })
 
       tl.fromTo(
-        '.hero__meta > *, .hero__lede, .hero__cta > *',
+        '.hero__lede, .hero__cta > *',
         { y: 20, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: 'power3.out' },
         '-=0.6',
@@ -93,11 +93,6 @@ export default function Hero({ ready }: { ready: boolean }) {
         <i className="blob blob--cyan" />
         <i className="blob blob--pink" />
         <i className="blob blob--lilac" />
-      </div>
-
-      <div className="hero__meta">
-        <span>Revue de portfolio — 2026</span>
-        <span>St-Jean-sur-Richelieu, QC</span>
       </div>
 
       <div className="hero__main">
