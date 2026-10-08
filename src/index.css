@@ -281,7 +281,7 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 .nav nav a { position: relative; }
 .nav nav a::after { content: ''; position: absolute; left: 0.6rem; right: 0.6rem; bottom: 8px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1); }
 .nav nav a:hover::after { transform: scaleX(1); }
-.nav__brand { padding-left: 0 !important; font-weight: 500; }
+.nav__brand { padding-left: 0 !important; font-weight: 500; white-space: nowrap; }
 
 /* ───────── Hero: lede + actions ───────── */
 .hero__main { margin: auto 0; padding: 2vh 0; }
@@ -317,7 +317,33 @@ a:focus-visible, button:focus-visible { outline: 2px solid #fff; outline-offset:
   .card__cta { grid-column: auto; margin-top: 0.8rem; }
   .hero__cta .btn { flex: 1 1 auto; justify-content: center; }
 }
-@media (max-width: 520px) {
-  .nav__brand { display: none; }
-  .nav { justify-content: flex-end; }
+
+/* ───────── Mobile menu ───────── */
+.burger { display: none; position: relative; flex: 0 0 44px; width: 44px; height: 44px; margin-right: -0.6rem; color: inherit; }
+.burger__line { position: absolute; left: 10px; right: 10px; height: 2px; background: currentColor; border-radius: 2px; transform-origin: center; }
+.burger__line--top { top: 18px; }
+.burger__line--bottom { top: 26px; }
+
+.menu { position: fixed; inset: 0; z-index: 79; display: none; visibility: hidden; flex-direction: column; justify-content: space-between; padding: 6.5rem var(--pad) 2rem; color: var(--ink); overflow: hidden; }
+.menu > *:not(.hero__bg) { position: relative; z-index: 1; }
+.menu__nav { display: flex; flex-direction: column; }
+.menu__link { position: relative; display: block; padding: 1.1rem 0; transition: padding-left 0.5s cubic-bezier(0.19, 1, 0.22, 1); }
+.menu__link:hover, .menu__link:focus-visible { padding-left: 0.8rem; }
+.menu__mask { display: block; overflow: hidden; padding: 0.1em 0; }
+.menu__text { display: flex; align-items: baseline; gap: 1rem; font-size: clamp(2.8rem, 15vw, 6rem); font-weight: 700; line-height: 1; letter-spacing: -0.05em; }
+.menu__text i { font-family: var(--mono); font-style: normal; font-weight: 500; font-size: var(--text-xs); letter-spacing: 0.14em; transform: translateY(-0.9em); }
+.menu__rule { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--ink); transform-origin: left; }
+.menu__foot { display: grid; gap: 0.6rem; font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.1em; text-transform: uppercase; }
+.menu__foot a { display: inline-flex; align-items: center; min-height: 44px; width: fit-content; }
+.menu__foot span { opacity: 0.65; }
+
+/* GSAP owns these — see the transition guard above */
+.menu, .menu__text, .menu__rule, .menu__foot > *, .burger__line { transition: none !important; }
+.burger__line, .menu { will-change: transform; }
+
+@media (max-width: 800px) {
+  .nav .nav__links { display: none; }
+  .burger { display: block; }
+  .menu { display: flex; }
 }
+@media (prefers-reduced-motion: reduce) { .menu__link { transition: none; } }
