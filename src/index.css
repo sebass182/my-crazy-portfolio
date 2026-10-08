@@ -61,8 +61,9 @@ img { display: block; max-width: 100%; }
 /* ───────── Hero ───────── */
 .hero {
   position: relative;
+  --hero-gap: clamp(1.25rem, 3.2vh, 2.5rem); /* the one vertical rhythm: title → lede → actions → strip → bottom */
   min-height: 100vh;
-  padding: calc(var(--pad) + 2.5rem) var(--pad) 0; /* clears the fixed nav */
+  padding: 4.5rem var(--pad) 0; /* clears the fixed nav; the content group is centred in the space that remains */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -71,21 +72,21 @@ img { display: block; max-width: 100%; }
 .hero__title {
   visibility: hidden;
   margin: 0;
-  padding: 0 0 3vh;
-  font-size: clamp(3.5rem, 12.5vw, 15rem);
+  padding: 0;
+  font-size: clamp(3.5rem, 11vw, 13rem);
   font-weight: 700;
   line-height: 0.9;
   letter-spacing: -0.055em;
 }
 .hero__marquee {
   margin: 0 calc(var(--pad) * -1);
-  padding-bottom: 4vh;
+  padding-bottom: calc(var(--hero-gap) * 1.5);
   overflow: hidden;
   opacity: 0;
 }
 .hero__track { display: flex; gap: 1.2vw; width: max-content; padding-left: 1.2vw; }
 .hero__track img {
-  height: clamp(100px, 20vh, 220px);
+  height: clamp(100px, 17vh, 200px);
   width: auto;
   border-radius: var(--radius);
   box-shadow: 0 20px 50px -20px rgba(10, 10, 15, 0.35);
@@ -236,9 +237,8 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 
   /* Hero */
   .hero { padding-top: calc(var(--pad) + 3rem); }
-  .hero__title { font-size: 21vw; line-height: 0.88; padding: 0 0 2.5vh; }
+  .hero__title { font-size: 21vw; line-height: 0.88; }
   .hero__track img { height: 22vh; border-radius: var(--radius); }
-  .hero__marquee { padding-bottom: 5vh; }
 
   /* Work */
   .card__frame { border-radius: var(--radius); }
@@ -282,10 +282,10 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 .nav__brand { padding-left: 0 !important; font-weight: 500; white-space: nowrap; }
 
 /* ───────── Hero: lede + actions ───────── */
-.hero__main { margin: auto 0; padding: 2vh 0; }
-.hero__lede { max-width: 46ch; margin-top: 2.2vh; font-size: clamp(1.05rem, 1.5vw, 1.45rem); line-height: 1.4; }
+.hero__main { margin: auto 0; padding: var(--hero-gap) 0; }
+.hero__lede { max-width: 46ch; margin-top: var(--hero-gap); font-size: clamp(1.05rem, 1.5vw, 1.45rem); line-height: 1.4; }
 .hero__lede strong { font-weight: 700; }
-.hero__cta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 3vh; }
+.hero__cta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: var(--hero-gap); }
 .btn { display: inline-flex; align-items: center; gap: 0.6rem; min-height: 48px; padding: 0 1.6rem; border-radius: 999px; background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink); font-weight: 600; transition: background-color 0.3s, color 0.3s; }
 .btn:hover { background: transparent; color: var(--ink); }
 .btn--outline { background: transparent; color: var(--ink); }
