@@ -11,6 +11,10 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
   useGSAP(
     () => {
       const distance = () => track.current!.scrollWidth - window.innerWidth
+      const setBar = gsap.quickSetter('.work__bar', 'scaleX') as (v: number) => void
+      const total = String(projects.length).padStart(2, '0')
+      const counter = root.current!.querySelector('.work__count')!
+      const show = (i: number) => (counter.textContent = `${String(i).padStart(2, '0')} / ${total}`)
 
       const scroll = gsap.to(track.current, {
         x: () => -distance(),
@@ -22,6 +26,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
           start: 'top top',
           end: () => `+=${distance()}`,
           invalidateOnRefresh: true,
+          onUpdate: (self) => setBar(self.progress),
         },
       })
 
@@ -33,13 +38,17 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
         ['.work__intro', INK],
         ...projects.map((p, i): [string, string] => [`.card:nth-of-type(${i + 1})`, p.bg]),
       ]
-      stops.forEach(([sel, color]) =>
+      stops.forEach(([sel, color], i) =>
         ScrollTrigger.create({
           trigger: sel,
           containerAnimation: scroll,
           start: 'left 65%',
           end: 'right 35%',
-          onToggle: (self) => self.isActive && paint(color),
+          onToggle: (self) => {
+            if (!self.isActive) return
+            paint(color)
+            show(i)
+          },
         }),
       )
 
@@ -64,6 +73,11 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
 
   return (
     <section className="work" ref={root} id="work">
+      <div className="work__hud" aria-hidden="true">
+        <span className="work__count">00 / {String(projects.length).padStart(2, '0')}</span>
+        <span className="work__hint">Défiler ↓</span>
+      </div>
+      <div className="work__bar" aria-hidden="true" />
       <div className="work__track" ref={track}>
         <div className="work__intro">
           <span className="label">Études de cas</span>
