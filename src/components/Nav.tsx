@@ -8,6 +8,7 @@ const links = [
 ]
 
 const MOBILE = '(max-width: 800px)'
+const NAME = 'Sébastien Lemyre'
 
 export default function Nav({ ready }: { ready: boolean }) {
   const root = useRef<HTMLDivElement>(null)
@@ -68,6 +69,32 @@ export default function Nav({ ready }: { ready: boolean }) {
 
   const close = useCallback(() => setOpen(false), [])
 
+  // ── Home link: a house icon that types out the name on hover/focus, and erases it again on leave ──
+  const typed = useRef<HTMLSpanElement>(null)
+  const typing = useRef<gsap.core.Tween | null>(null)
+  const cursor = useRef({ n: 0 }) // how many letters are currently shown
+
+  const typeTo = (target: number) => {
+    const el = typed.current
+    if (!el) return
+    const speed = target > cursor.current.n ? 0.05 : 0.022 // typing is slower than erasing
+    typing.current?.kill()
+    if (prefersReducedMotion()) {
+      cursor.current.n = target
+      el.textContent = NAME.slice(0, target)
+      return
+    }
+    typing.current = gsap.to(cursor.current, {
+      n: target,
+      duration: Math.abs(target - cursor.current.n) * speed,
+      ease: 'none',
+      onUpdate: () => {
+        el.textContent = NAME.slice(0, Math.round(cursor.current.n))
+      },
+    })
+  }
+  useEffect(() => () => void typing.current?.kill(), [])
+
   // React to open/close: play the timeline, lock scroll, manage focus and the page behind
   useEffect(() => {
     const tl = menuTl.current
@@ -113,8 +140,22 @@ export default function Nav({ ready }: { ready: boolean }) {
   return (
     <div className="nav-root" ref={root}>
       <header className="nav">
-        <a className="nav__brand" href="#top">
-          Sébastien Lemyre
+        <a
+          className="nav__brand"
+          href="#top"
+          aria-label="Retour en haut de la page — Sébastien Lemyre"
+          onClick={(e) => go(e, '#top')}
+          onMouseEnter={() => typeTo(NAME.length)}
+          onMouseLeave={() => typeTo(0)}
+          onFocus={() => typeTo(NAME.length)}
+          onBlur={() => typeTo(0)}
+        >
+          <svg className="nav__home" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M3 10.5 12 3l9 7.5" />
+            <path d="M5.5 9.2V20a1 1 0 0 0 1 1H10v-6h4v6h3.5a1 1 0 0 0 1-1V9.2" />
+          </svg>
+          <span className="nav__typed" ref={typed} aria-hidden="true" />
+          <span className="nav__caret" aria-hidden="true" />
         </a>
 
         <nav className="nav__links" aria-label="Navigation principale">

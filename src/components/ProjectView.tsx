@@ -8,6 +8,7 @@ const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1
 
 export default function ProjectView({ project, onClose, onNavigate }: Props) {
   const root = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null) // the scrolling layer; the panel itself never scrolls
   const closeBtn = useRef<HTMLButtonElement>(null)
   const closing = useRef(false)
   // the card that opened us, captured before focus moves into the dialog (survives strict-mode re-runs)
@@ -20,7 +21,8 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
   useGSAP(
     () => {
       const el = root.current!
-      el.scrollTop = 0
+      const scroller = scrollRef.current!
+      scroller.scrollTop = 0
 
       if (prefersReducedMotion()) {
         gsap.fromTo(el, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 })
@@ -36,7 +38,7 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
           opacity: 0,
           duration: 0.9,
           ease: 'power3.out',
-          scrollTrigger: { trigger: s, scroller: el, start: 'top 92%', toggleActions: 'play none none none' },
+          scrollTrigger: { trigger: s, scroller, start: 'top 92%', toggleActions: 'play none none none' },
         }),
       )
     },
@@ -101,6 +103,7 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
         Fermer <span aria-hidden="true">✕</span>
       </button>
 
+      <div className="pv__scroll" ref={scrollRef}>
       <header className="pv__head">
         <span className="pv__n">
           {project.n} / {String(projects.length).padStart(2, '0')}
@@ -129,6 +132,7 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
         <span>Projet suivant</span>
         <strong>{next.name} →</strong>
       </button>
+      </div>
     </div>
   )
 }

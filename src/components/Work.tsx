@@ -64,13 +64,8 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
           }),
         )
 
-        // Image settles from a zoom as each card arrives; caption slides up
+        // Caption slides up as each card arrives (the picture itself stays at its true size — no zoom)
         cards.forEach((card) => {
-          gsap.from(card.querySelector('.card__img'), {
-            scale: 1.25,
-            ease: 'none',
-            scrollTrigger: { trigger: card, containerAnimation: scroll, start: 'left 100%', end: 'left 30%', scrub: true },
-          })
           gsap.from(card.querySelectorAll('.card__meta > *'), {
             y: 40,
             opacity: 0,
@@ -103,7 +98,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
 
           if (reduce) return // content stays put; only the background colour changes
 
-          // Frame wipes open, image settles from a zoom while you scroll, caption slides up
+          // Frame wipes open, caption slides up (the picture itself stays at its true size — no zoom)
           gsap.fromTo(
             card.querySelector('.card__frame'),
             { clipPath: 'inset(0 0 100% 0)' },
@@ -113,11 +108,6 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
               ease: 'expo.out',
               scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none reverse' },
             },
-          )
-          gsap.fromTo(
-            card.querySelector('.card__img'),
-            { scale: 1.3 },
-            { scale: 1, ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'center center', scrub: true } },
           )
           gsap.from(card.querySelectorAll('.card__meta > *'), {
             y: 40,
