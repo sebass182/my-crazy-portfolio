@@ -6,66 +6,61 @@ const INK = '#0a0a0f'
 
 export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
   const root = useRef<HTMLElement>(null)
-  const track = useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
-      const distance = () => track.current!.scrollWidth - window.innerWidth
-      const setBar = gsap.quickSetter('.work__bar', 'scaleX') as (v: number) => void
-      const total = String(projects.length).padStart(2, '0')
-      const counter = root.current!.querySelector('.work__count')!
-      const show = (i: number) => (counter.textContent = `${String(i).padStart(2, '0')} / ${total}`)
-
-      const scroll = gsap.to(track.current, {
-        x: () => -distance(),
-        ease: 'none',
-        scrollTrigger: {
-          trigger: root.current,
-          pin: true,
-          scrub: 1,
-          start: 'top top',
-          end: () => `+=${distance()}`,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => setBar(self.progress),
-        },
-      })
-
-      // The section background takes on the colour of whichever project is centred
+      // The section background takes on the colour of the project nearest the middle of the screen
       const paint = (color: string) =>
         gsap.to(root.current, { backgroundColor: color, duration: 0.7, ease: 'power2.out', overwrite: 'auto' })
 
-      const stops: [string, string][] = [
-        ['.work__intro', INK],
-        ...projects.map((p, i): [string, string] => [`.card:nth-of-type(${i + 1})`, p.bg]),
-      ]
-      stops.forEach(([sel, color], i) =>
-        ScrollTrigger.create({
-          trigger: sel,
-          containerAnimation: scroll,
-          start: 'left 65%',
-          end: 'right 35%',
-          onToggle: (self) => {
-            if (!self.isActive) return
-            paint(color)
-            show(i)
-          },
-        }),
-      )
+      ScrollTrigger.create({
+        trigger: '.work__intro',
+        start: 'top 60%',
+        end: 'bottom 40%',
+        onToggle: (self) => self.isActive && paint(INK),
+      })
 
-      // Cards lift and the image settles as each one arrives
-      gsap.utils.toArray<HTMLElement>('.card').forEach((card) => {
-        gsap.from(card.querySelector('.card__img'), {
-          scale: 1.25,
-          ease: 'none',
-          scrollTrigger: { trigger: card, containerAnimation: scroll, start: 'left 100%', end: 'left 30%', scrub: true },
+      gsap.utils.toArray<HTMLElement>('.card').forEach((card, i) => {
+        ScrollTrigger.create({
+          trigger: card,
+          start: 'top 55%',
+          end: 'bottom 45%',
+          onToggle: (self) => self.isActive && paint(projects[i].bg),
         })
+
+        // Frame wipes open, image settles from a zoom while you scroll, caption slides up
+        gsap.fromTo(
+          card.querySelector('.card__frame'),
+          { clipPath: 'inset(0 0 100% 0)' },
+          {
+            clipPath: 'inset(0 0 0% 0)',
+            duration: 1.2,
+            ease: 'expo.out',
+            scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none reverse' },
+          },
+        )
+        gsap.fromTo(
+          card.querySelector('.card__img'),
+          { scale: 1.3 },
+          { scale: 1, ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'center center', scrub: true } },
+        )
         gsap.from(card.querySelectorAll('.card__meta > *'), {
           y: 40,
           opacity: 0,
+          duration: 0.9,
           stagger: 0.08,
           ease: 'power3.out',
-          scrollTrigger: { trigger: card, containerAnimation: scroll, start: 'left 85%', toggleActions: 'play none none reverse' },
+          scrollTrigger: { trigger: card, start: 'top 75%', toggleActions: 'play none none reverse' },
         })
+      })
+
+      gsap.from('.work__intro > *', {
+        y: 50,
+        opacity: 0,
+        duration: 1,
+        stagger: 0.12,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '.work__intro', start: 'top 85%' },
       })
     },
     { scope: root },
@@ -73,24 +68,19 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
 
   return (
     <section className="work" ref={root} id="work">
-      <div className="work__hud" aria-hidden="true">
-        <span className="work__count">00 / {String(projects.length).padStart(2, '0')}</span>
-        <span className="work__hint">Défiler ↓</span>
-      </div>
-      <div className="work__bar" aria-hidden="true" />
-      <div className="work__track" ref={track}>
-        <div className="work__intro">
+      <div className="work__intro">
+        <div>
           <span className="label">Études de cas</span>
           <h2>
             Travaux
             <br />
             sélectionnés
           </h2>
-          <p>
-            {String(projects.length).padStart(2, '0')} projets <span aria-hidden="true">→</span>
-          </p>
         </div>
+        <p>{String(projects.length).padStart(2, '0')} projets</p>
+      </div>
 
+      <div className="work__grid">
         {projects.map((p) => (
           <article className="card" key={p.slug}>
             <button
@@ -100,7 +90,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
               data-cursor="Voir"
             >
               <div className="card__frame" style={{ ['--accent' as string]: p.accent }}>
-                <img className="card__img" src={mockupOf(p)} alt="" draggable={false} />
+                <img className="card__img" src={mockupOf(p)} alt="" draggable={false} loading="lazy" />
               </div>
             </button>
             <div className="card__meta">
@@ -112,11 +102,6 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
             </div>
           </article>
         ))}
-
-        <div className="work__outro">
-          <span className="label">Fin</span>
-          <p>Et la suite ?</p>
-        </div>
       </div>
     </section>
   )
