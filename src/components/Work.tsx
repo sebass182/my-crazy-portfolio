@@ -1,6 +1,6 @@
 import { useRef } from 'react'
-import { gsap, ScrollTrigger, useGSAP } from '../lib/gsap'
-import { projects, mockupOf, type Project } from '../data/projects'
+import { gsap, ScrollTrigger, prefersReducedMotion, useGSAP } from '../lib/gsap'
+import { projects, mockupOf, altOf, type Project } from '../data/projects'
 
 const INK = '#0a0a0f'
 
@@ -9,9 +9,11 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
 
   useGSAP(
     () => {
+      const reduce = prefersReducedMotion()
+
       // The section background takes on the colour of the project nearest the middle of the screen
       const paint = (color: string) =>
-        gsap.to(root.current, { backgroundColor: color, duration: 0.7, ease: 'power2.out', overwrite: 'auto' })
+        gsap.to(root.current, { backgroundColor: color, duration: reduce ? 0 : 0.7, ease: 'power2.out', overwrite: 'auto' })
 
       ScrollTrigger.create({
         trigger: '.work__intro',
@@ -27,6 +29,8 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
           end: 'bottom 45%',
           onToggle: (self) => self.isActive && paint(projects[i].bg),
         })
+
+        if (reduce) return // content stays put; only the background colour changes
 
         // Frame wipes open, image settles from a zoom while you scroll, caption slides up
         gsap.fromTo(
@@ -54,6 +58,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
         })
       })
 
+      if (reduce) return
       gsap.from('.work__intro > *', {
         y: 50,
         opacity: 0,
@@ -67,11 +72,11 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
   )
 
   return (
-    <section className="work" ref={root} id="work">
+    <section className="work" ref={root} id="work" aria-labelledby="work-title">
       <div className="work__intro">
         <div>
           <span className="label">Études de cas</span>
-          <h2>
+          <h2 id="work-title">
             Travaux
             <br />
             sélectionnés
@@ -88,9 +93,12 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
               onClick={() => onOpen(p)}
               aria-label={`Voir l'étude de cas : ${p.name}`}
               data-cursor="Voir"
+              style={{ ['--accent' as string]: p.accent }}
             >
-              <div className="card__frame" style={{ ['--accent' as string]: p.accent }}>
-                <img className="card__img" src={mockupOf(p)} alt="" draggable={false} loading="lazy" />
+              <div className="card__frame">
+                <img className="card__img" src={mockupOf(p)} alt="" draggable={false} loading="lazy" decoding="async" />
+                {/* swaps in on hover so each project shows something other than the shared laptop frame */}
+                <img className="card__alt" src={altOf(p)} alt="" draggable={false} loading="lazy" decoding="async" />
               </div>
             </button>
             <div className="card__meta">
@@ -99,6 +107,9 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
               </span>
               <h3>{p.name}</h3>
               <p>{p.tags}</p>
+              <span className="card__cta" style={{ color: p.accent }} aria-hidden="true">
+                Voir le projet <span className="card__arrow">→</span>
+              </span>
             </div>
           </article>
         ))}

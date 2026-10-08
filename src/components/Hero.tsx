@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { gsap, SplitText, useGSAP } from '../lib/gsap'
+import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import { projects, mockupOf } from '../data/projects'
 
 export default function Hero({ ready }: { ready: boolean }) {
@@ -9,7 +9,9 @@ export default function Hero({ ready }: { ready: boolean }) {
   // Build the intro once (paused) — the split title stays hidden until the preloader hands over
   useGSAP(
     () => {
+      const reduce = prefersReducedMotion()
       const tl = gsap.timeline({ paused: true })
+      if (reduce) tl.timeScale(40) // same end state, no visible motion
       intro.current = tl
       let charsTween: gsap.core.Tween | undefined
 
@@ -34,9 +36,9 @@ export default function Hero({ ready }: { ready: boolean }) {
       })
 
       tl.fromTo(
-        '.hero__meta > *',
+        '.hero__meta > *, .hero__lede, .hero__cta > *',
         { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, stagger: 0.12, ease: 'power3.out' },
+        { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: 'power3.out' },
         '-=0.6',
       ).fromTo(
         '.hero__marquee',
@@ -44,6 +46,8 @@ export default function Hero({ ready }: { ready: boolean }) {
         { y: 0, opacity: 1, duration: 1.2, ease: 'expo.out' },
         '-=1',
       )
+
+      if (reduce) return // no drifting blobs, no endless strip, no scroll-linked fade
 
       // Gradient blobs drift forever
       gsap.utils.toArray<HTMLElement>('.hero .blob').forEach((b, i) => {
@@ -72,7 +76,7 @@ export default function Hero({ ready }: { ready: boolean }) {
     { scope: root },
   )
 
-  // Play when the preloader is done
+  // Play when the preloader is done (immediately, if it was skipped)
   useGSAP(
     () => {
       if (ready) intro.current?.play()
@@ -83,7 +87,7 @@ export default function Hero({ ready }: { ready: boolean }) {
   const strip = [...projects, ...projects]
 
   return (
-    <section className="hero" ref={root}>
+    <section className="hero" ref={root} id="top">
       <div className="hero__bg" aria-hidden="true">
         <i className="blob blob--yellow" />
         <i className="blob blob--cyan" />
@@ -93,20 +97,33 @@ export default function Hero({ ready }: { ready: boolean }) {
 
       <div className="hero__meta">
         <span>Revue de portfolio — 2026</span>
-        <span>Senior UI/UX Designer</span>
         <span>St-Jean-sur-Richelieu, QC</span>
       </div>
 
-      <h1 className="hero__title" aria-label="Sébastien Lemyre">
-        Sébastien
-        <br />
-        Lemyre
-      </h1>
+      <div className="hero__main">
+        <h1 className="hero__title" aria-label="Sébastien Lemyre">
+          Sébastien
+          <br />
+          Lemyre
+        </h1>
+        <p className="hero__lede">
+          <strong>Designer UI/UX Senior.</strong> Design systems, direction artistique et IA générative — 15 ans à
+          transformer des produits complexes en interfaces simples.
+        </p>
+        <div className="hero__cta">
+          <a className="btn" href="#work">
+            Voir les travaux <span aria-hidden="true">↓</span>
+          </a>
+          <a className="btn btn--outline" href="#contact">
+            Me contacter
+          </a>
+        </div>
+      </div>
 
       <div className="hero__marquee" aria-hidden="true">
         <div className="hero__track">
           {strip.map((p, i) => (
-            <img key={i} src={mockupOf(p)} alt="" draggable={false} />
+            <img key={i} src={mockupOf(p)} alt="" draggable={false} decoding="async" />
           ))}
         </div>
       </div>

@@ -1,11 +1,13 @@
 import { useRef } from 'react'
-import { gsap, SplitText, useGSAP } from '../lib/gsap'
+import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 
 export default function Contact() {
   const root = useRef<HTMLElement>(null)
 
   useGSAP(
     (_, contextSafe) => {
+      if (prefersReducedMotion()) return // headline shows as-is, buttons stay put
+
       SplitText.create('.contact__title', {
         type: 'words',
         mask: 'words',
@@ -72,7 +74,7 @@ export default function Contact() {
             Portfolio
           </a>
         </div>
-        <span className="label">Sébastien Lemyre — Senior UI/UX Designer</span>
+        <span className="label">Sébastien Lemyre — Designer UI/UX Senior</span>
       </div>
     </footer>
   )

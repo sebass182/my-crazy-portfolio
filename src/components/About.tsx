@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { gsap, SplitText, useGSAP } from '../lib/gsap'
+import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 
 const bio =
   "Avec plus de 15 ans d'expérience en design numérique, UI/UX et direction artistique, j'accompagne les entreprises, agences et grands comptes dans la création de produits digitaux performants, d'architectures d'information complexes et d'identités visuelles mémorables."
@@ -28,6 +28,9 @@ export default function About() {
 
   useGSAP(
     () => {
+      // Reduced motion: the bio is solid ink (see CSS), photo and lists are simply there
+      if (prefersReducedMotion()) return
+
       // Bio: each line carries a copy of itself; the solid layer is masked open as you scroll
       SplitText.create('.about__text', {
         type: 'lines',
@@ -83,7 +86,12 @@ export default function About() {
           <p className="about__text">{bio}</p>
         </div>
         <figure className="about__photo">
-          <img src={`${import.meta.env.BASE_URL}me.png`} alt="Sébastien Lemyre" />
+          <img
+            src={`${import.meta.env.BASE_URL}me.webp`}
+            alt="Sébastien Lemyre en selfie dans les montagnes, entouré de photos : fat-bike, appareil photo, basse sur scène et skateboard"
+            loading="lazy"
+            decoding="async"
+          />
         </figure>
       </div>
 

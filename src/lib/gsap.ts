@@ -10,4 +10,8 @@ gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText)
 // which causes a visible re-raster "snap" on text and images).
 gsap.config({ force3D: true })
 
+// Read at animation-setup time. Components skip loops, scrubs and large movements when this is true.
+export const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
 export { gsap, ScrollTrigger, SplitText, useGSAP }
