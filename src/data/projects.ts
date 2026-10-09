@@ -13,8 +13,9 @@ export type Project = {
   brand?: Brand // when set, the case study opens with a brand panel (logo, palette, type, pattern)
 }
 
-// Real device frame + real screens exported from Figma, layered on the card
-export type Scene = { laptop: string; desktop: string; mobile: string; pattern?: string; background?: string; alt: string }
+// Each Work card has its own composition (see components/Scenes.tsx)
+export type SceneKind = 'bleed' | 'tilt' | 'posters' | 'modules' | 'laptop' | 'diagonal' | 'stickers' | 'dash' | 'bento'
+export type Scene = { kind: SceneKind; alt: string }
 
 // Read off each deck cover slide
 export type Meta = { role: string; agency: string; scope: string; tools: string }
@@ -36,7 +37,6 @@ const slide = (n: number) => `${base}work/t${pad(n)}.webp` // 1920px
 const slideSm = (n: number) => `${base}work/t${pad(n)}-sm.webp` // 960px
 
 export const mockupOf = (p: Project) => slideSm(p.cover + 1) // card + hero strip
-export const altOf = (p: Project) => slideSm(p.cover + 4) // card hover (first detail slide, photo-rich)
 
 export type Slide = { src: string; alt: string }
 export const slidesOf = (p: Project): Slide[] => {
@@ -58,6 +58,7 @@ export const projects: Project[] = [
     bg: '#003b2d',
     accent: '#2fe39b',
     cover: 5,
+    scene: { kind: 'bleed', alt: 'Site Camping Québec : page d’accueil plein cadre et écran du moteur de recherche de terrains' },
     details: [
       'recherche géolocalisée et système de favoris',
       'espace propriétaire et gestion des adhésions',
@@ -74,6 +75,7 @@ export const projects: Project[] = [
     bg: '#162a54',
     accent: '#1fa5ea',
     cover: 12,
+    scene: { kind: 'tilt', alt: 'Site Air Transat : la page « Soyez prêt pour votre voyage familial en Jamaïque » dans une fenêtre de navigateur inclinée' },
     details: [
       'Inbound AI et recherche conversationnelle avec Ria',
       'landings de destinations hyper-personnalisées',
@@ -89,6 +91,7 @@ export const projects: Project[] = [
     bg: '#1f1f1f',
     accent: '#b89b6a',
     cover: 19,
+    scene: { kind: 'posters', alt: 'ESSLLL : trois visuels de la marque musicale en triptyque, sur fond de chaîne YouTube' },
     details: [
       'direction artistique et univers visuel généré par IA',
       'production multimédia et déclinaisons de contenus vidéo',
@@ -105,6 +108,7 @@ export const projects: Project[] = [
     bg: '#000131',
     accent: '#7b6dff',
     cover: 26,
+    scene: { kind: 'modules', alt: 'Holo MD : tableaux de bord cliniques, écrans de l’application patient, carte du Dr Holo et losange de marque' },
     details: [
       "branding global, brandbook et vitrine d'investissement",
       'application patient et suivi thérapeutique à distance',
@@ -115,13 +119,6 @@ export const projects: Project[] = [
       agency: 'Globalia',
       scope: 'Branding 360° · Micro-site de financement · App patient (LLM chatbot) · SaaS clinique (RTM & billing)',
       tools: 'Figma',
-    },
-    scene: {
-      laptop: `${base}maia/laptop.webp`, // same transparent MacBook frame
-      desktop: `${base}holo/screen-desktop.webp`,
-      mobile: `${base}holo/screen-mobile.webp`,
-      background: 'radial-gradient(90% 120% at 85% 0%, #3a1fa8 0%, rgba(58, 31, 168, 0) 60%), radial-gradient(120% 130% at 10% 100%, #5b21d6 0%, rgba(91, 33, 214, 0) 55%), #000131',
-      alt: 'Plateforme HoloMD : écran de connexion sur portable et écran d’accueil de l’application patient sur téléphone',
     },
   },
   {
@@ -135,14 +132,8 @@ export const projects: Project[] = [
     bg: '#032d32',
     accent: '#f36d64',
     cover: 33,
+    scene: { kind: 'laptop', alt: 'Site Maïa : page d’accueil sur portable et bloc « Restez connectée » sur téléphone' },
     details: ['identité de marque et guide de normes graphiques', "parcours d'acquisition web", 'expérience mobile optimisée'],
-    scene: {
-      laptop: `${base}maia/laptop.webp`,
-      desktop: `${base}maia/screen-desktop.webp`,
-      mobile: `${base}maia/screen-mobile.webp`,
-      pattern: `${base}maia/hex.svg`,
-      alt: 'Site Maïa : page Fournisseur sur portable et bloc « Restez connectée » sur téléphone',
-    },
     brand: {
       logo: `${base}maia/logo.svg`,
       pattern: `${base}maia/hex.svg`,
@@ -170,6 +161,7 @@ export const projects: Project[] = [
     bg: '#011331',
     accent: '#5b8dff',
     cover: 40,
+    scene: { kind: 'diagonal', alt: 'Bijouterie Lavigueur : page d’accueil de la montre Alpina découpée en diagonale et fiche produit mobile' },
     details: ['direction artistique et vision luxe', "l'expérience catalogue", 'habillage du tunnel de commande standardisé'],
   },
   {
@@ -182,6 +174,7 @@ export const projects: Project[] = [
     bg: '#600177',
     accent: '#ffa11f',
     cover: 47,
+    scene: { kind: 'stickers', alt: 'Intelli Jeunes : page d’accueil du portail éducatif avec mascotte, entourée de vignettes de jeux' },
     details: [
       'mascottes 3D et prompt engineering via Midjourney',
       'modules ludiques et outils enseignants',
@@ -198,6 +191,7 @@ export const projects: Project[] = [
     bg: '#08183a',
     accent: '#8c82ff',
     cover: 54,
+    scene: { kind: 'dash', alt: 'Staking Data : tableau de bord des actifs en perspective et écran d’alertes mobile' },
     details: ['gestion de portfolio unifiée', 'calculateur de gains intelligent', 'suivi des validateurs et alertes'],
   },
   {
@@ -210,6 +204,7 @@ export const projects: Project[] = [
     bg: '#162a54',
     accent: '#ff6b6b',
     cover: 61,
+    scene: { kind: 'bento', alt: 'Globalia : site corporatif et deux visuels de l’écosystème de marque en mosaïque' },
     details: [
       'refonte du site corporatif et études de cas',
       'écosystème social media, documents RH et outils de vente',

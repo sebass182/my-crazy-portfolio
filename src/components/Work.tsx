@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { gsap, ScrollTrigger, prefersReducedMotion, useGSAP } from '../lib/gsap'
-import { projects, mockupOf, altOf, type Project } from '../data/projects'
+import { projects, type Project } from '../data/projects'
+import Scene from './Scenes'
 
 const INK = '#0a0a0f'
 
@@ -167,28 +168,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
                 style={{ ['--accent' as string]: p.accent }}
               >
                 <div className="card__frame">
-                  {p.scene ? (
-                    <div
-                      className="scene"
-                      role="img"
-                      aria-label={p.scene.alt}
-                      style={p.scene.background ? { background: p.scene.background } : undefined}
-                    >
-                      {p.scene.pattern && <img className="scene__pattern" src={p.scene.pattern} alt="" draggable={false} />}
-                      <div className="scene__laptop">
-                        <img className="scene__screen" src={p.scene.desktop} alt="" draggable={false} decoding="async" />
-                        <img className="scene__device" src={p.scene.laptop} alt="" draggable={false} decoding="async" />
-                      </div>
-                      <div className="scene__phone">
-                        <img src={p.scene.mobile} alt="" draggable={false} decoding="async" />
-                      </div>
-                    </div>
-                  ) : (
-                    /* eager: in the slider these start off-screen to the right, where lazy-loading would show blanks */
-                    <img className="card__img" src={mockupOf(p)} alt="" draggable={false} decoding="async" />
-                  )}
-                  {/* swaps in on hover so each project shows something other than the shared laptop frame */}
-                  <img className="card__alt" src={altOf(p)} alt="" draggable={false} loading="lazy" decoding="async" />
+                  <Scene p={p} />
                 </div>
               </button>
               <div className="card__meta">
