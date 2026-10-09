@@ -168,8 +168,13 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
               >
                 <div className="card__frame">
                   {p.scene ? (
-                    <div className="scene" role="img" aria-label={p.scene.alt}>
-                      <img className="scene__pattern" src={p.scene.pattern} alt="" draggable={false} />
+                    <div
+                      className="scene"
+                      role="img"
+                      aria-label={p.scene.alt}
+                      style={p.scene.background ? { background: p.scene.background } : undefined}
+                    >
+                      {p.scene.pattern && <img className="scene__pattern" src={p.scene.pattern} alt="" draggable={false} />}
                       <div className="scene__laptop">
                         <img className="scene__screen" src={p.scene.desktop} alt="" draggable={false} decoding="async" />
                         <img className="scene__device" src={p.scene.laptop} alt="" draggable={false} decoding="async" />

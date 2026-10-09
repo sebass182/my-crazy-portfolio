@@ -388,3 +388,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid #fff; outline-offset:
   .pv__fonts { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { .scene__laptop, .scene__phone { transition: none; } }
+
+/* ───────── Case-study facts (role / agency / scope / tools) ───────── */
+.pv__meta { display: grid; grid-template-columns: repeat(4, auto); gap: 1.2rem 2.5rem; justify-content: start; margin-top: 2.4rem; padding-top: 1.4rem; border-top: 1px solid rgba(255, 255, 255, 0.25); }
+.pv__meta dt { font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+.pv__meta dd { margin-top: 0.4rem; max-width: 34ch; font-size: 0.98rem; line-height: 1.4; opacity: 0.9; }
+@media (max-width: 800px) { .pv__meta { grid-template-columns: 1fr 1fr; } .pv__meta div:nth-child(3) { grid-column: 1 / -1; } }

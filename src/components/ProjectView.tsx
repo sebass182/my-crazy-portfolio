@@ -127,6 +127,26 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
         <h2>{project.name}</h2>
         <p className="pv__tags">{project.tags}</p>
         <p className="pv__summary">{project.summary}</p>
+        {project.meta && (
+          <dl className="pv__meta">
+            <div>
+              <dt>Rôle</dt>
+              <dd>{project.meta.role}</dd>
+            </div>
+            <div>
+              <dt>Agence</dt>
+              <dd>{project.meta.agency}</dd>
+            </div>
+            <div>
+              <dt>Portée</dt>
+              <dd>{project.meta.scope}</dd>
+            </div>
+            <div>
+              <dt>Outils</dt>
+              <dd>{project.meta.tools}</dd>
+            </div>
+          </dl>
+        )}
       </header>
 
       {project.brand && (

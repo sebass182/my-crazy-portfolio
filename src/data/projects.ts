@@ -9,11 +9,15 @@ export type Project = {
   cover: number // first slide of the case study in the deck
   details: [string, string, string] // titles of the three detail slides, used as image descriptions
   scene?: Scene // when set, the Work card shows this composed scene instead of the flat deck mockup
+  meta?: Meta // role / agency / scope / tools, shown under the title
   brand?: Brand // when set, the case study opens with a brand panel (logo, palette, type, pattern)
 }
 
 // Real device frame + real screens exported from Figma, layered on the card
-export type Scene = { laptop: string; desktop: string; mobile: string; pattern: string; alt: string }
+export type Scene = { laptop: string; desktop: string; mobile: string; pattern?: string; background?: string; alt: string }
+
+// Read off each deck cover slide
+export type Meta = { role: string; agency: string; scope: string; tools: string }
 
 export type Brand = {
   logo: string
@@ -106,6 +110,19 @@ export const projects: Project[] = [
       'application patient et suivi thérapeutique à distance',
       'dashboard psychiatre et aide à la décision clinique',
     ],
+    meta: {
+      role: 'Lead Product Designer & Brand Strategist',
+      agency: 'Globalia',
+      scope: 'Branding 360° · Micro-site de financement · App patient (LLM chatbot) · SaaS clinique (RTM & billing)',
+      tools: 'Figma',
+    },
+    scene: {
+      laptop: `${base}maia/laptop.webp`, // same transparent MacBook frame
+      desktop: `${base}holo/screen-desktop.webp`,
+      mobile: `${base}holo/screen-mobile.webp`,
+      background: 'radial-gradient(90% 120% at 85% 0%, #3a1fa8 0%, rgba(58, 31, 168, 0) 60%), radial-gradient(120% 130% at 10% 100%, #5b21d6 0%, rgba(91, 33, 214, 0) 55%), #000131',
+      alt: 'Plateforme HoloMD : écran de connexion sur portable et écran d’accueil de l’application patient sur téléphone',
+    },
   },
   {
     slug: 'maia',
