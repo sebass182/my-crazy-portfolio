@@ -154,7 +154,7 @@ img { display: block; max-width: 100%; }
 
 /* ───────── About ───────── */
 .about { padding: 22vh var(--pad) 14vh; display: flex; flex-direction: column; gap: 14vh; }
-.about__top { display: grid; grid-template-columns: 1fr minmax(180px, 24vw); gap: 6vw; align-items: start; }
+.about__top { display: grid; grid-template-columns: 1fr minmax(220px, 30vw); gap: 6vw; align-items: start; }
 .about__text { font-size: clamp(1.7rem, 4.1vw, 4.6rem); font-weight: 700; line-height: 1.08; letter-spacing: -0.04em; color: var(--muted); }
 .about__text > div { position: relative; }
 .about__text > div::after {
@@ -165,8 +165,27 @@ img { display: block; max-width: 100%; }
   white-space: nowrap;
   clip-path: inset(0 calc(100% - var(--r, 0%)) 0 0);
 }
-.about__photo { overflow: hidden; border-radius: var(--radius); aspect-ratio: 4 / 5; position: sticky; top: 12vh; }
-.about__photo img { width: 100%; height: 115%; object-fit: cover; }
+/* the montage sits on the same pastel gradient as the hero; the photos float above it */
+.about__photo {
+  position: sticky;
+  top: 12vh;
+  isolation: isolate;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  border-radius: 24px;
+  background:
+    radial-gradient(62% 46% at 12% 14%, #f3ff2e 0%, rgba(243, 255, 46, 0) 70%),
+    radial-gradient(54% 44% at 92% 6%, #8ff4ff 0%, rgba(143, 244, 255, 0) 72%),
+    radial-gradient(72% 52% at 8% 100%, #ffcdbd 0%, rgba(255, 205, 189, 0) 70%),
+    radial-gradient(52% 42% at 96% 92%, #d3c8ff 0%, rgba(211, 200, 255, 0) 72%),
+    #ebe7e3;
+}
+.collage { position: absolute; inset: 0; will-change: transform; }
+.cp { position: absolute; will-change: transform; }
+.cp__s { will-change: transform; }
+.cp__f { overflow: hidden; border-radius: 7% / 5.4%; box-shadow: 0 24px 44px -20px rgba(10, 10, 15, 0.55); transform: rotate(var(--tilt, 0deg)); transition: transform 0.9s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.9s; }
+.cp__f img { display: block; width: 100%; height: auto; will-change: transform; }
+.cp:hover .cp__f { transform: rotate(0deg) scale(1.06); box-shadow: 0 34px 60px -24px rgba(10, 10, 15, 0.65); }
 .about__cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; }
 .about__col { padding-top: 0; }
 .about__col ul { list-style: none; margin-top: 1.2rem; display: grid; gap: 0.55rem; font-size: 1.05rem; line-height: 1.35; }
@@ -199,7 +218,7 @@ img { display: block; max-width: 100%; }
 /* ───────── Small screens ───────── */
 @media (max-width: 800px) {
   .about__top { grid-template-columns: 1fr; }
-  .about__photo { position: static; max-width: 280px; }
+  .about__photo { position: relative; max-width: 360px; }
   .about__cols { grid-template-columns: 1fr; gap: 2rem; }
   .xp__row { grid-template-columns: 1fr; gap: 0.3rem; }
 }
