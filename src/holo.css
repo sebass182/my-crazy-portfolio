@@ -1,0 +1,96 @@
+/* ═════════ Holo MD case study — built from text + Figma modules ═════════
+   Default layout is static (no JS / reduced motion). HoloCase adds .is-anim to switch the two
+   scrubbed sections (.hc-app, .hc-dash) to their pinned layout. */
+.hc { --gap: clamp(5rem, 14vh, 10rem); max-width: 1200px; margin: 0 auto; display: grid; gap: var(--gap); padding-bottom: 8vh; }
+.hc img { display: block; max-width: 100%; user-select: none; }
+.hc-tag { display: inline-block; font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+
+/* shared section header */
+.hc-sec__head { display: grid; gap: 1.1rem; max-width: 46ch; }
+.hc-sec__head h3 { font-size: clamp(2rem, 4.2vw, 4rem); font-weight: 700; line-height: 1; letter-spacing: -0.045em; }
+.hc-sec__head p { font-size: clamp(1.05rem, 1.5vw, 1.35rem); line-height: 1.5; opacity: 0.85; }
+
+/* hero visual */
+.hc-hero__frame { position: relative; overflow: hidden; aspect-ratio: 1600 / 1021; border-radius: 22px; box-shadow: 0 40px 80px -30px rgba(0, 0, 8, 0.7); }
+.hc-hero__img { position: absolute; left: 0; top: -6%; width: 100%; height: 112%; object-fit: cover; }
+
+/* context */
+.hc-intro { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(2rem, 6vw, 6rem); align-items: center; }
+.hc-lead { margin-top: 1.6rem; font-size: clamp(1.3rem, 2.4vw, 2.2rem); line-height: 1.32; letter-spacing: -0.012em; }
+.hc-photo { position: relative; isolation: isolate; }
+.hc-swoosh { position: absolute; z-index: -1; right: -22%; top: -14%; width: 100%; max-width: none; pointer-events: none; }
+.hc-photo__frame { overflow: hidden; aspect-ratio: 839 / 1080; border-radius: 22px; box-shadow: 0 40px 70px -30px rgba(0, 0, 8, 0.7); }
+.hc-photo__frame img { width: 100%; height: 100%; object-fit: cover; }
+
+/* goals */
+.hc-goals__head { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem 3rem; align-items: end; }
+.hc-goals__title { font-size: clamp(3rem, 7.5vw, 7rem); font-weight: 700; line-height: 0.95; letter-spacing: -0.055em; color: var(--accent); }
+.hc-goals__lead { font-size: clamp(1.1rem, 1.7vw, 1.55rem); line-height: 1.4; opacity: 0.92; max-width: 34ch; }
+.hc-goals ol { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 3vw, 3rem); margin-top: clamp(2.5rem, 7vh, 5.5rem); }
+.hc-goal { position: relative; padding-top: 1.5rem; }
+.hc-goal__line { position: absolute; left: 0; right: 0; top: 0; height: 1px; background: rgba(255, 255, 255, 0.32); transform-origin: left; }
+.hc-goal__n { display: block; font-family: var(--mono); color: var(--accent); }
+.hc-goal strong { display: block; margin: 0.7rem 0 0.6rem; font-size: 1.2rem; line-height: 1.3; font-weight: 600; }
+.hc-goal p { line-height: 1.55; opacity: 0.8; }
+
+/* 01 brand */
+.hc-brand { display: grid; gap: clamp(2.5rem, 7vh, 5rem); }
+.hc-brand__stage { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: clamp(1rem, 2.5vw, 2rem); align-items: start; }
+.hc-brand__site { width: 100%; border-radius: 16px; box-shadow: 0 40px 70px -28px rgba(0, 0, 8, 0.75); }
+.hc-brand__col { display: grid; gap: clamp(1rem, 2.5vw, 2rem); align-content: start; }
+.hc-brand__col--b { margin-top: clamp(2rem, 8vw, 6rem); }
+.hc-brand__card { width: 100%; border-radius: 16px; box-shadow: 0 30px 55px -24px rgba(0, 0, 8, 0.7); }
+.hc-brand__diamond { width: 78%; margin-left: auto; filter: drop-shadow(0 24px 30px rgba(0, 0, 8, 0.5)); }
+.hc-brand__tile { display: grid; place-items: center; aspect-ratio: 1; border-radius: 16px; background: radial-gradient(90% 90% at 30% 20%, #4a2bc4 0%, #1d0a6b 60%, #0b0446 100%); }
+.hc-brand__gem { width: 34%; }
+
+/* pinned sections (shared) */
+.hc-pin { display: grid; grid-template-columns: 0.75fr 1.35fr; grid-template-areas: 'head stage' 'steps stage'; align-content: center; column-gap: clamp(2rem, 5vw, 5rem); }
+.hc-pin > .hc-sec__head { grid-area: head; align-self: end; }
+.hc-pin > .hc-steps { grid-area: steps; align-self: start; }
+.hc-pin > .hc-app__stage, .hc-pin > .hc-dash__deck { grid-area: stage; align-self: center; }
+.hc-steps { list-style: none; display: grid; gap: 0.2rem; margin-top: clamp(1.5rem, 4vh, 2.8rem); padding-top: 1.2rem; border-top: 1px solid rgba(255, 255, 255, 0.25); }
+.hc-steps li { display: flex; gap: 1rem; align-items: baseline; padding: 0.45rem 0; font-size: 1.05rem; opacity: 0.4; transition: opacity 0.5s, color 0.5s, transform 0.5s; }
+.hc-steps li span { font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.1em; }
+.hc-steps li.is-on { opacity: 1; color: var(--accent); transform: translateX(6px); }
+
+/* 02 app — static: three phones in a row */
+.hc-app__stage { position: relative; display: flex; justify-content: center; align-items: center; gap: 3%; }
+.hc-ph { width: 31%; filter: drop-shadow(0 28px 34px rgba(0, 0, 8, 0.6)); }
+
+/* 03 dashboard — static: the three screens stacked in a list */
+.hc-dash__deck { position: relative; display: grid; gap: 1rem; }
+.hc-deck { width: 100%; border-radius: 14px; filter: drop-shadow(0 26px 34px rgba(0, 0, 8, 0.55)); }
+
+/* ── pinned layout (JS added .is-anim) ── */
+.is-anim .hc-app, .is-anim .hc-dash { height: 330vh; }
+.is-anim .hc-pin { position: sticky; top: 0; height: 100vh; }
+.is-anim .hc-app__stage { display: block; height: min(86vh, 64vw); }
+.is-anim .hc-ph { position: absolute; left: 50%; top: 50%; width: 40%; max-height: 92%; width: auto; height: 88%; will-change: transform; }
+.is-anim .hc-dash__deck { display: block; aspect-ratio: 2 / 1; perspective: 1600px; align-self: center; }
+.is-anim .hc-deck { position: absolute; inset: 0; height: 100%; will-change: transform; }
+
+/* tablets and phones: the text scrolls normally; only the step list and the screens stay pinned */
+@media (max-width: 800px) {
+  .hc-intro, .hc-goals__head { grid-template-columns: 1fr; }
+  .hc-goals ol { grid-template-columns: 1fr; }
+  .hc-brand__stage { grid-template-columns: 1fr 1fr; }
+  .hc-brand__site { grid-column: 1 / -1; }
+  .hc-brand__col--b { margin-top: 0; }
+  .hc-sec__head h3 { font-size: clamp(1.8rem, 8vw, 2.6rem); }
+
+  .hc-pin { display: block; }
+  .hc-steps { margin-top: 1.2rem; }
+  .hc-app__stage { gap: 2%; margin-top: 1.5rem; }
+  .is-anim .hc-app, .is-anim .hc-dash { height: 300vh; }
+  .is-anim .hc-pin { position: static; height: 100%; } /* full section height, so the sticky children can travel through all of it */
+  .is-anim .hc-steps { position: sticky; top: 3.4rem; z-index: 3; margin-top: 1.2rem; padding: 0.7rem 0 0.8rem; background: var(--pv-bg); }
+  .is-anim .hc-app__stage { position: sticky; top: 13.5rem; height: calc(100svh - 14.5rem); margin-top: 0; }
+  .is-anim .hc-ph { height: 84%; width: auto; }
+  .is-anim .hc-dash__deck { position: sticky; top: 13.5rem; aspect-ratio: 1 / 1; max-height: calc(100svh - 14.5rem); }
+  .is-anim .hc-deck { object-fit: cover; object-position: 28% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hc-steps li { transition: none; }
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { gsap, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import { projects, slidesOf, type Project } from '../data/projects'
+import HoloCase from './HoloCase'
 
 type Props = { project: Project; onClose: () => void; onNavigate: (p: Project) => void }
 
@@ -113,7 +114,7 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
       role="dialog"
       aria-modal="true"
       aria-label={project.name}
-      style={{ background: project.bg, ['--accent' as string]: project.accent }}
+      style={{ background: project.bg, ['--pv-bg' as string]: project.bg, ['--accent' as string]: project.accent }}
     >
       <button className="pv__close" ref={closeBtn} onClick={close} aria-label="Fermer l'étude de cas">
         Fermer <span aria-hidden="true">✕</span>
@@ -181,20 +182,24 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
         </section>
       )}
 
-      <div className="pv__slides">
-        {slidesOf(project).map((s) => (
-          <img
-            className="pv__slide"
-            key={s.src}
-            src={s.src}
-            alt={s.alt}
-            width={1920}
-            height={1080}
-            loading="lazy"
-            decoding="async"
-          />
-        ))}
-      </div>
+      {project.story === 'holo' ? (
+        <HoloCase key={project.slug} />
+      ) : (
+        <div className="pv__slides">
+          {slidesOf(project).map((s) => (
+            <img
+              className="pv__slide"
+              key={s.src}
+              src={s.src}
+              alt={s.alt}
+              width={1920}
+              height={1080}
+              loading="lazy"
+              decoding="async"
+            />
+          ))}
+        </div>
+      )}
 
       <button className="pv__next" onClick={() => onNavigate(next)}>
         <span>Projet suivant</span>

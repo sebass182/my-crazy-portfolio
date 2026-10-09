@@ -71,18 +71,13 @@ export default function Scene({ p }: { p: Project }) {
         />,
       )
 
-    // Holo MD — the product modules from Figma, floating at different depths
-    case 'modules':
+    // Holo MD — two objects, no clutter: the sign-in screen and the patient app's first screen
+    case 'login':
       return wrap(
         <Layers
           items={[
-            { src: c('doctor'), cls: 'sc-mod__doctor' },
-            { src: c('dash'), cls: 'sc-mod__dash' },
-            { src: c('phone-welcome'), cls: 'sc-mod__welcome' },
-            { src: c('phone-chat'), cls: 'sc-mod__chat' },
-            { src: c('drcard'), cls: 'sc-mod__drcard' },
-            { src: c('diamond'), cls: 'sc-mod__diamond' },
-            { src: card(p.slug, 'gem', 'svg'), cls: 'sc-mod__gem' },
+            { src: c('login'), cls: 'sc-login__screen' },
+            { src: c('phone-welcome'), cls: 'sc-login__phone' },
           ]}
         />,
       )

@@ -33,19 +33,12 @@
 .card__open:hover .sc-posters__b, .card__open:focus-visible .sc-posters__b { transform: translateY(5%) rotate(0.5deg); }
 .card__open:hover .sc-posters__c, .card__open:focus-visible .sc-posters__c { transform: translateY(-5%) rotate(5.5deg); }
 
-/* 4 · Holo MD — Figma modules floating at different depths */
-.scene--modules { background: radial-gradient(90% 120% at 85% 0%, #3a1fa8 0%, rgba(58, 31, 168, 0) 60%), radial-gradient(120% 130% at 10% 100%, #5b21d6 0%, rgba(91, 33, 214, 0) 55%), #000131; }
-.sc-mod__doctor { left: -6%; top: 6%; width: 56%; border-radius: 1.4%; filter: drop-shadow(0 24px 30px rgba(0, 0, 8, 0.55)); opacity: 0.9; transform: rotate(-4deg); }
-.sc-mod__dash { right: -8%; top: 36%; width: 54%; border-radius: 1.4%; filter: drop-shadow(0 24px 30px rgba(0, 0, 8, 0.55)); transform: rotate(3deg); }
-.sc-mod__welcome { z-index: 2; left: 41%; top: 9%; width: 16%; filter: drop-shadow(0 26px 30px rgba(0, 0, 8, 0.6)); }
-.sc-mod__chat { z-index: 1; left: 58.5%; top: 17%; width: 14%; filter: drop-shadow(0 24px 28px rgba(0, 0, 8, 0.6)); transform: rotate(4deg); }
-.sc-mod__drcard { z-index: 3; left: 6%; bottom: -9%; width: 15%; filter: drop-shadow(0 24px 28px rgba(0, 0, 8, 0.6)); transform: rotate(-6deg); }
-.sc-mod__diamond { z-index: 1; right: 5%; top: -4%; width: 13%; filter: drop-shadow(0 20px 24px rgba(0, 0, 8, 0.5)); transform: rotate(8deg); }
-.sc-mod__gem { z-index: 3; left: 36%; bottom: 8%; width: 6%; }
-.card__open:hover .sc-mod__welcome, .card__open:focus-visible .sc-mod__welcome { transform: translateY(-5%); }
-.card__open:hover .sc-mod__chat, .card__open:focus-visible .sc-mod__chat { transform: translateY(-8%) rotate(6deg); }
-.card__open:hover .sc-mod__drcard, .card__open:focus-visible .sc-mod__drcard { transform: translateY(-7%) rotate(-3deg); }
-.card__open:hover .sc-mod__gem, .card__open:focus-visible .sc-mod__gem { transform: scale(1.5) rotate(20deg); }
+/* 4 · Holo MD — sign-in screen and the first app screen, nothing else */
+.scene--login { background: radial-gradient(90% 120% at 85% 0%, #3a1fa8 0%, rgba(58, 31, 168, 0) 60%), radial-gradient(120% 130% at 10% 100%, #5b21d6 0%, rgba(91, 33, 214, 0) 55%), #000131; }
+.sc-login__screen { left: 7%; top: 13%; width: 64%; border-radius: 1.8% / 2.8%; box-shadow: 0 36px 60px -22px rgba(0, 0, 8, 0.75); }
+.sc-login__phone { right: 8%; top: 9%; width: 25%; filter: drop-shadow(0 30px 36px rgba(0, 0, 8, 0.6)); }
+.card__open:hover .sc-login__screen, .card__open:focus-visible .sc-login__screen { transform: translateX(-2%); }
+.card__open:hover .sc-login__phone, .card__open:focus-visible .sc-login__phone { transform: translateY(-4%); }
 
 /* 5 · Maïa — the only laptop. Transparent frame; the screen sits in its see-through area (1141×713 at 180,162 of 1500×1110) */
 .scene--laptop { background: radial-gradient(120% 130% at 18% 0%, #0b4a52 0%, #032d32 52%, #011c1f 100%); }

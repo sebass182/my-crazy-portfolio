@@ -9,12 +9,13 @@ export type Project = {
   cover: number // first slide of the case study in the deck
   details: [string, string, string] // titles of the three detail slides, used as image descriptions
   scene?: Scene // when set, the Work card shows this composed scene instead of the flat deck mockup
+  story?: 'holo' // a hand-built case-study page replaces the deck slides
   meta?: Meta // role / agency / scope / tools, shown under the title
   brand?: Brand // when set, the case study opens with a brand panel (logo, palette, type, pattern)
 }
 
 // Each Work card has its own composition (see components/Scenes.tsx)
-export type SceneKind = 'bleed' | 'tilt' | 'posters' | 'modules' | 'laptop' | 'diagonal' | 'stickers' | 'dash' | 'bento'
+export type SceneKind = 'bleed' | 'tilt' | 'posters' | 'login' | 'laptop' | 'diagonal' | 'stickers' | 'dash' | 'bento'
 export type Scene = { kind: SceneKind; alt: string }
 
 // Read off each deck cover slide
@@ -108,7 +109,8 @@ export const projects: Project[] = [
     bg: '#000131',
     accent: '#7b6dff',
     cover: 26,
-    scene: { kind: 'modules', alt: 'Holo MD : tableaux de bord cliniques, écrans de l’application patient, carte du Dr Holo et losange de marque' },
+    scene: { kind: 'login', alt: 'Holo MD : écran de connexion de la plateforme et écran d’accueil « Welcome » de l’application patient' },
+    story: 'holo',
     details: [
       "branding global, brandbook et vitrine d'investissement",
       'application patient et suivi thérapeutique à distance',
