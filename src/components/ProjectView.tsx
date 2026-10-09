@@ -41,7 +41,7 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
             opacity: 0,
             duration: 0.9,
             ease: 'power3.out',
-            scrollTrigger: { trigger: '.pv__brand', scroller, start: 'top 80%', toggleActions: 'play none none none' },
+            scrollTrigger: { trigger: '.pv__brand', scroller, start: 'top 80%', end: 'bottom top', toggleActions: 'play reverse play reverse' },
             ...vars,
           })
         reveal('.pv__brand-logo')
@@ -55,7 +55,7 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
           opacity: 0,
           duration: 0.9,
           ease: 'power3.out',
-          scrollTrigger: { trigger: s, scroller, start: 'top 92%', toggleActions: 'play none none none' },
+          scrollTrigger: { trigger: s, scroller, start: 'top 92%', end: 'bottom top', toggleActions: 'play reverse play reverse' },
         }),
       )
     },

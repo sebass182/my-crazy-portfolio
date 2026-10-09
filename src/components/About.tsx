@@ -57,7 +57,7 @@ export default function About() {
           clipPath: 'inset(0% 0 0 0)',
           ease: 'power3.out',
           duration: 1.2,
-          scrollTrigger: { trigger: '.about__photo', start: 'top 85%' },
+          scrollTrigger: { trigger: '.about__photo', start: 'top 85%', toggleActions: 'play none none reverse' },
         },
       )
       gsap.to('.about__photo img', {
@@ -72,7 +72,7 @@ export default function About() {
         duration: 0.8,
         stagger: 0.08,
         ease: 'power3.out',
-        scrollTrigger: { trigger: '.about__cols', start: 'top 85%' },
+        scrollTrigger: { trigger: '.about__cols', start: 'top 85%', end: 'bottom top', toggleActions: 'play reverse play reverse' },
       })
     },
     { scope: root },

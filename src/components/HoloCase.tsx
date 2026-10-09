@@ -117,15 +117,24 @@ export default function HoloCase() {
 
       const q = <T extends Element>(sel: string) => el.querySelector<T>(sel)!
       const all = <T extends Element>(sel: string, from: ParentNode = el) => gsap.utils.toArray<T>(sel, from)
-      const once = (trigger: Element, start = 'top 85%') => ({ trigger, scroller, start, once: true })
-      const rise = (targets: gsap.TweenTarget, trigger: Element, start?: string, extra: gsap.TweenVars = {}) =>
-        gsap.from(targets, { y: 28, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, scrollTrigger: once(trigger, start), ...extra })
+      // Plays when the trigger scrolls into view from EITHER direction and rewinds when it leaves,
+      // so the animation can be watched again on the way back up. Sticky triggers (the stacking cards) stay on screen
+      // while "scrolled past", so they only rewind when you go back above their start.
+      const view = (trigger: Element, start = 'top 85%', sticky = false) => ({
+        trigger,
+        scroller,
+        start,
+        end: 'bottom top',
+        toggleActions: sticky ? 'play none none reverse' : 'play reverse play reverse',
+      })
+      const rise = (targets: gsap.TweenTarget, trigger: Element, start?: string, extra: gsap.TweenVars = {}, sticky = false) =>
+        gsap.from(targets, { y: 28, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, scrollTrigger: view(trigger, start, sticky), ...extra })
 
       /* Hero: the sign-in screen opens like a curtain */
       gsap.fromTo(
         q('.hc-hero__frame'),
         { clipPath: 'inset(100% 0 0 0)' },
-        { clipPath: 'inset(0% 0 0 0)', duration: 1.3, ease: 'expo.out', scrollTrigger: once(q('.hc-hero'), 'top 92%') },
+        { clipPath: 'inset(0% 0 0 0)', duration: 1.3, ease: 'expo.out', scrollTrigger: view(q('.hc-hero'), 'top 92%') },
       )
 
       /* Context */
@@ -134,17 +143,17 @@ export default function HoloCase() {
         mask: 'lines',
         autoSplit: true,
         onSplit: (self) =>
-          gsap.from(self.lines, { yPercent: 110, duration: 1, stagger: 0.08, ease: 'expo.out', scrollTrigger: once(q('.hc-intro'), 'top 78%') }),
+          gsap.from(self.lines, { yPercent: 110, duration: 1, stagger: 0.08, ease: 'expo.out', scrollTrigger: view(q('.hc-intro'), 'top 78%') }),
       })
       gsap.fromTo(
         q('.hc-photo'),
         { clipPath: 'inset(0 0 100% 0)' },
-        { clipPath: 'inset(0 0 0% 0)', duration: 1.2, ease: 'expo.out', scrollTrigger: once(q('.hc-photo'), 'top 88%') },
+        { clipPath: 'inset(0 0 0% 0)', duration: 1.2, ease: 'expo.out', scrollTrigger: view(q('.hc-photo'), 'top 88%') },
       )
 
       /* Goals: three cards that stack. Each one is sticky; the next slides over it while the covered card
          steps back (scale + shade) and its art drifts up — depth from a single scroll. */
-      rise(q('.hc-goals__head').children, q('.hc-goals'))
+      rise(q('.hc-goals__head').children, q('.hc-goals__head'))
       const stack = all<HTMLElement>('.hc-goal')
       stack.forEach((li, i) => {
         const card = li.querySelector<HTMLElement>('.hc-goal__card')!
@@ -157,7 +166,7 @@ export default function HoloCase() {
         gsap.fromTo(li, { rotate: i % 2 ? -2.2 : 2.2 }, { rotate: 0, ease: 'none', scrollTrigger: { trigger: li, scroller, start: 'top bottom', end: `top ${stuckAt + 160}px`, scrub: true } })
         gsap.fromTo(art, { y: 110 }, { y: 0, ease: 'none', scrollTrigger: { trigger: li, scroller, start: 'top bottom', end: `top ${stuckAt}px`, scrub: true } })
         gsap.fromTo(ghost, { y: 70 }, { y: -40, ease: 'none', scrollTrigger: { trigger: li, scroller, start: 'top bottom', end: 'bottom top', scrub: true } })
-        rise(li.querySelectorAll('.hc-goal__n, strong, p'), li, 'top 80%')
+        rise(li.querySelectorAll('.hc-goal__n, strong, p'), li, 'top 80%', {}, true)
 
         // being covered by the next card
         const next = stack[i + 1]
@@ -192,7 +201,7 @@ export default function HoloCase() {
           duration: 1.2,
           ease: 'expo.out',
           stagger: 0.09,
-          scrollTrigger: once(slide, 'top 72%'),
+          scrollTrigger: view(slide, 'top 72%'),
         })
 
         // scroll parallax: the deeper the layer, the further it travels

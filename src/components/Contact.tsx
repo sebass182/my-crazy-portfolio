@@ -18,7 +18,7 @@ export default function Contact() {
             duration: 1,
             stagger: 0.1,
             ease: 'expo.out',
-            scrollTrigger: { trigger: '.contact__title', start: 'top 85%' },
+            scrollTrigger: { trigger: '.contact__title', start: 'top 85%', end: 'bottom top', toggleActions: 'play reverse play reverse' },
           }),
       })
 

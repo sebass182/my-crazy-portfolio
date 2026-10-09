@@ -72,7 +72,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
             opacity: 0,
             stagger: 0.08,
             ease: 'power3.out',
-            scrollTrigger: { trigger: card, containerAnimation: scroll, start: 'left 85%', toggleActions: 'play none none reverse' },
+            scrollTrigger: { trigger: card, containerAnimation: scroll, start: 'left 85%', end: 'right left', toggleActions: 'play reverse play reverse' },
           })
         })
       })
@@ -107,7 +107,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
               clipPath: 'inset(0 0 0% 0)',
               duration: 1.2,
               ease: 'expo.out',
-              scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none reverse' },
+              scrollTrigger: { trigger: card, start: 'top 88%', end: 'bottom top', toggleActions: 'play reverse play reverse' },
             },
           )
           gsap.from(card.querySelectorAll('.card__meta > *'), {
@@ -116,7 +116,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
             duration: 0.9,
             stagger: 0.08,
             ease: 'power3.out',
-            scrollTrigger: { trigger: card, start: 'top 75%', toggleActions: 'play none none reverse' },
+            scrollTrigger: { trigger: card, start: 'top 75%', end: 'bottom top', toggleActions: 'play reverse play reverse' },
           })
         })
 
@@ -127,7 +127,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
           duration: 1,
           stagger: 0.12,
           ease: 'power3.out',
-          scrollTrigger: { trigger: q('.work__intro'), start: 'top 85%' },
+          scrollTrigger: { trigger: q('.work__intro'), start: 'top 85%', end: 'bottom top', toggleActions: 'play reverse play reverse' },
         })
       })
 
