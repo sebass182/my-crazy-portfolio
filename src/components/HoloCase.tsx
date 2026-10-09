@@ -1,34 +1,96 @@
 import { useRef } from 'react'
-import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
+import { gsap, ScrollTrigger, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 
 const base = import.meta.env.BASE_URL
-const m = (file: string) => `${base}cards/holo-md/${file}`
+const src = (file: string) => `${base}cards/holo-md/${file}`
 
-// Copy comes word for word from the deck slides; the screens and cards are the Figma modules.
+// Every image carries its real size so the browser reserves the space before it loads.
+// (Without it the page jumped ~500px when images arrived and the scroll triggers fired in the wrong place.)
+const IMG = {
+  login: ['login.webp', 1600, 1021],
+  woman: ['woman.webp', 839, 1080],
+  site: ['microsite.webp', 900, 1289],
+  drcard: ['drcard.webp', 420, 846],
+  bruce: ['bruce.webp', 360, 574],
+  diamond: ['diamond.webp', 429, 735],
+  gem: ['gem.svg', 40, 38],
+  welcome: ['phone-welcome.webp', 520, 1127],
+  chat: ['phone-chat.webp', 520, 1127],
+  history: ['phone-history.webp', 520, 1127],
+  dash: ['dash.webp', 1100, 550],
+  patient: ['patient.webp', 1100, 550],
+  doctor: ['doctor.webp', 1100, 550],
+} as const
+
+function Pic({ k, alt, className }: { k: keyof typeof IMG; alt: string; className?: string }) {
+  const [file, w, h] = IMG[k]
+  return <img className={className} src={src(file)} width={w} height={h} alt={alt} decoding="async" draggable={false} />
+}
+
+// Copy is word for word from the deck slides.
 const goals = [
   {
     n: '01',
-    title: "Forger l'identité de marque et le micro-site d'investissement :",
+    title: "Forger l'identité de marque et le micro-site d'investissement",
     text: 'Déployer le logo, la charte visuelle et le site vitrine pour présenter la vision technologique aux investisseurs et cliniques.',
   },
   {
     n: '02',
-    title: "Concevoir l'app patient et l'assistant IA (Dr. Holo™) :",
+    title: "Concevoir l'app patient et l'assistant IA (Dr. Holo™)",
     text: 'Structurer une interface mobile empathique réalisant un suivi RTM quotidien via SMS/chat conversationnel.',
   },
   {
     n: '03',
-    title: 'Développer le dashboard clinique et la facturation RTM :',
+    title: 'Développer le dashboard clinique et la facturation RTM',
     text: "Bâtir un outil d'aide à la décision centralisant les métriques de santé mentale et l'intégration des codes de remboursement.",
   },
 ]
 
-// Short labels read off the screens themselves
+// Short labels read off the screens
 const appSteps = ['Onboarding sécurisé', 'Échanges avec Dr. Holo', 'Historique des symptômes']
 const dashSteps = ["Vue d'ensemble des patients", "Fiche patient et historique d'humeur", 'Profil du médecin et liste des patients']
 
+function Eyebrow({ n, label }: { n: string; label: string }) {
+  return (
+    <span className="hc-eyebrow">
+      <img src={src('gem.svg')} width={14} height={13} alt="" />
+      {n} — {label}
+    </span>
+  )
+}
+
+function Steps({ items, onPick, label }: { items: string[]; onPick: (i: number) => void; label: string }) {
+  return (
+    <ol className="hc-steps" aria-label={label}>
+      {items.map((s, i) => (
+        <li key={s}>
+          <button type="button" onClick={() => onPick(i)}>
+            <span>{String(i + 1).padStart(2, '0')}</span>
+            {s}
+          </button>
+        </li>
+      ))}
+    </ol>
+  )
+}
+
 export default function HoloCase() {
   const root = useRef<HTMLDivElement>(null)
+
+  // Clicking a step jumps to it: scroll to that third of the pinned section (or just show the item when motion is off)
+  const jump = (sel: string, i: number) => {
+    const el = root.current
+    const scroller = el?.closest<HTMLElement>('.pv__scroll')
+    const section = el?.querySelector<HTMLElement>(sel)
+    if (!el || !scroller || !section) return
+    if (prefersReducedMotion()) {
+      section.querySelectorAll('.hc-item')[i]?.scrollIntoView({ block: 'center' })
+      return
+    }
+    const top = section.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop
+    const travel = section.offsetHeight - scroller.clientHeight
+    scroller.scrollTo({ top: top + ((i + 0.5) / 3) * travel, behavior: 'smooth' })
+  }
 
   useGSAP(
     () => {
@@ -37,155 +99,118 @@ export default function HoloCase() {
       const el = root.current!
       const scroller = el.closest<HTMLElement>('.pv__scroll')
       if (!scroller) return
-      el.classList.add('is-anim') // switches the two scrubbed sections to their sticky, stacked layout
 
       const q = <T extends Element>(sel: string) => el.querySelector<T>(sel)!
       const all = <T extends Element>(sel: string) => gsap.utils.toArray<T>(sel, el)
-      const enter = (trigger: Element, start = 'top 85%') => ({ trigger, scroller, start, toggleActions: 'play none none none' })
-      const scrub = (trigger: Element, extra = {}) => ({ trigger, scroller, start: 'top bottom', end: 'bottom top', scrub: true, ...extra })
+      const once = (trigger: Element, start = 'top 85%') => ({ trigger, scroller, start, once: true })
 
-      /* ── Hero: the login screen wipes open, the image drifts inside its frame ── */
+      // Reveal helper: a short, quiet rise. Used everywhere so the page moves with one voice.
+      const rise = (targets: gsap.TweenTarget, trigger: Element, start?: string, extra: gsap.TweenVars = {}) =>
+        gsap.from(targets, { y: 28, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, scrollTrigger: once(trigger, start), ...extra })
+
+      /* ── Hero: the sign-in screen opens like a curtain, the image drifts a touch ── */
       gsap.fromTo(
         q('.hc-hero__frame'),
         { clipPath: 'inset(100% 0 0 0)' },
-        { clipPath: 'inset(0% 0 0 0)', duration: 1.4, ease: 'expo.out', scrollTrigger: enter(q('.hc-hero'), 'top 92%') },
+        { clipPath: 'inset(0% 0 0 0)', duration: 1.3, ease: 'expo.out', scrollTrigger: once(q('.hc-hero'), 'top 92%') },
       )
-      gsap.fromTo(q('.hc-hero__img'), { yPercent: -5 }, { yPercent: 5, ease: 'none', scrollTrigger: scrub(q('.hc-hero')) })
+      gsap.fromTo(
+        q('.hc-hero__img'),
+        { yPercent: -4 },
+        { yPercent: 4, ease: 'none', scrollTrigger: { trigger: q('.hc-hero'), scroller, start: 'top bottom', end: 'bottom top', scrub: true } },
+      )
 
-      /* ── Context: lead text rises line by line, photo wipes open, the brand line drifts ── */
+      /* ── Context ── */
       SplitText.create('.hc-lead', {
         type: 'lines',
         mask: 'lines',
         autoSplit: true,
         onSplit: (self) =>
-          gsap.from(self.lines, { yPercent: 110, duration: 1, stagger: 0.09, ease: 'expo.out', scrollTrigger: enter(q('.hc-intro'), 'top 78%') }),
+          gsap.from(self.lines, { yPercent: 110, duration: 1, stagger: 0.08, ease: 'expo.out', scrollTrigger: once(q('.hc-intro'), 'top 78%') }),
       })
       gsap.fromTo(
-        q('.hc-photo__frame'),
+        q('.hc-photo'),
         { clipPath: 'inset(0 0 100% 0)' },
-        { clipPath: 'inset(0 0 0% 0)', duration: 1.3, ease: 'expo.out', scrollTrigger: enter(q('.hc-photo'), 'top 85%') },
+        { clipPath: 'inset(0 0 0% 0)', duration: 1.2, ease: 'expo.out', scrollTrigger: once(q('.hc-photo'), 'top 88%') },
       )
-      gsap.fromTo(q('.hc-swoosh'), { yPercent: 8, rotate: -4 }, { yPercent: -8, rotate: 4, ease: 'none', scrollTrigger: scrub(q('.hc-intro')) })
 
-      /* ── Goals: heading, lead, then each objective draws its rule and rises ── */
-      gsap.from(['.hc-goals__title', '.hc-goals__lead'].map((s) => q(s)), {
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.12,
-        ease: 'power3.out',
-        scrollTrigger: enter(q('.hc-goals')),
-      })
+      /* ── Goals ── */
+      rise(q('.hc-goals__head').children, q('.hc-goals'))
       all('.hc-goal').forEach((g, i) => {
-        const tl = gsap.timeline({ scrollTrigger: enter(g, 'top 88%'), delay: i * 0.08 })
-        tl.from(g.querySelector('.hc-goal__line'), { scaleX: 0, duration: 1, ease: 'expo.out' })
-          .from(g.querySelectorAll('.hc-goal__n, strong, p'), { y: 30, opacity: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out' }, 0.15)
+        gsap.from(g.querySelector('.hc-goal__line'), { scaleX: 0, duration: 1, ease: 'expo.out', delay: i * 0.08, scrollTrigger: once(g, 'top 90%') })
+        rise(g.querySelectorAll('.hc-goal__n, strong, p'), g, 'top 90%', { delay: 0.12 + i * 0.08 })
       })
 
-      /* ── 01 Brand: header, the microsite and the cards slide into a clean grid ── */
-      gsap.from(q('.hc-brand .hc-sec__head').children, { y: 50, opacity: 0, duration: 1, stagger: 0.1, ease: 'power3.out', scrollTrigger: enter(q('.hc-brand')) })
-      gsap.fromTo(q('.hc-brand__site'), { yPercent: 7 }, { yPercent: -7, ease: 'none', scrollTrigger: scrub(q('.hc-brand__stage')) })
-      gsap.from(all('.hc-brand__card'), {
-        x: 70,
-        opacity: 0,
-        duration: 1.1,
-        stagger: 0.15,
-        ease: 'expo.out',
-        scrollTrigger: enter(q('.hc-brand__stage'), 'top 75%'),
-      })
-      gsap.fromTo(q('.hc-brand__diamond'), { rotate: -14, yPercent: 6 }, { rotate: 6, yPercent: -6, ease: 'none', scrollTrigger: scrub(q('.hc-brand__stage')) })
-      gsap.fromTo(q('.hc-brand__gem'), { rotate: -90, scale: 0.7 }, { rotate: 90, scale: 1.1, ease: 'none', scrollTrigger: scrub(q('.hc-brand__stage')) })
+      /* ── 01 Brand: the grid assembles itself ── */
+      rise(q('.hc-brand .hc-sec__head').children, q('.hc-brand'))
+      gsap.from(q('.hc-bento__site'), { clipPath: 'inset(0 0 100% 0)', duration: 1.3, ease: 'expo.out', scrollTrigger: once(q('.hc-bento'), 'top 82%') })
+      rise(all('.hc-bento > :not(.hc-bento__site)'), q('.hc-bento'), 'top 78%', { delay: 0.2 })
 
-      /* ── 02 Patient app: pinned. Three screens take the centre one after the other ── */
-      {
-        const section = q('.hc-app')
-        const [welcome, chat, history] = all<HTMLElement>('.hc-ph')
-        const steps = all<HTMLElement>('.hc-app .hc-steps li')
-        gsap.set([welcome, chat, history], { xPercent: -50, yPercent: -50 })
-        const center = { xPercent: -50, scale: 1, opacity: 1 }
-        const left = { xPercent: -135, scale: 0.78, opacity: 0.45 }
-        const farLeft = { xPercent: -215, scale: 0.6, opacity: 0 }
-        const right = { xPercent: 35, scale: 0.78, opacity: 0.45 }
-        const farRight = { xPercent: 115, scale: 0.6, opacity: 0 }
-        gsap.set(welcome, center)
-        gsap.set(chat, right)
-        gsap.set(history, farRight)
-        const tl = gsap.timeline({
-          defaults: { ease: 'power2.inOut', duration: 1 },
-          scrollTrigger: {
-            trigger: section,
-            scroller,
-            start: 'top top',
-            end: 'bottom bottom',
-            scrub: 0.6,
-            onUpdate: (self) => {
-              const i = self.progress < 0.36 ? 0 : self.progress < 0.7 ? 1 : 2
-              steps.forEach((s, k) => s.classList.toggle('is-on', k === i))
-            },
+      /* ── Pinned sections: one step per third of the scroll, played as a short tween (not scrubbed) ── */
+      const pinned = (sel: string, apply: (i: number, instant: boolean) => void) => {
+        const section = q<HTMLElement>(sel)
+        const steps = all<HTMLElement>(`${sel} .hc-steps li`)
+        let current = -1
+        const show = (i: number, instant = false) => {
+          if (i === current) return
+          current = i
+          steps.forEach((s, k) => s.classList.toggle('is-on', k === i))
+          apply(i, instant)
+        }
+        show(0, true)
+        ScrollTrigger.create({
+          trigger: section,
+          scroller,
+          start: 'top top',
+          end: 'bottom bottom',
+          onUpdate: (self) => {
+            section.style.setProperty('--p', self.progress.toFixed(4)) // drives the progress line
+            show(Math.min(2, Math.floor(self.progress * 3)))
           },
         })
-        tl.to({}, { duration: 0.3 })
-          .to(welcome, left, '>')
-          .to(chat, center, '<')
-          .to(history, right, '<')
-          .to({}, { duration: 0.3 })
-          .to(welcome, farLeft, '>')
-          .to(chat, left, '<')
-          .to(history, center, '<')
-          .to({}, { duration: 0.3 })
-        steps[0].classList.add('is-on')
+        rise(section.querySelector('.hc-sec__head')!.children, section, 'top 70%')
       }
 
-      /* ── 03 Dashboard: pinned. The three clinical screens peel off the deck one by one ── */
-      {
-        const section = q('.hc-dash')
-        const [a, b, c] = all<HTMLElement>('.hc-deck')
-        const steps = all<HTMLElement>('.hc-dash .hc-steps li')
-        const front = { yPercent: 0, scale: 1, opacity: 1, rotateX: 0 }
-        const second = { yPercent: 9, scale: 0.94, opacity: 0.85, rotateX: 0 }
-        const third = { yPercent: 18, scale: 0.88, opacity: 0.55, rotateX: 0 }
-        const gone = { yPercent: -28, scale: 1.04, opacity: 0, rotateX: 14 }
-        gsap.set([a, b, c], { transformOrigin: '50% 100%' })
-        gsap.set(a, front)
-        gsap.set(b, second)
-        gsap.set(c, third)
-        const tl = gsap.timeline({
-          defaults: { ease: 'power2.inOut', duration: 1 },
-          scrollTrigger: {
-            trigger: section,
-            scroller,
-            start: 'top top',
-            end: 'bottom bottom',
-            scrub: 0.6,
-            onUpdate: (self) => {
-              const i = self.progress < 0.36 ? 0 : self.progress < 0.7 ? 1 : 2
-              steps.forEach((s, k) => s.classList.toggle('is-on', k === i))
-            },
-          },
-        })
-        tl.to({}, { duration: 0.3 })
-          .to(a, gone, '>')
-          .to(b, front, '<')
-          .to(c, second, '<')
-          .to({}, { duration: 0.3 })
-          .to(b, gone, '>')
-          .to(c, front, '<')
-          .to({}, { duration: 0.3 })
-        steps[0].classList.add('is-on')
-      }
+      // Patient app: the screen in focus sits in the middle, its neighbours step back.
+      const phones = all<HTMLElement>('.hc-app .hc-ph')
+      gsap.set(phones, { xPercent: -50, yPercent: -50 })
+      pinned('.hc-app', (i, instant) =>
+        phones.forEach((p, k) => {
+          const d = k - i
+          gsap.to(p, {
+            xPercent: -50 + d * 88,
+            scale: d === 0 ? 1 : 0.72,
+            opacity: d === 0 ? 1 : Math.abs(d) === 1 ? 0.35 : 0,
+            zIndex: 3 - Math.abs(d),
+            duration: instant ? 0 : 0.9,
+            ease: 'expo.out',
+            overwrite: 'auto',
+          })
+        }),
+      )
 
-      for (const sel of ['.hc-app', '.hc-dash']) {
-        gsap.from(q(`${sel} .hc-sec__head`).children, {
-          y: 40,
-          opacity: 0,
-          duration: 1,
-          stagger: 0.08,
-          ease: 'power3.out',
-          scrollTrigger: enter(q(sel), 'top 60%'),
-        })
-      }
+      // Dashboard: one screen at a time inside a fixed frame; the next slides up, the last lifts away.
+      const decks = all<HTMLElement>('.hc-dash .hc-deck')
+      pinned('.hc-dash', (i, instant) =>
+        decks.forEach((d, k) => {
+          const rel = k - i
+          gsap.to(d, {
+            opacity: rel === 0 ? 1 : 0,
+            yPercent: rel === 0 ? 0 : rel < 0 ? -6 : 6,
+            scale: rel === 0 ? 1 : 0.97,
+            duration: instant ? 0 : 0.8,
+            ease: 'power3.out',
+            overwrite: 'auto',
+          })
+        }),
+      )
 
-      return () => el.classList.remove('is-anim')
+      // The page is now at its final size: measure every trigger again once the images are decoded.
+      let alive = true
+      Promise.all([...el.querySelectorAll('img')].map((img) => img.decode().catch(() => {}))).then(() => alive && ScrollTrigger.refresh())
+      return () => {
+        alive = false
+      }
     },
     { scope: root },
   )
@@ -195,14 +220,14 @@ export default function HoloCase() {
       {/* Hero visual */}
       <section className="hc-hero" aria-label="Écran de connexion de la plateforme Holo MD">
         <div className="hc-hero__frame">
-          <img className="hc-hero__img" src={m('login.webp')} alt="Écran de connexion Holo MD : « Imagine a New Era of AI-Powered Psychiatric Care »" />
+          <Pic k="login" className="hc-hero__img" alt="Écran de connexion Holo MD : « Imagine a New Era of AI-Powered Psychiatric Care »" />
         </div>
       </section>
 
       {/* Context */}
       <section className="hc-intro" aria-label="Contexte du projet">
         <div>
-          <span className="hc-tag">À propos</span>
+          <span className="hc-eyebrow">À propos</span>
           <p className="hc-lead">
             Projet d'innovation pour des leaders de la psychiatrie. HoloMD combine un assistant IA conversationnel (Dr. Holo™) pour le suivi
             thérapeutique à distance (RTM) et un tableau de bord analytique permettant aux psychiatres d'ajuster les traitements et
@@ -210,22 +235,18 @@ export default function HoloCase() {
           </p>
         </div>
         <figure className="hc-photo">
-          <img className="hc-swoosh" src={m('swoosh.svg')} alt="" />
-          <div className="hc-photo__frame">
-            <img src={m('woman.webp')} alt="Une femme assise dans un fauteuil, son téléphone à la main" loading="lazy" />
-          </div>
+          <Pic k="woman" alt="Une femme assise dans un fauteuil, son téléphone à la main" />
         </figure>
       </section>
 
       {/* Goals */}
       <section className="hc-goals" aria-labelledby="hc-goals-title">
         <div className="hc-goals__head">
-          <h3 className="hc-goals__title" id="hc-goals-title">
-            Objectifs
-          </h3>
-          <p className="hc-goals__lead">
-            Bâtir une expérience médicale hautement sécurisée (HIPAA) qui connecte en continu le patient à son équipe de soins.
-          </p>
+          <div>
+            <span className="hc-eyebrow">Objectifs</span>
+            <h3 id="hc-goals-title">Une expérience médicale hautement sécurisée (HIPAA)</h3>
+          </div>
+          <p>Bâtir une expérience médicale hautement sécurisée (HIPAA) qui connecte en continu le patient à son équipe de soins.</p>
         </div>
         <ol>
           {goals.map((g) => (
@@ -241,26 +262,24 @@ export default function HoloCase() {
 
       {/* 01 · Branding */}
       <section className="hc-brand" aria-labelledby="hc-brand-title">
-        <header className="hc-sec__head">
-          <span className="hc-tag">01</span>
-          <h3 id="hc-brand-title">
-            Branding global, Brandbook <br />& vitrine d'investissement
-          </h3>
-          <p>
-            Création de l'identité visuelle HoloMD. Déclinaison sur le Brandbook institutionnel et design du micro-site responsive conçu pour
-            présenter la technologie aux investisseurs et partenaires cliniques.
-          </p>
-        </header>
-        <div className="hc-brand__stage">
-          <img className="hc-brand__site" src={m('microsite.webp')} alt="Micro-site Holo MD : « Rehumanizing Psychiatry in a New Era of AI-Powered Care »" loading="lazy" />
-          <div className="hc-brand__col">
-            <img className="hc-brand__card" src={m('drcard.webp')} alt="Carte « Dr. Holo is designed to be an empathetic, caring, trustworthy… »" loading="lazy" />
-            <img className="hc-brand__diamond" src={m('diamond.webp')} alt="" loading="lazy" />
-          </div>
-          <div className="hc-brand__col hc-brand__col--b">
-            <img className="hc-brand__card" src={m('bruce.webp')} alt="Carte de Bruce A. Kehr, fondateur et chef de la direction" loading="lazy" />
-            <div className="hc-brand__tile" aria-hidden="true">
-              <img className="hc-brand__gem" src={m('gem.svg')} alt="" />
+        <div className="hc-row">
+          <header className="hc-sec__head">
+            <Eyebrow n="01" label="Branding" />
+            <h3 id="hc-brand-title">Branding global, Brandbook &amp; vitrine d'investissement</h3>
+            <p>
+              Création de l'identité visuelle HoloMD. Déclinaison sur le Brandbook institutionnel et design du micro-site responsive conçu pour
+              présenter la technologie aux investisseurs et partenaires cliniques.
+            </p>
+          </header>
+          <div className="hc-bento">
+            <Pic k="site" className="hc-bento__site" alt="Micro-site Holo MD : « Rehumanizing Psychiatry in a New Era of AI-Powered Care »" />
+            <Pic k="drcard" className="hc-bento__dr" alt="Carte « Dr. Holo is designed to be an empathetic, caring, trustworthy… »" />
+            <Pic k="bruce" className="hc-bento__bruce" alt="Carte de Bruce A. Kehr, fondateur et chef de la direction" />
+            <div className="hc-bento__tile hc-bento__tile--a" aria-hidden="true">
+              <Pic k="diamond" alt="" />
+            </div>
+            <div className="hc-bento__tile hc-bento__tile--b" aria-hidden="true">
+              <Pic k="gem" alt="" />
             </div>
           </div>
         </div>
@@ -268,58 +287,40 @@ export default function HoloCase() {
 
       {/* 02 · Patient app (pinned) */}
       <section className="hc-app" aria-labelledby="hc-app-title">
-        <div className="hc-pin">
+        <div className="hc-pin hc-row">
           <header className="hc-sec__head">
-              <span className="hc-tag">02</span>
-              <h3 id="hc-app-title">
-                Application patient <br />& suivi thérapeutique à distance (RTM)
-              </h3>
-              <p>
-                Conception UX/UI de l'application mobile intégrant l'assistant IA Dr. Holo™. L'interface assure un onboarding sécurisé (HIPAA), la
-                gestion des consentements et des échanges quotidiens empathiques pour évaluer l'évolution des symptômes.
-              </p>
-            </header>
-            <ol className="hc-steps" aria-label="Écrans de l'application">
-              {appSteps.map((s, i) => (
-                <li key={s}>
-                  <span>{String(i + 1).padStart(2, '0')}</span>
-                  {s}
-                </li>
-              ))}
-            </ol>
-          <div className="hc-app__stage">
-            <img className="hc-ph" src={m('phone-welcome.webp')} alt="Application Holo MD : écran d'accueil « Welcome », saisie du code fourni par le clinicien" loading="lazy" />
-            <img className="hc-ph" src={m('phone-chat.webp')} alt="Application Holo MD : conversation avec l'assistant Dr. Holo" loading="lazy" />
-            <img className="hc-ph" src={m('phone-history.webp')} alt="Application Holo MD : historique des échanges par période" loading="lazy" />
+            <Eyebrow n="02" label="Application patient" />
+            <h3 id="hc-app-title">Application patient &amp; suivi thérapeutique à distance (RTM)</h3>
+            <p>
+              Conception UX/UI de l'application mobile intégrant l'assistant IA Dr. Holo™. L'interface assure un onboarding sécurisé (HIPAA), la
+              gestion des consentements et des échanges quotidiens empathiques pour évaluer l'évolution des symptômes.
+            </p>
+          </header>
+          <Steps items={appSteps} label="Écrans de l'application" onPick={(i) => jump('.hc-app', i)} />
+          <div className="hc-stage hc-app__stage">
+            <Pic k="welcome" className="hc-ph hc-item" alt="Application Holo MD : écran d'accueil « Welcome », saisie du code fourni par le clinicien" />
+            <Pic k="chat" className="hc-ph hc-item" alt="Application Holo MD : conversation avec l'assistant Dr. Holo" />
+            <Pic k="history" className="hc-ph hc-item" alt="Application Holo MD : historique des échanges par période" />
           </div>
         </div>
       </section>
 
       {/* 03 · Clinical dashboard (pinned) */}
       <section className="hc-dash" aria-labelledby="hc-dash-title">
-        <div className="hc-pin">
+        <div className="hc-pin hc-row">
           <header className="hc-sec__head">
-              <span className="hc-tag">03</span>
-              <h3 id="hc-dash-title">
-                Dashboard psychiatre <br />& aide à la décision clinique
-              </h3>
-              <p>
-                Design de la plateforme web pour les médecins : visualisation en temps réel des données patients, alertes cliniques pour ajuster
-                les traitements et automatisation de la facturation via les codes de remboursement RTM (Medicare / Assurances).
-              </p>
-            </header>
-            <ol className="hc-steps" aria-label="Écrans du dashboard">
-              {dashSteps.map((s, i) => (
-                <li key={s}>
-                  <span>{String(i + 1).padStart(2, '0')}</span>
-                  {s}
-                </li>
-              ))}
-            </ol>
-          <div className="hc-dash__deck">
-            <img className="hc-deck" src={m('dash.webp')} alt="Dashboard : vue d'ensemble des patients, statistiques mensuelles et liste" loading="lazy" />
-            <img className="hc-deck" src={m('patient.webp')} alt="Fiche patient : informations, notes et historique d'humeur" loading="lazy" />
-            <img className="hc-deck" src={m('doctor.webp')} alt="Profil du Dr Bruce et liste des patients avec leur humeur" loading="lazy" />
+            <Eyebrow n="03" label="Dashboard clinique" />
+            <h3 id="hc-dash-title">Dashboard psychiatre &amp; aide à la décision clinique</h3>
+            <p>
+              Design de la plateforme web pour les médecins : visualisation en temps réel des données patients, alertes cliniques pour ajuster
+              les traitements et automatisation de la facturation via les codes de remboursement RTM (Medicare / Assurances).
+            </p>
+          </header>
+          <Steps items={dashSteps} label="Écrans du dashboard" onPick={(i) => jump('.hc-dash', i)} />
+          <div className="hc-stage hc-dash__stage">
+            <Pic k="dash" className="hc-deck hc-item" alt="Dashboard : vue d'ensemble des patients, statistiques mensuelles et liste" />
+            <Pic k="patient" className="hc-deck hc-item" alt="Fiche patient : informations, notes et historique d'humeur" />
+            <Pic k="doctor" className="hc-deck hc-item" alt="Profil du Dr Bruce et liste des patients avec leur humeur" />
           </div>
         </div>
       </section>
