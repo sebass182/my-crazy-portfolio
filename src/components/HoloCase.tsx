@@ -86,16 +86,19 @@ const slides = [
 const goals = [
   {
     n: '01',
+    art: 'identity',
     title: "Forger l'identité de marque et le micro-site d'investissement",
     text: 'Déployer le logo, la charte visuelle et le site vitrine pour présenter la vision technologique aux investisseurs et cliniques.',
   },
   {
     n: '02',
+    art: 'app',
     title: "Concevoir l'app patient et l'assistant IA (Dr. Holo™)",
     text: 'Structurer une interface mobile empathique réalisant un suivi RTM quotidien via SMS/chat conversationnel.',
   },
   {
     n: '03',
+    art: 'dash',
     title: 'Développer le dashboard clinique et la facturation RTM',
     text: "Bâtir un outil d'aide à la décision centralisant les métriques de santé mentale et l'intégration des codes de remboursement.",
   },
@@ -118,16 +121,11 @@ export default function HoloCase() {
       const rise = (targets: gsap.TweenTarget, trigger: Element, start?: string, extra: gsap.TweenVars = {}) =>
         gsap.from(targets, { y: 28, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, scrollTrigger: once(trigger, start), ...extra })
 
-      /* Hero: the sign-in screen opens like a curtain, the picture drifts a touch */
+      /* Hero: the sign-in screen opens like a curtain */
       gsap.fromTo(
         q('.hc-hero__frame'),
         { clipPath: 'inset(100% 0 0 0)' },
         { clipPath: 'inset(0% 0 0 0)', duration: 1.3, ease: 'expo.out', scrollTrigger: once(q('.hc-hero'), 'top 92%') },
-      )
-      gsap.fromTo(
-        q('.hc-hero__img'),
-        { yPercent: -4 },
-        { yPercent: 4, ease: 'none', scrollTrigger: { trigger: q('.hc-hero'), scroller, start: 'top bottom', end: 'bottom top', scrub: true } },
       )
 
       /* Context */
@@ -144,11 +142,32 @@ export default function HoloCase() {
         { clipPath: 'inset(0 0 0% 0)', duration: 1.2, ease: 'expo.out', scrollTrigger: once(q('.hc-photo'), 'top 88%') },
       )
 
-      /* Goals */
+      /* Goals: three cards that stack. Each one is sticky; the next slides over it while the covered card
+         steps back (scale + shade) and its art drifts up — depth from a single scroll. */
       rise(q('.hc-goals__head').children, q('.hc-goals'))
-      all('.hc-goal').forEach((g, i) => {
-        gsap.from(g.querySelector('.hc-goal__line'), { scaleX: 0, duration: 1, ease: 'expo.out', delay: i * 0.08, scrollTrigger: once(g, 'top 90%') })
-        rise(g.querySelectorAll('.hc-goal__n, strong, p'), g, 'top 90%', { delay: 0.12 + i * 0.08 })
+      const stack = all<HTMLElement>('.hc-goal')
+      stack.forEach((li, i) => {
+        const card = li.querySelector<HTMLElement>('.hc-goal__card')!
+        const art = li.querySelector<HTMLElement>('.hc-goal__art')!
+        const ghost = li.querySelector<HTMLElement>('.hc-goal__ghost')!
+        const shade = li.querySelector<HTMLElement>('.hc-goal__shade')!
+        const stuckAt = parseFloat(getComputedStyle(li).top) || 0 // the sticky offset set in CSS
+
+        // arrival: a slight tilt straightens, the art rises into place, the big numeral drifts slower than the card
+        gsap.fromTo(li, { rotate: i % 2 ? -2.2 : 2.2 }, { rotate: 0, ease: 'none', scrollTrigger: { trigger: li, scroller, start: 'top bottom', end: `top ${stuckAt + 160}px`, scrub: true } })
+        gsap.fromTo(art, { y: 110 }, { y: 0, ease: 'none', scrollTrigger: { trigger: li, scroller, start: 'top bottom', end: `top ${stuckAt}px`, scrub: true } })
+        gsap.fromTo(ghost, { y: 70 }, { y: -40, ease: 'none', scrollTrigger: { trigger: li, scroller, start: 'top bottom', end: 'bottom top', scrub: true } })
+        rise(li.querySelectorAll('.hc-goal__n, strong, p'), li, 'top 80%')
+
+        // being covered by the next card
+        const next = stack[i + 1]
+        if (next) {
+          const nextStuck = parseFloat(getComputedStyle(next).top) || 0
+          const cover = { trigger: next, scroller, start: 'top bottom', end: `top ${nextStuck}px`, scrub: true }
+          gsap.to(card, { scale: 0.92, ease: 'none', scrollTrigger: cover })
+          gsap.to(shade, { opacity: 0.62, ease: 'none', scrollTrigger: cover })
+          gsap.to(art, { yPercent: -12, ease: 'none', scrollTrigger: cover })
+        }
       })
 
       /* The three slides.
@@ -265,13 +284,42 @@ export default function HoloCase() {
           </div>
           <p>Bâtir une expérience médicale hautement sécurisée (HIPAA) qui connecte en continu le patient à son équipe de soins.</p>
         </div>
-        <ol>
-          {goals.map((g) => (
-            <li className="hc-goal" key={g.n}>
-              <i className="hc-goal__line" />
-              <span className="hc-goal__n">{g.n}</span>
-              <strong>{g.title}</strong>
-              <p>{g.text}</p>
+        <ol className="hc-stack">
+          {goals.map((g, i) => (
+            <li className={`hc-goal hc-goal--${g.art}`} key={g.n} style={{ ['--i' as string]: i }}>
+              <div className="hc-goal__card">
+                <span className="hc-goal__ghost" aria-hidden="true">
+                  {g.n}
+                </span>
+                <div className="hc-goal__body">
+                  <span className="hc-goal__n">{g.n} / 03</span>
+                  <div>
+                    <strong>{g.title}</strong>
+                    <p>{g.text}</p>
+                  </div>
+                </div>
+                <div className="hc-goal__art" aria-hidden="true">
+                  {g.art === 'identity' && (
+                    <>
+                      <Pic k="diamond" className="ga ga--diamond" />
+                      <Pic k="gem" className="ga ga--gem" />
+                    </>
+                  )}
+                  {g.art === 'app' && (
+                    <>
+                      <Pic k="history" className="ga ga--phone-b" />
+                      <Pic k="welcome" className="ga ga--phone-a" />
+                    </>
+                  )}
+                  {g.art === 'dash' && (
+                    <>
+                      <Pic k="dash" className="ga ga--screen-b" />
+                      <Pic k="doctor" className="ga ga--screen-a" />
+                    </>
+                  )}
+                </div>
+                <i className="hc-goal__shade" />
+              </div>
             </li>
           ))}
         </ol>
