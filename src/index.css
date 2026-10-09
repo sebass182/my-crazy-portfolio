@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:wght@600&family=Outfit:wght@400;500&display=swap');
 
 :root {
   --ink: #0a0a0f;
@@ -354,3 +354,37 @@ a:focus-visible, button:focus-visible { outline: 2px solid #fff; outline-offset:
 .nav__brand:hover .nav__caret, .nav__brand:focus-visible .nav__caret { display: inline-block; }
 @keyframes caret { 50% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .nav__caret { animation: none; } }
+
+/* ───────── Work card scene (Maïa): real laptop frame + real screens + brand pattern ─────────
+   The screen sits exactly in the see-through area of the frame (1141×713 at 180,162 inside 1500×1110). */
+.scene { position: absolute; inset: 0; overflow: hidden; background: radial-gradient(120% 130% at 18% 0%, #0b4a52 0%, #032d32 52%, #011c1f 100%); }
+.scene__pattern { position: absolute; left: 0; top: -8%; width: 100%; height: 116%; object-fit: cover; opacity: 0.7; }
+.scene__laptop { position: absolute; left: 4%; top: 8%; width: 68%; aspect-ratio: 1500 / 1110; filter: drop-shadow(0 28px 36px rgba(0, 0, 0, 0.55)); transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1); }
+.scene__screen { position: absolute; left: 12%; top: 14.595%; width: 76.07%; height: 64.23%; object-fit: cover; object-position: top; border-radius: 0.9% / 1.3%; }
+.scene__device { position: absolute; inset: 0; width: 100%; height: 100%; }
+.scene__phone { position: absolute; right: 6%; bottom: -10%; width: 21%; aspect-ratio: 494 / 937; padding: 3.2%; background: #0d0d0d; border-radius: 13% / 7%; box-shadow: 0 30px 50px -10px rgba(0, 0, 0, 0.65), inset 0 0 0 2px #2b2b2b; transform: rotate(5deg); transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1); }
+.scene__phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 10% / 5.2%; }
+.card__open:hover .scene__laptop, .card__open:focus-visible .scene__laptop { transform: translateY(-2.5%) scale(1.012); }
+.card__open:hover .scene__phone, .card__open:focus-visible .scene__phone { transform: translateY(-7%) rotate(2deg); }
+
+/* ───────── Case-study brand panel ───────── */
+.pv__brand { max-width: 1100px; margin: 0 auto 7vh; display: grid; gap: clamp(1rem, 2.5vw, 2rem); }
+.pv__brand-logo { display: grid; place-items: center; min-height: clamp(220px, 32vw, 380px); border-radius: var(--radius); background: #021f23 var(--pattern) center / cover; border: 1px solid rgba(255, 255, 255, 0.12); }
+.pv__brand-logo img { width: clamp(180px, 32%, 360px); height: auto; }
+.pv__palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.6rem; }
+.pv__swatch { aspect-ratio: 3 / 4; display: flex; flex-direction: column; justify-content: flex-end; gap: 0.25rem; padding: 1rem; border-radius: var(--radius); border: 1px solid rgba(255, 255, 255, 0.14); }
+.pv__swatch strong { font-size: 0.95rem; font-weight: 600; }
+.pv__swatch span { font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; }
+.pv__fonts { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(1rem, 2.5vw, 2rem); }
+.pv__font { display: flex; align-items: center; gap: 1.4rem; padding: clamp(1.2rem, 2.5vw, 2rem); border-radius: var(--radius); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); }
+.pv__font-aa { font-size: clamp(3.5rem, 8vw, 6.5rem); line-height: 1; color: var(--accent); }
+.pv__font strong { display: block; font-size: 1.3rem; font-weight: 600; }
+.pv__font em { display: block; margin: 0.2rem 0 0.8rem; font-family: var(--mono); font-style: normal; font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.7; }
+.pv__font p { font-size: clamp(1rem, 1.6vw, 1.4rem); opacity: 0.9; }
+.pv__brand-logo, .pv__swatch, .pv__font { transition: none !important; } /* GSAP reveals these */
+
+@media (max-width: 800px) {
+  .pv__palette { grid-template-columns: repeat(3, 1fr); }
+  .pv__fonts { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .scene__laptop, .scene__phone { transition: none; } }

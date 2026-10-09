@@ -32,6 +32,22 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
       gsap.fromTo(el, { yPercent: 100 }, { yPercent: 0, duration: 0.9, ease: 'expo.out' })
       gsap.from('.pv__head > *', { y: 50, opacity: 0, stagger: 0.08, duration: 0.9, delay: 0.35, ease: 'power3.out' })
 
+      // Brand panel: logo, swatches and type specimens rise in as it enters the panel's scroll
+      if (scroller.querySelector('.pv__brand')) {
+        const reveal = (targets: string, vars: gsap.TweenVars = {}) =>
+          gsap.from(targets, {
+            y: 50,
+            opacity: 0,
+            duration: 0.9,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: '.pv__brand', scroller, start: 'top 80%', toggleActions: 'play none none none' },
+            ...vars,
+          })
+        reveal('.pv__brand-logo')
+        reveal('.pv__swatch', { stagger: 0.08, delay: 0.15 })
+        reveal('.pv__font', { stagger: 0.12, delay: 0.3 })
+      }
+
       gsap.utils.toArray<HTMLElement>('.pv__slide').forEach((s) =>
         gsap.from(s, {
           y: 80,
@@ -112,6 +128,38 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
         <p className="pv__tags">{project.tags}</p>
         <p className="pv__summary">{project.summary}</p>
       </header>
+
+      {project.brand && (
+        <section className="pv__brand" aria-label={`Identité visuelle — ${project.name}`}>
+          <div className="pv__brand-logo" style={{ ['--pattern' as string]: `url(${project.brand.pattern})` }}>
+            <img src={project.brand.logo} alt={`Logo ${project.name}`} width={122} height={40} />
+          </div>
+
+          <div className="pv__palette">
+            {project.brand.palette.map((c) => (
+              <div className="pv__swatch" key={c.hex} style={{ background: c.hex, color: c.ink }}>
+                <strong>{c.name}</strong>
+                <span>{c.hex}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="pv__fonts">
+            {project.brand.fonts.map((f) => (
+              <div className="pv__font" key={f.name} style={{ fontFamily: f.family }}>
+                <span className="pv__font-aa" aria-hidden="true">
+                  Aa
+                </span>
+                <div>
+                  <strong>{f.name}</strong>
+                  <em>{f.role}</em>
+                  <p>{f.sample}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="pv__slides">
         {slidesOf(project).map((s) => (

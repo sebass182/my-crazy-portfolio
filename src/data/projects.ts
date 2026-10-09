@@ -8,6 +8,18 @@ export type Project = {
   accent: string // headline colour — every accent is ≥4.5:1 against its bg (AA)
   cover: number // first slide of the case study in the deck
   details: [string, string, string] // titles of the three detail slides, used as image descriptions
+  scene?: Scene // when set, the Work card shows this composed scene instead of the flat deck mockup
+  brand?: Brand // when set, the case study opens with a brand panel (logo, palette, type, pattern)
+}
+
+// Real device frame + real screens exported from Figma, layered on the card
+export type Scene = { laptop: string; desktop: string; mobile: string; pattern: string; alt: string }
+
+export type Brand = {
+  logo: string
+  pattern: string
+  palette: { name: string; hex: string; ink: string }[] // ink = readable text colour on that swatch
+  fonts: { name: string; role: string; family: string; sample: string }[]
 }
 
 // Each case study in the deck is 7 consecutive slides:
@@ -102,10 +114,34 @@ export const projects: Project[] = [
     tags: 'Branding B2B, plateforme d’acquisition',
     summary:
       'Créer de zéro la première identité de marque et plateforme web propulsant les entreprises féminines au Canada.',
-    bg: '#011c1f',
-    accent: '#ff6b5c',
+    // brand colours straight from the Figma variables (saumon on vert = 5.04:1)
+    bg: '#032d32',
+    accent: '#f36d64',
     cover: 33,
     details: ['identité de marque et guide de normes graphiques', "parcours d'acquisition web", 'expérience mobile optimisée'],
+    scene: {
+      laptop: `${base}maia/laptop.webp`,
+      desktop: `${base}maia/screen-desktop.webp`,
+      mobile: `${base}maia/screen-mobile.webp`,
+      pattern: `${base}maia/hex.svg`,
+      alt: 'Site Maïa : page Fournisseur sur portable et bloc « Restez connectée » sur téléphone',
+    },
+    brand: {
+      logo: `${base}maia/logo.svg`,
+      pattern: `${base}maia/hex.svg`,
+      palette: [
+        { name: 'Vert', hex: '#032d32', ink: '#ffffff' },
+        { name: 'Saumon', hex: '#f36d64', ink: '#032d32' },
+        { name: 'Vert moyen', hex: '#bbd4ce', ink: '#032d32' },
+        { name: 'Saumon pâle', hex: '#fff6ec', ink: '#032d32' },
+        { name: 'Charcoal', hex: '#212121', ink: '#ffffff' },
+        { name: 'Blanc', hex: '#ffffff', ink: '#032d32' },
+      ],
+      fonts: [
+        { name: 'Playfair Display', role: 'Titres', family: "'Playfair Display', serif", sample: 'Entreprises féminines' },
+        { name: 'Outfit', role: 'Texte et interface', family: "'Outfit', sans-serif", sample: 'Partenariats gagnants' },
+      ],
+    },
   },
   {
     slug: 'bijouterie-lavigueur',
