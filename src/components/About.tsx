@@ -3,14 +3,15 @@ import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 
 const base = import.meta.env.BASE_URL
 
-// The montage: x / y / w are % of the gradient frame (positions taken from the original deck collage),
-// d = depth (how far the photo travels with scroll and cursor), r = resting tilt in degrees.
+// The montage: x / y / w are % of the montage box (positions taken from the original deck collage), r = resting tilt (deg).
+// Every photo has its own speed: d = cursor depth, sy / sx = how far it travels (px) over the scroll, z0 → z1 = its zoom range.
+// The nearer a photo is, the faster it moves and the more it zooms.
 const photos = [
-  { f: 'selfie', w: 900, h: 1159, x: 24.2, y: 10.8, wd: 73.2, z: 1, d: 0.6, r: 0, alt: 'Sébastien en selfie, casquette à l’envers, au sommet d’une montagne' },
-  { f: 'bass', w: 600, h: 860, x: 75.3, y: 0.5, wd: 24.7, z: 2, d: 1.2, r: 3, alt: 'Sur scène à la basse, dans des traînées de lumière rouge' },
-  { f: 'bike', w: 148, h: 202, x: 17.4, y: 2, wd: 19.3, z: 3, d: 1.7, r: -4, alt: 'Un fat-bike sur un pont de métal au coucher du soleil' },
-  { f: 'camera', w: 640, h: 824, x: 0, y: 40, wd: 34.7, z: 4, d: 1.4, r: -2.5, alt: 'Reflet derrière une vitre, un appareil photo devant le visage' },
-  { f: 'skate', w: 560, h: 722, x: 65, y: 68.5, wd: 27, z: 4, d: 1.9, r: 4, alt: 'Un saut de skateboard devant une clôture, photo d’archive' },
+  { f: 'selfie', w: 900, h: 1159, x: 24.2, y: 10.8, wd: 73.2, z: 1, r: 0, d: 0.6, sy: 45, sx: 0, z0: 0.9, z1: 1.07, alt: 'Sébastien en selfie, casquette à l’envers, au sommet d’une montagne' },
+  { f: 'bass', w: 600, h: 860, x: 75.3, y: 0.5, wd: 24.7, z: 2, r: 3, d: 1.2, sy: 150, sx: -26, z0: 0.72, z1: 1.22, alt: 'Sur scène à la basse, dans des traînées de lumière rouge' },
+  { f: 'bike', w: 148, h: 202, x: 17.4, y: 2, wd: 19.3, z: 3, r: -4, d: 1.7, sy: 240, sx: 34, z0: 0.6, z1: 1.45, alt: 'Un fat-bike sur un pont de métal au coucher du soleil' },
+  { f: 'camera', w: 640, h: 824, x: 0, y: 40, wd: 34.7, z: 4, r: -2.5, d: 1.4, sy: 100, sx: 30, z0: 0.78, z1: 1.18, alt: 'Reflet derrière une vitre, un appareil photo devant le visage' },
+  { f: 'skate', w: 560, h: 722, x: 65, y: 68.5, wd: 27, z: 4, r: 4, d: 1.9, sy: 195, sx: -34, z0: 0.66, z1: 1.32, alt: 'Un saut de skateboard devant une clôture, photo d’archive' },
 ]
 
 const bio =
@@ -72,21 +73,21 @@ export default function About() {
       })
 
       /* Montage.
-         Channels per photo, so nothing fights: .cp = entrance (scale, opacity) + cursor parallax (x, y);
-         .cp__s = scroll parallax (y); img = scroll zoom-in (scale); .cp__f = resting tilt + hover (CSS). */
+         Channels per layer, so nothing fights: .aura = entrance; .aura__b = scroll swirl;
+         .cp = entrance (scale, opacity) + cursor parallax (x, y); .cp__s = scroll travel + scroll zoom (y, x, scale);
+         img = a slower zoom inside the photo's own frame; .cp__f = resting tilt (CSS). */
       const cps = gsap.utils.toArray<HTMLElement>('.cp')
+      // the montage's own journey: from entering at the bottom of the screen to leaving at the top
+      const journey = { trigger: '.about__top', start: 'top bottom', end: 'bottom top' }
 
-      // the frame opens from the bottom, then the photos zoom in one after another (replays after you go back above it)
-      gsap.fromTo(
-        '.about__photo',
-        { clipPath: 'inset(100% 0 0 0)' },
-        {
-          clipPath: 'inset(0% 0 0 0)',
-          ease: 'power3.out',
-          duration: 1.2,
-          scrollTrigger: { trigger: '.about__photo', start: 'top 85%', toggleActions: 'play none none reverse' },
-        },
-      )
+      // the soft round gradient swells in, then the photos zoom in one after another (replays after you go back above it)
+      gsap.from('.aura', {
+        scale: 0.4,
+        opacity: 0,
+        duration: 1.8,
+        ease: 'expo.out',
+        scrollTrigger: { trigger: '.about__photo', start: 'top 88%', toggleActions: 'play none none reverse' },
+      })
       gsap.from(cps, {
         scale: 0.55,
         opacity: 0,
@@ -96,27 +97,19 @@ export default function About() {
         scrollTrigger: { trigger: '.about__photo', start: 'top 82%', toggleActions: 'play none none reverse' },
       })
 
-      // the whole montage zooms in as it climbs the screen
-      gsap.fromTo(
-        '.collage',
-        { scale: 0.86 },
-        { scale: 1, ease: 'none', scrollTrigger: { trigger: '.about__top', start: 'top bottom', end: 'center 55%', scrub: true } },
-      )
+      // the colours drift while you scroll
+      gsap.fromTo('.aura__b', { rotation: -40, scale: 0.9 }, { rotation: 140, scale: 1.12, ease: 'none', scrollTrigger: { ...journey, scrub: 1 } })
 
-      cps.forEach((cp) => {
-        const d = Number(cp.dataset.depth)
-        // deeper photos travel further
+      photos.forEach((p, i) => {
+        const cp = cps[i]
+        // each photo travels its own distance (nearer = faster) and zooms from far to near; a longer scrub = a lazier follow
         gsap.fromTo(
           cp.querySelector('.cp__s'),
-          { y: d * 22 },
-          { y: -d * 22, ease: 'none', scrollTrigger: { trigger: '.about', start: 'top bottom', end: 'bottom top', scrub: true } },
+          { y: p.sy, x: -p.sx, scale: p.z0 },
+          { y: -p.sy, x: p.sx, scale: p.z1, ease: 'none', scrollTrigger: { ...journey, scrub: 0.4 + p.sy / 220 } },
         )
-        // every photo slowly zooms in on itself while you scroll through the section
-        gsap.fromTo(
-          cp.querySelector('img'),
-          { scale: 1 },
-          { scale: 1.18, ease: 'none', scrollTrigger: { trigger: '.about__top', start: 'top 75%', end: 'bottom top', scrub: true } },
-        )
+        // and the picture inside its frame zooms a little more
+        gsap.fromTo(cp.querySelector('img'), { scale: 1 }, { scale: 1.16, ease: 'none', scrollTrigger: { ...journey, scrub: true } })
       })
 
       // cursor parallax (mouse only)
@@ -154,6 +147,9 @@ export default function About() {
           <p className="about__text">{bio}</p>
         </div>
         <figure className="about__photo" aria-label="Montage de photos de Sébastien : selfie en montagne, fat-bike, appareil photo, basse sur scène et skateboard">
+          <div className="aura" aria-hidden="true">
+            <div className="aura__b" />
+          </div>
           <div className="collage">
             {photos.map((p) => (
               <div
