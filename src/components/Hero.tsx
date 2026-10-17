@@ -1,9 +1,11 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import { projects, mockupOf } from '../data/projects'
+import HeroShader from './HeroShader'
 
 export default function Hero({ ready }: { ready: boolean }) {
   const root = useRef<HTMLElement>(null)
+  const [shader, setShader] = useState(false) // true while the WebGL backdrop is drawing; the CSS blobs are the fallback
   const intro = useRef<gsap.core.Timeline | null>(null)
 
   // Build the intro once (paused) — the split title stays hidden until the preloader hands over
@@ -87,12 +89,13 @@ export default function Hero({ ready }: { ready: boolean }) {
   const strip = [...projects, ...projects]
 
   return (
-    <section className="hero" ref={root} id="top">
+    <section className={shader ? 'hero has-shader' : 'hero'} ref={root} id="top">
       <div className="hero__bg" aria-hidden="true">
         <i className="blob blob--yellow" />
         <i className="blob blob--cyan" />
         <i className="blob blob--pink" />
         <i className="blob blob--lilac" />
+        <HeroShader ready={ready} onActive={setShader} />
       </div>
 
       <div className="hero__main">

@@ -71,6 +71,9 @@ img { display: block; max-width: 100%; }
   overflow: hidden;
 }
 .hero > *:not(.hero__bg) { position: relative; z-index: 1; }
+/* the shader draws the backdrop; the blobs are only the fallback (no WebGL, reduced motion, lost context) */
+.hero__shader { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero.has-shader .blob { display: none; }
 .hero__title {
   visibility: hidden;
   margin: 0;
