@@ -2,14 +2,12 @@ import { useEffect, useRef } from 'react'
 import { gsap, prefersReducedMotion } from '../lib/gsap'
 
 /* The hero's backdrop as a fragment shader: the deck's four pastels (yellow / cyan / peach / lilac) are soft round
-   fields that a domain-warped noise keeps bending, and the cursor draws in the liquid:
-     · a stroke drags the colours along with it (marbling),
-     · ripples spread out from the stroke and light up as they pass,
-     · a thin luminous line in cycling pastel ink follows it and fades.
-   A click drops a splash. Scrolling slides the flow; with no pointer (phones) a lens drifts on its own.
+   fields that a domain-warped noise keeps bending. The cursor only makes ripples: moving sends rings out from its
+   path, a click drops a splash. The colours themselves never change — the waves bend the picture and catch the light.
+   Scrolling slides the flow.
 
    Light on purpose: one triangle, drawn well below the screen's pixel density (a soft gradient doesn't need more),
-   at 30 fps while nothing is happening, only while the hero is on screen, with the drop loop skipped when no stroke is
+   at 30 fps while nothing is happening, only while the hero is on screen, with the ripple loop skipped when none is
    alive, and a quality knob that steps down by itself if frames get slow. The grain is a static CSS layer, not shader work.
    Plain WebGL, no library. If WebGL is missing (or motion is reduced) nothing is drawn and the CSS blobs stay in charge. */
 
@@ -33,7 +31,6 @@ precision mediump float;
 varying vec2 vUv;
 uniform vec2 uRes;
 uniform float uTime;
-uniform vec2 uMouse;
 uniform float uScroll;
 uniform float uIntro;
 uniform float uCount;
@@ -69,27 +66,14 @@ float field(vec2 p, vec2 c, float r) {
   float d = length(p - c) / r;
   return exp(-d * d * 1.7);
 }
-// the ink cycles cyan → pink → violet → lime → cyan
-vec3 ink(float h) {
-  h = fract(h) * 4.0;
-  vec3 c = mix(vec3(0.55, 0.93, 1.0), vec3(1.0, 0.62, 0.78), smoothstep(0.0, 1.0, h));
-  c = mix(c, vec3(0.66, 0.58, 1.0), smoothstep(1.0, 2.0, h));
-  c = mix(c, vec3(0.95, 1.0, 0.35), smoothstep(2.0, 3.0, h));
-  return mix(c, vec3(0.55, 0.93, 1.0), smoothstep(3.0, 4.0, h));
-}
-
 void main() {
   float asp = uRes.x / uRes.y;
   vec2 p = vec2(vUv.x * asp, vUv.y); // x: 0..aspect, y: 0 (bottom) .. 1 (top)
   float t = uTime * 0.07;
 
-  // ── the cursor draws: every live stroke stirs, ripples and inks ──
-  vec2 stir = vec2(0.0);
+  // ── ripples: every live stroke sends rings out from its path ──
   vec2 push = vec2(0.0);
   float shine = 0.0;
-  float inkW = 0.0;
-  float heart = 0.0;
-  vec3 inkRGB = vec3(0.0);
   for (int i = 0; i < N; i++) {
     if (float(i) >= uCount) break;
     float age = uTime - uInfo[i].x;
@@ -99,32 +83,14 @@ void main() {
     float h = clamp(dot(p - a, ba) / max(dot(ba, ba), 0.00001), 0.0, 1.0);
     vec2 dv = p - (a + ba * h);                 // from the nearest point of the stroke to this pixel
     float d = length(dv);
-    float str = uInfo[i].y;
-    float fade = exp(-age * 2.2) * str;
 
-    // marbling: the picture is dragged along the stroke (we read it from behind the motion)
-    stir += ba * exp(-d * d * 150.0) * fade * 1.1;
-
-    // ripples: rings spreading out from the stroke, riding a travelling bump
+    // a travelling bump with a few crests riding it; it spreads outward and dies down
     float ring = d - age * 0.3;
-    float wave = sin(ring * 46.0) * exp(-ring * ring * 60.0) * exp(-age * 1.7) * str;
-    push += dv / max(d, 0.001) * wave * 0.02;
-    shine += wave;
-
-    // ink: a coloured glow with a thin bright heart, fading out by the end of the stroke's life
-    float inkFade = exp(-age * 1.5) * str * smoothstep(LIFE, LIFE * 0.55, age);
-    float glow = exp(-d * d * 1100.0) * inkFade;
-    heart += exp(-d * d * 7000.0) * inkFade;
-    inkW += glow;
-    inkRGB += ink(uInfo[i].x * 0.18) * glow;
+    float wave = sin(ring * 46.0) * exp(-ring * ring * 60.0) * exp(-age * 1.7) * uInfo[i].y;
+    push += dv / max(d, 0.001) * wave * 0.024; // the picture is bent along the wave...
+    shine += wave;                              // ...and the crests catch the light (white up, grey down: no hue change)
   }
-  p = p - stir + push;
-
-  // the cursor is a lens that pushes the picture away from it
-  vec2 m = vec2(uMouse.x * asp, uMouse.y);
-  vec2 dm = p - m;
-  float dl = length(dm);
-  p += dm * exp(-dl * dl * 7.0) * 0.12;
+  p += push;
 
   // scrolling slides the flow upwards
   p.y += uScroll * 0.45;
@@ -161,13 +127,7 @@ void main() {
   col = mix(col, cyan, smoothstep(0.52, 0.82, q.y) * 0.22);
   col += smoothstep(0.5, 0.85, q.y) * 0.05; // a faint sheen
 
-  // light that follows the cursor
-  col = mix(col, vec3(1.0), exp(-dl * dl * 12.0) * 0.18);
-
-  // ripple crests catch the light; the drawn line sits on top in its ink, with a white heart
-  col += shine * 0.09;
-  col = mix(col, inkRGB / max(inkW, 0.001), clamp(inkW * 1.3, 0.0, 1.0) * 0.9);
-  col = mix(col, vec3(1.0), clamp(heart * 1.3, 0.0, 1.0) * 0.85);
+  col += shine * 0.1; // ripple crests (and troughs) lighten (and darken) whatever colour is under them
 
   gl_FragColor = vec4(mix(base, col, smoothstep(0.0, 1.0, uIntro)), 1.0);
 }`
@@ -204,7 +164,7 @@ export default function HeroShader({ ready, onActive }: Props) {
 
     let program: WebGLProgram | null = null
     let buffer: WebGLBuffer | null = null
-    type Loc = Record<'res' | 'time' | 'mouse' | 'scroll' | 'intro' | 'count' | 'seg' | 'info', WebGLUniformLocation | null>
+    type Loc = Record<'res' | 'time' | 'scroll' | 'intro' | 'count' | 'seg' | 'info', WebGLUniformLocation | null>
     let loc: Loc | null = null
 
     const compile = (type: number, src: string) => {
@@ -241,7 +201,7 @@ export default function HeroShader({ ready, onActive }: Props) {
       gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0)
 
       const u = (n: string) => gl.getUniformLocation(program!, n)
-      loc = { res: u('uRes'), time: u('uTime'), mouse: u('uMouse'), scroll: u('uScroll'), intro: u('uIntro'), count: u('uCount'), seg: u('uSeg'), info: u('uInfo') }
+      loc = { res: u('uRes'), time: u('uTime'), scroll: u('uScroll'), intro: u('uIntro'), count: u('uCount'), seg: u('uSeg'), info: u('uInfo') }
       return true
     }
 
@@ -269,12 +229,7 @@ export default function HeroShader({ ready, onActive }: Props) {
     const io = new IntersectionObserver(([entry]) => (visible = entry.isIntersecting))
     io.observe(canvas)
 
-    // ── cursor: the lens eases after the pointer (and wanders when there is none) ──
-    const target = { x: 0.62, y: 0.7 }
-    const mouse = { x: 0.62, y: 0.7 }
-    let lastMove = -10
-
-    // ── drawing: the pointer's path becomes short segments, each one a stroke that lives LIFE seconds ──
+    // ── ripples: the pointer's path becomes short segments, each one a stroke that lives LIFE seconds ──
     const pen = { x: 0, y: 0, t: -10 }
     const spawn = (ax: number, ay: number, bx: number, by: number, strength: number, now: number) => {
       segs.set([ax, ay, bx, by], head * 4)
@@ -284,19 +239,16 @@ export default function HeroShader({ ready, onActive }: Props) {
       count = Math.min(count + 1, N)
       lastDrop = now
     }
-    const toLocal = (e: PointerEvent) => {
-      const nx = e.clientX / cssW
-      const ny = 1 - (e.clientY + window.scrollY) / cssH // the hero is the top of the page
-      return { nx, ny, x: nx * (cssW / cssH), y: ny }
-    }
+    // pointer → the shader's space: x in screen-height units (0..aspect), y 0 (bottom) .. 1 (top)
+    const toLocal = (e: PointerEvent) => ({
+      x: (e.clientX / cssW) * (cssW / cssH),
+      y: 1 - (e.clientY + window.scrollY) / cssH, // the hero is the top of the page
+    })
     // the pen's pacing uses the event clock (exact); a stroke's birth uses the ticker's, the one the shader reads
     const eventClock = () => performance.now() / 1000
     const onMove = (e: PointerEvent) => {
       const now = eventClock()
-      const { nx, ny, x, y } = toLocal(e)
-      target.x = nx
-      target.y = ny
-      lastMove = gsap.ticker.time
+      const { x, y } = toLocal(e)
       if (!visible) return
       if (now - pen.t > 0.3) {
         // a pause or a jump: start a fresh line instead of joining the old one
@@ -348,21 +300,11 @@ export default function HeroShader({ ready, onActive }: Props) {
       if (!drawing && sinceDraw < 28) return
       sinceDraw = 0
 
-      const dt = Math.min(deltaTime, 100) / 1000
-      if (time - lastMove > 2.5) {
-        target.x = 0.5 + 0.28 * Math.sin(time * 0.31)
-        target.y = 0.62 + 0.2 * Math.cos(time * 0.43)
-      }
-      const ease = 1 - Math.exp(-dt * 3.5)
-      mouse.x += (target.x - mouse.x) * ease
-      mouse.y += (target.y - mouse.y) * ease
-
       gl.uniform2f(loc.res, canvas.width, canvas.height)
       gl.uniform1f(loc.time, time)
-      gl.uniform2f(loc.mouse, mouse.x, mouse.y)
       gl.uniform1f(loc.scroll, Math.min(1, Math.max(0, window.scrollY / cssH)))
       gl.uniform1f(loc.intro, intro.current.v)
-      gl.uniform1f(loc.count, drawing ? count : 0) // no live stroke: the shader skips the whole drawing loop
+      gl.uniform1f(loc.count, drawing ? count : 0) // no live ripple: the shader skips the whole loop
       if (drawing) {
         gl.uniform4fv(loc.seg, segs)
         gl.uniform2fv(loc.info, info)
