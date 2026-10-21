@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { gsap, ScrollTrigger, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import { projects, type Project } from '../data/projects'
+import { jumpTo } from '../lib/jump'
 import Scene from './Scenes'
 
 const INK = '#0a0a0f'
@@ -138,9 +139,26 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
 
   return (
     <section className="work" ref={root} id="work" aria-labelledby="work-title">
-      <div className="work__hud" aria-hidden="true">
-        <span className="work__count">00 / {String(projects.length).padStart(2, '0')}</span>
-        <span className="work__hint">Défiler ↓</span>
+      <div className="work__hud">
+        <span className="work__count" aria-hidden="true">
+          00 / {String(projects.length).padStart(2, '0')}
+        </span>
+        <span className="work__side">
+          {/* the slider is ~9 screens of scroll: a way out, first in tab order, that skips straight to À propos */}
+          <a
+            className="work__skip"
+            href="#about"
+            onClick={(e) => {
+              e.preventDefault()
+              jumpTo('#about')
+            }}
+          >
+            Passer les travaux →
+          </a>
+          <span className="work__hint" aria-hidden="true">
+            Défiler ↓
+          </span>
+        </span>
       </div>
       <div className="work__bar" aria-hidden="true" />
 

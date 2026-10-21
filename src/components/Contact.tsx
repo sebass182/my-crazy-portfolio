@@ -70,6 +70,15 @@ export default function Contact() {
           <a className="magnetic pill" href="tel:5144428885">
             514.442.8885
           </a>
+          <a
+            className="magnetic pill pill--outline"
+            href="https://www.linkedin.com/in/sebastien-lemyre/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn (s’ouvre dans un nouvel onglet)"
+          >
+            LinkedIn
+          </a>
           <a className="magnetic pill pill--outline" href="https://sebass182.github.io/sebasslemyre-site/index.html">
             Portfolio
           </a>

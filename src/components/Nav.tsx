@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { gsap, prefersReducedMotion, useGSAP } from '../lib/gsap'
+import { jumpTo } from '../lib/jump'
 
 const links = [
   { href: '#work', label: 'Travaux' },
@@ -126,15 +127,14 @@ export default function Nav({ ready }: { ready: boolean }) {
     }
   }, [open, close])
 
-  // Anchor links: close the menu first, then glide to the section (the page is scroll-locked while open)
+  // Anchor links: close the menu first (the page is scroll-locked while it is open), then go to the section —
+  // straight there when it is far, so "À propos" skips the whole Travaux slider
   const go = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    const target = document.querySelector(href)
-    if (!target) return
+    if (!document.querySelector(href)) return
     e.preventDefault()
     document.body.classList.remove('is-locked')
-    history.pushState(null, '', href)
     setOpen(false)
-    target.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
+    jumpTo(href)
   }
 
   return (
@@ -160,7 +160,7 @@ export default function Nav({ ready }: { ready: boolean }) {
 
         <nav className="nav__links" aria-label="Navigation principale">
           {links.map((l) => (
-            <a key={l.href} href={l.href}>
+            <a key={l.href} href={l.href} onClick={(e) => go(e, l.href)}>
               {l.label}
             </a>
           ))}

@@ -144,6 +144,10 @@ img { display: block; max-width: 100%; }
   .work__outro a { display: inline-block; margin-top: 1rem; font-size: clamp(2rem, 5vw, 5rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1; border-bottom: 3px solid currentColor; }
   .work__hud { display: flex; position: absolute; z-index: 2; top: calc(var(--pad) + 1.5rem); left: var(--pad); right: var(--pad); justify-content: space-between; font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; pointer-events: none; }
   .work__hint { opacity: 0.6; }
+  .work__side { display: flex; align-items: baseline; gap: 2.2rem; }
+  .work__skip { pointer-events: auto; padding: 0.8rem 0; margin: -0.8rem 0; border-bottom: 1px solid transparent; transition: border-color 0.3s; } /* the HUD ignores the mouse; this link doesn't */
+  .work__skip:hover { border-bottom-color: currentColor; }
+  .work__skip:focus-visible { outline: 2px solid currentColor; outline-offset: 6px; }
   .work__bar { display: block; position: absolute; z-index: 2; left: 0; bottom: 0; height: 4px; width: 100%; background: #fff; transform: scaleX(0); transform-origin: left; opacity: 0.85; }
   .work__hud, .work__bar { transition: none !important; }
 }
