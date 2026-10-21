@@ -1,17 +1,18 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 
 const base = import.meta.env.BASE_URL
 
 // The montage: x / y / w are % of the montage box (positions taken from the original deck collage), r = resting tilt (deg).
-// Every photo has its own speed: d = cursor depth, sy / sx = how far it travels (px) over the scroll, z0 → z1 = its zoom range.
-// The nearer a photo is, the faster it moves and the more it zooms.
+// Every photo has its own speed: d = cursor depth; over the scroll it travels from +sy to −sy (px) vertically and from −sx to
+// +sx sideways, turns from −rot to +rot (deg), and zooms z0 → z1. The nearer a photo is, the further, faster and more it zooms.
+// Each is at its resting place (the composition) when the montage is mid-screen.
 const photos = [
-  { f: 'selfie', w: 900, h: 1159, x: 24.2, y: 10.8, wd: 73.2, z: 1, r: 0, d: 0.6, sy: 45, sx: 0, z0: 0.9, z1: 1.07, alt: 'Sébastien en selfie, casquette à l’envers, au sommet d’une montagne' },
-  { f: 'bass', w: 600, h: 860, x: 75.3, y: 0.5, wd: 24.7, z: 2, r: 3, d: 1.2, sy: 150, sx: -26, z0: 0.72, z1: 1.22, alt: 'Sur scène à la basse, dans des traînées de lumière rouge' },
-  { f: 'bike', w: 148, h: 202, x: 17.4, y: 2, wd: 19.3, z: 3, r: -4, d: 1.7, sy: 240, sx: 34, z0: 0.6, z1: 1.45, alt: 'Un fat-bike sur un pont de métal au coucher du soleil' },
-  { f: 'camera', w: 640, h: 824, x: 0, y: 40, wd: 34.7, z: 4, r: -2.5, d: 1.4, sy: 100, sx: 30, z0: 0.78, z1: 1.18, alt: 'Reflet derrière une vitre, un appareil photo devant le visage' },
-  { f: 'skate', w: 560, h: 722, x: 65, y: 68.5, wd: 27, z: 4, r: 4, d: 1.9, sy: 195, sx: -34, z0: 0.66, z1: 1.32, alt: 'Un saut de skateboard devant une clôture, photo d’archive' },
+  { f: 'selfie', w: 900, h: 1159, x: 24.2, y: 10.8, wd: 73.2, z: 1, r: 0, d: 0.6, sy: 70, sx: 0, rot: 0, z0: 0.82, z1: 1.18, alt: 'Sébastien en selfie, casquette à l’envers, au sommet d’une montagne' },
+  { f: 'bass', w: 600, h: 860, x: 75.3, y: 0.5, wd: 24.7, z: 2, r: 3, d: 1.2, sy: 230, sx: -50, rot: 7, z0: 0.55, z1: 1.45, alt: 'Sur scène à la basse, dans des traînées de lumière rouge' },
+  { f: 'bike', w: 148, h: 202, x: 17.4, y: 2, wd: 19.3, z: 3, r: -4, d: 1.7, sy: 360, sx: 60, rot: -12, z0: 0.4, z1: 1.8, alt: 'Un fat-bike sur un pont de métal au coucher du soleil' },
+  { f: 'camera', w: 640, h: 824, x: 0, y: 40, wd: 34.7, z: 4, r: -2.5, d: 1.4, sy: 160, sx: 40, rot: -6, z0: 0.6, z1: 1.35, alt: 'Reflet derrière une vitre, un appareil photo devant le visage' },
+  { f: 'skate', w: 560, h: 722, x: 65, y: 68.5, wd: 27, z: 4, r: 4, d: 1.9, sy: 300, sx: -60, rot: 10, z0: 0.48, z1: 1.55, alt: 'Un saut de skateboard devant une clôture, photo d’archive' },
 ]
 
 const bio =
@@ -36,8 +37,17 @@ const experience = [
   { years: '2012—2016', company: 'Empire Sport', role: 'Directeur artistique & image de marque' },
 ]
 
+// iOS 13+ only hands out the device's motion after a tap (and a yes); everywhere else it just flows.
+// Decided at the first render, so the button doesn't depend on effect ordering.
+const tiltNeedsTap = () =>
+  !window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+  !prefersReducedMotion() &&
+  typeof (window.DeviceOrientationEvent as unknown as { requestPermission?: unknown } | undefined)?.requestPermission === 'function'
+
 export default function About() {
   const root = useRef<HTMLElement>(null)
+  const [needsTilt, setNeedsTilt] = useState(tiltNeedsTap)
+  const askTilt = useRef<(() => void) | null>(null)
 
   useGSAP(
     () => {
@@ -100,37 +110,36 @@ export default function About() {
       // the colours drift while you scroll
       gsap.fromTo('.aura__b', { rotation: -40, scale: 0.9 }, { rotation: 140, scale: 1.12, ease: 'none', scrollTrigger: { ...journey, scrub: 0.6 } })
 
-      // Each photo gathers into the composition as the montage comes into view, holds it while it is fully on screen,
-      // then drifts apart as it leaves — so it is assembled whenever you are actually looking at it, and only the
-      // edges of the journey scatter it. Every photo has its own distance (nearer = further) and zoom, same timing.
-      // The follow is short (a long scrub lag leaves the photos trailing far behind after a quick scroll).
+      // Each photo moves the whole time the montage is on screen, linearly, at its own distance, turn and zoom — it
+      // passes through the composition at mid-screen. The follow is short (0.35 s): a long scrub lag leaves the photos
+      // trailing far behind after a quick scroll (jumpTo also lands them straight on their final state).
       photos.forEach((p, i) => {
         const cp = cps[i]
-        const settled = 1 + (p.z1 - 1) * 0.35 // a slow push-in while it holds
-        gsap
-          .timeline({ scrollTrigger: { ...journey, scrub: 0.35 } })
-          .fromTo(cp.querySelector('.cp__s'), { y: p.sy, x: -p.sx, scale: p.z0 }, { y: 0, x: 0, scale: 1, duration: 0.3, ease: 'power2.out' })
-          .to(cp.querySelector('.cp__s'), { y: 0, x: 0, scale: settled, duration: 0.3, ease: 'none' })
-          .to(cp.querySelector('.cp__s'), { y: -p.sy, x: p.sx, scale: p.z1, duration: 0.4, ease: 'power2.in' })
-        // and the picture inside its frame zooms a little more
-        gsap.fromTo(cp.querySelector('img'), { scale: 1 }, { scale: 1.16, ease: 'none', scrollTrigger: { ...journey, scrub: true } })
+        gsap.fromTo(
+          cp.querySelector('.cp__s'),
+          { y: p.sy, x: -p.sx, rotation: -p.rot, scale: p.z0 },
+          { y: -p.sy, x: p.sx, rotation: p.rot, scale: p.z1, ease: 'none', scrollTrigger: { ...journey, scrub: 0.35 } },
+        )
+        // and the picture inside its frame zooms on its own too
+        gsap.fromTo(cp.querySelector('img'), { scale: 1 }, { scale: 1.25, ease: 'none', scrollTrigger: { ...journey, scrub: true } })
       })
 
-      // cursor parallax (mouse only)
+      // Depth layers that answer the visitor: the cursor on a mouse, the tilt of the device on a phone or tablet.
+      // The nearer a photo is (data-depth), the further it shifts.
       const photo = root.current!.querySelector<HTMLElement>('.about__photo')!
+      const movers = cps.map((cp) => ({
+        d: Number(cp.dataset.depth),
+        x: gsap.quickTo(cp, 'x', { duration: 0.9, ease: 'power3.out' }),
+        y: gsap.quickTo(cp, 'y', { duration: 0.9, ease: 'power3.out' }),
+      }))
+      const shift = (nx: number, ny: number, amp: number) => movers.forEach((m) => (m.x(-nx * m.d * amp), m.y(-ny * m.d * amp)))
+
       if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-        const movers = cps.map((cp) => ({
-          d: Number(cp.dataset.depth),
-          x: gsap.quickTo(cp, 'x', { duration: 0.9, ease: 'power3.out' }),
-          y: gsap.quickTo(cp, 'y', { duration: 0.9, ease: 'power3.out' }),
-        }))
         const onMove = (e: PointerEvent) => {
           const r = photo.getBoundingClientRect()
-          const nx = (e.clientX - r.left) / r.width - 0.5
-          const ny = (e.clientY - r.top) / r.height - 0.5
-          movers.forEach((m) => (m.x(-nx * m.d * 14), m.y(-ny * m.d * 14)))
+          shift((e.clientX - r.left) / r.width - 0.5, (e.clientY - r.top) / r.height - 0.5, 14)
         }
-        const onLeave = () => movers.forEach((m) => (m.x(0), m.y(0)))
+        const onLeave = () => shift(0, 0, 0)
         photo.addEventListener('pointermove', onMove)
         photo.addEventListener('pointerleave', onLeave)
         return () => {
@@ -139,6 +148,53 @@ export default function About() {
         }
       }
 
+      // ── Tilt: the photos lean with the device, as if looking into a box ──
+      if (!('DeviceOrientationEvent' in window)) return
+      const sensor = DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<'granted' | 'denied'> }
+      let onScreen = true
+      const io = new IntersectionObserver(([entry]) => (onScreen = entry.isIntersecting))
+      io.observe(photo)
+
+      // The tilt is measured from the angle the device is held at (the first reading), and that reference follows slowly,
+      // so it works however it is held and settles back to the composition when it is set down.
+      const rest = { x: NaN, y: NaN }
+      const clamp = (v: number) => Math.max(-1, Math.min(1, v))
+      const onTilt = (e: DeviceOrientationEvent) => {
+        if (!onScreen || e.beta === null || e.gamma === null) return
+        // gamma = left/right, beta = front/back in portrait; turn the pair with the screen
+        const a = (((screen.orientation?.angle ?? 0) % 360) + 360) % 360
+        const [gx, gy] = a === 90 ? [e.beta, -e.gamma] : a === 270 ? [-e.beta, e.gamma] : a === 180 ? [-e.gamma, -e.beta] : [e.gamma, e.beta]
+        if (Number.isNaN(rest.x)) [rest.x, rest.y] = [gx, gy]
+        rest.x += (gx - rest.x) * 0.004
+        rest.y += (gy - rest.y) * 0.004
+        shift(clamp((gx - rest.x) / 20), clamp((gy - rest.y) / 20), 24)
+      }
+      let listening = false
+      const listen = () => {
+        if (listening) return
+        listening = true
+        window.addEventListener('deviceorientation', onTilt)
+      }
+
+      if (typeof sensor.requestPermission === 'function') {
+        // iOS: the visitor taps the button (see needsTilt), and can refuse
+        askTilt.current = async () => {
+          try {
+            if ((await sensor.requestPermission!()) === 'granted') listen()
+          } catch {
+            // refused, or not allowed here: the photos simply stay still
+          }
+          setNeedsTilt(false)
+        }
+      } else {
+        listen()
+      }
+
+      return () => {
+        io.disconnect()
+        window.removeEventListener('deviceorientation', onTilt)
+        askTilt.current = null
+      }
     },
     { scope: root },
   )
@@ -170,6 +226,11 @@ export default function About() {
               </div>
             ))}
           </div>
+          {needsTilt && (
+            <button className="tilt" type="button" onClick={() => askTilt.current?.()} aria-label="Activer l’animation au mouvement de l’appareil">
+              Activer l’inclinaison
+            </button>
+          )}
         </figure>
       </div>
 

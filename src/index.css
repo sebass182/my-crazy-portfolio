@@ -201,6 +201,9 @@ img { display: block; max-width: 100%; }
   will-change: transform;
 }
 .collage { position: absolute; inset: 0; }
+/* iOS only: motion data needs a tap first, so the montage offers one */
+.about__photo:has(.tilt) { margin-bottom: 3.8rem; } /* room for the button, so it doesn't sit on what follows */
+.tilt { position: absolute; z-index: 10; left: 50%; bottom: -3.6rem; transform: translateX(-50%); min-height: 44px; padding: 0.7rem 1.2rem; border-radius: 999px; background: rgba(244, 242, 238, 0.92); border: 1px solid var(--ink); font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; }
 .cp { position: absolute; will-change: transform; }
 .cp__s { will-change: transform; }
 .cp__f { overflow: hidden; border-radius: 7% / 5.4%; box-shadow: 0 24px 44px -20px rgba(10, 10, 15, 0.55); transform: rotate(var(--tilt, 0deg)); }
