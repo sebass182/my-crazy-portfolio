@@ -324,7 +324,7 @@ export const cases: Record<string, CaseData> = {
       "w": 71.3,
       "z": 3,
       "d": 1.4,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Direction artistique & univers visuel généré par IA : aperçu de l’interface"
      },
      {
