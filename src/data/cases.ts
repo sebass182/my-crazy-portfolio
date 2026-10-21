@@ -293,8 +293,8 @@ export const cases: Record<string, CaseData> = {
     "layers": [
      {
       "f": "g-bg.webp",
-      "iw": 1678,
-      "ih": 2160,
+      "iw": 839,
+      "ih": 1080,
       "x": 0,
       "y": 0,
       "w": 100,
@@ -371,8 +371,8 @@ export const cases: Record<string, CaseData> = {
     "layers": [
      {
       "f": "g-bg.webp",
-      "iw": 1678,
-      "ih": 2160,
+      "iw": 839,
+      "ih": 1080,
       "x": 0,
       "y": 0,
       "w": 100,
@@ -461,8 +461,8 @@ export const cases: Record<string, CaseData> = {
     "layers": [
      {
       "f": "g-bg.webp",
-      "iw": 1678,
-      "ih": 2160,
+      "iw": 839,
+      "ih": 1080,
       "x": 0,
       "y": 0,
       "w": 100,
