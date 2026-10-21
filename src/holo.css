@@ -38,13 +38,13 @@
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 32px;
-  background: #f7f6f2;
   color: #0a0a0f;
   box-shadow: 0 60px 110px -50px rgba(0, 0, 8, 0.9);
 }
 
-/* copy panel */
-.hc-slide__copy { display: grid; grid-template-rows: auto 1fr; align-content: stretch; padding: 7.2% 11% 6% 11%; min-width: 0; }
+/* copy panel — the cream is the panel's own, not the slide's: behind the stage there is nothing light left to show through
+   as a hairline where the stage's edge falls between two device pixels (or along the slide's rounded corners) */
+.hc-slide__copy { background: #f7f6f2; display: grid; grid-template-rows: auto 1fr; align-content: stretch; padding: 7.2% 11% 6% 11%; min-width: 0; }
 .hc-slide__n { font-family: var(--mono); font-size: clamp(1.6rem, 2.5vw, 2.5rem); font-weight: 300; letter-spacing: 0.02em; color: #7b6dff; line-height: 1; }
 .hc-slide__copy > div { align-self: center; display: grid; gap: clamp(1rem, 2.4vw, 2rem); }
 .hc-slide__copy h3 { font-size: clamp(1.25rem, 2.05vw, 1.95rem); font-weight: 700; line-height: 1.16; letter-spacing: -0.025em; }
