@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { gsap, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import { projects, slidesOf, type Project } from '../data/projects'
+import { cases } from '../data/cases'
 import HoloCase from './HoloCase'
+import CaseStudy from './CaseStudy'
 
 type Props = { project: Project; onClose: () => void; onNavigate: (p: Project) => void }
 
@@ -15,6 +17,8 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
   // the card that opened us, captured before focus moves into the dialog (survives strict-mode re-runs)
   const openerRef = useRef(document.activeElement as HTMLElement | null)
 
+  const study = cases[project.slug] // projects rebuilt from the Figma deck (Holo MD has its own hand-built page)
+  const meta = project.meta ?? study?.meta
   const idx = projects.findIndex((p) => p.slug === project.slug)
   const next = projects[(idx + 1) % projects.length]
 
@@ -128,29 +132,29 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
         <h2>{project.name}</h2>
         <p className="pv__tags">{project.tags}</p>
         <p className="pv__summary">{project.summary}</p>
-        {project.meta && (
+        {meta && (
           <dl className="pv__meta">
             <div>
               <dt>Rôle</dt>
-              <dd>{project.meta.role}</dd>
+              <dd>{meta.role}</dd>
             </div>
             <div>
               <dt>Agence</dt>
-              <dd>{project.meta.agency}</dd>
+              <dd>{meta.agency}</dd>
             </div>
             <div>
               <dt>Portée</dt>
-              <dd>{project.meta.scope}</dd>
+              <dd>{meta.scope}</dd>
             </div>
             <div>
               <dt>Outils</dt>
-              <dd>{project.meta.tools}</dd>
+              <dd>{meta.tools}</dd>
             </div>
           </dl>
         )}
       </header>
 
-      {project.brand && (
+      {project.brand && !study && (
         <section className="pv__brand" aria-label={`Identité visuelle — ${project.name}`}>
           <div className="pv__brand-logo" style={{ ['--pattern' as string]: `url(${project.brand.pattern})` }}>
             <img src={project.brand.logo} alt={`Logo ${project.name}`} width={122} height={40} />
@@ -184,6 +188,8 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
 
       {project.story === 'holo' ? (
         <HoloCase key={project.slug} />
+      ) : study ? (
+        <CaseStudy key={project.slug} project={project} data={study} />
       ) : (
         <div className="pv__slides">
           {slidesOf(project).map((s) => (
