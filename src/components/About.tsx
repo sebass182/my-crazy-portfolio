@@ -98,16 +98,20 @@ export default function About() {
       })
 
       // the colours drift while you scroll
-      gsap.fromTo('.aura__b', { rotation: -40, scale: 0.9 }, { rotation: 140, scale: 1.12, ease: 'none', scrollTrigger: { ...journey, scrub: 1 } })
+      gsap.fromTo('.aura__b', { rotation: -40, scale: 0.9 }, { rotation: 140, scale: 1.12, ease: 'none', scrollTrigger: { ...journey, scrub: 0.6 } })
 
+      // Each photo gathers into the composition as the montage comes into view, holds it while it is fully on screen,
+      // then drifts apart as it leaves — so it is assembled whenever you are actually looking at it, and only the
+      // edges of the journey scatter it. Every photo has its own distance (nearer = further) and zoom, same timing.
+      // The follow is short (a long scrub lag leaves the photos trailing far behind after a quick scroll).
       photos.forEach((p, i) => {
         const cp = cps[i]
-        // each photo travels its own distance (nearer = faster) and zooms from far to near; a longer scrub = a lazier follow
-        gsap.fromTo(
-          cp.querySelector('.cp__s'),
-          { y: p.sy, x: -p.sx, scale: p.z0 },
-          { y: -p.sy, x: p.sx, scale: p.z1, ease: 'none', scrollTrigger: { ...journey, scrub: 0.4 + p.sy / 220 } },
-        )
+        const settled = 1 + (p.z1 - 1) * 0.35 // a slow push-in while it holds
+        gsap
+          .timeline({ scrollTrigger: { ...journey, scrub: 0.35 } })
+          .fromTo(cp.querySelector('.cp__s'), { y: p.sy, x: -p.sx, scale: p.z0 }, { y: 0, x: 0, scale: 1, duration: 0.3, ease: 'power2.out' })
+          .to(cp.querySelector('.cp__s'), { y: 0, x: 0, scale: settled, duration: 0.3, ease: 'none' })
+          .to(cp.querySelector('.cp__s'), { y: -p.sy, x: p.sx, scale: p.z1, duration: 0.4, ease: 'power2.in' })
         // and the picture inside its frame zooms a little more
         gsap.fromTo(cp.querySelector('img'), { scale: 1 }, { scale: 1.16, ease: 'none', scrollTrigger: { ...journey, scrub: true } })
       })
