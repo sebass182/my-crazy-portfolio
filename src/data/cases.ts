@@ -336,7 +336,7 @@ export const cases: Record<string, CaseData> = {
       "w": 17.3,
       "z": 4,
       "d": 2,
-      "kind": "mod"
+      "kind": "shape"
      },
      {
       "f": "g1-vintage.webp",
@@ -347,7 +347,7 @@ export const cases: Record<string, CaseData> = {
       "w": 19.1,
       "z": 5,
       "d": 2,
-      "kind": "mod"
+      "kind": "shape"
      },
      {
       "f": "g1-image10.webp",
