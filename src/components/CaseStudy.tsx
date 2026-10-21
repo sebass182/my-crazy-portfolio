@@ -4,8 +4,8 @@ import type { CaseData, CaseLayer } from '../data/cases'
 import type { Project } from '../data/projects'
 
 /* A case study built the way the Holo MD page is, from the Figma deck:
-     the laptop → À propos (the paragraph and the photo, the three goals floating over it) → the three goals as
-     cards that stack → the three objective slides rebuilt layer by layer.
+     the laptop → À propos (the paragraph and the photo, the three goals floating over it) → the three objective
+     slides, rebuilt layer by layer, as cards that stack.
    Everything comes from src/data/cases.ts (itself built from the deck: each module of each slide is its own image,
    placed where the deck puts it). Same grid, type scale and holo.css as the Holo MD page. */
 
@@ -23,11 +23,6 @@ const cuts = (l: CaseLayer) => (l.cut ? ' ' + [...l.cut].map((c) => `cut-${c}`).
 
 // the laptop of every hero slide: same image, same spot (x, y, w in % of the slide)
 const LAPTOP = { f: 'cases/_shared/laptop.webp', iw: 2400, ih: 1500, x: 11.7, y: 7.4, w: 76.7 }
-
-// each goal card takes its colour from the project: its own dark ground, lit from a different corner each time
-const GLOWS = ['100% 0%', '0% 100%', '40% 0%']
-const cardBg = (project: Project, i: number) =>
-  `radial-gradient(90% 120% at ${GLOWS[i % 3]}, color-mix(in srgb, ${project.accent} 42%, transparent) 0%, transparent 62%), linear-gradient(140deg, color-mix(in srgb, ${project.bg} 80%, white) 0%, ${project.bg} 100%)`
 
 export default function CaseStudy({ project, data }: { project: Project; data: CaseData }) {
   const root = useRef<HTMLDivElement>(null)
@@ -76,32 +71,24 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
         gsap.fromTo(c.querySelector('.hl__s'), { y: d * amp }, { y: -d * amp, ease: 'none', scrollTrigger: { trigger: q('.hc-intro'), scroller, start: 'top bottom', end: 'bottom top', scrub: true } })
       })
 
-      /* Goals: three cards that stack. Each one is sticky; the next slides over it while the covered card
-         steps back (scale + shade) and its art drifts up — depth from a single scroll. */
-      rise(q('.hc-goals__head').children, q('.hc-goals__head'))
-      const stack = all<HTMLElement>('.hc-goal')
+      /* The three objective slides are the stacking cards: each one is sticky, the next slides over it while the
+         covered slide steps back (scale + a shade towards the page's own ground). The sticky offset is clamped so a
+         slide taller than the screen (phones) parks with its bottom edge in view instead of being cut off. */
+      const stack = all<HTMLElement>('.hc-slide--card')
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+      const park = () =>
+        stack.forEach((li, i) => {
+          const wanted = (phone ? 4.6 + i : 5.6 + i * 1.5) * rem
+          li.style.top = `${Math.min(wanted, scroller.clientHeight - li.offsetHeight - 14)}px`
+        })
+      park()
+      ScrollTrigger.addEventListener('refreshInit', park)
       stack.forEach((li, i) => {
-        const card = li.querySelector<HTMLElement>('.hc-goal__card')!
-        const art = li.querySelector<HTMLElement>('.hc-goal__art')!
-        const ghost = li.querySelector<HTMLElement>('.hc-goal__ghost')!
-        const shade = li.querySelector<HTMLElement>('.hc-goal__shade')!
-        const stuckAt = parseFloat(getComputedStyle(li).top) || 0 // the sticky offset set in CSS
-
-        // arrival: a slight tilt straightens, the art rises into place, the big numeral drifts slower than the card
-        gsap.fromTo(li, { rotate: i % 2 ? -2.2 : 2.2 }, { rotate: 0, ease: 'none', scrollTrigger: { trigger: li, scroller, start: 'top bottom', end: `top ${stuckAt + 160}px`, scrub: true } })
-        gsap.fromTo(art, { y: 110 }, { y: 0, ease: 'none', scrollTrigger: { trigger: li, scroller, start: 'top bottom', end: `top ${stuckAt}px`, scrub: true } })
-        gsap.fromTo(ghost, { y: 70 }, { y: -40, ease: 'none', scrollTrigger: { trigger: li, scroller, start: 'top bottom', end: 'bottom top', scrub: true } })
-        rise(li.querySelectorAll('.hc-goal__n, strong, p'), li, 'top 80%', {}, true)
-
-        // being covered by the next card
         const next = stack[i + 1]
-        if (next) {
-          const nextStuck = parseFloat(getComputedStyle(next).top) || 0
-          const cover = { trigger: next, scroller, start: 'top bottom', end: `top ${nextStuck}px`, scrub: true }
-          gsap.to(card, { scale: 0.92, ease: 'none', scrollTrigger: cover })
-          gsap.to(shade, { opacity: 0.62, ease: 'none', scrollTrigger: cover })
-          gsap.to(art, { yPercent: -12, ease: 'none', scrollTrigger: cover })
-        }
+        if (!next) return
+        const cover = { trigger: next, scroller, start: 'top bottom', end: () => `top ${parseFloat(next.style.top) || 0}px`, scrub: true, invalidateOnRefresh: true }
+        gsap.to(li, { scale: 0.93, ease: 'none', scrollTrigger: cover })
+        gsap.to(li.querySelector('.hc-slide__shade'), { opacity: 0.66, ease: 'none', scrollTrigger: cover })
       })
 
       /* The slides (the laptop first, then the three objective slides).
@@ -117,8 +104,9 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
         const stage = slide.querySelector<HTMLElement>('.hc-slide__stage')!
         const layers = all<HTMLElement>('.hl:not(.hl--bg)', stage)
         const copy = slide.querySelector('.hc-slide__copy')
+        const sticky = slide.classList.contains('hc-slide--card') // a parked card is still on screen once "scrolled past"
 
-        if (copy) rise(copy.children, slide, 'top 78%')
+        if (copy) rise(copy.children, slide, 'top 78%', {}, sticky)
 
         // entrance: the layers settle in one after another, back to front
         gsap.from(layers, {
@@ -127,7 +115,7 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
           duration: 1.2,
           ease: 'expo.out',
           stagger: 0.09,
-          scrollTrigger: view(slide, 'top 72%'),
+          scrollTrigger: view(slide, 'top 72%', sticky),
         })
 
         // scroll parallax: the deeper the layer, the further it travels
@@ -196,6 +184,7 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
       )
       return () => {
         alive = false
+        ScrollTrigger.removeEventListener('refreshInit', park)
         cleanups.forEach((fn) => fn())
       }
     },
@@ -247,81 +236,36 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
         </figure>
       </section>
 
-      {/* Goals: three cards that stack, each with a window onto its slide's composition */}
-      <section className="hc-goals" aria-labelledby="hc-goals-title">
-        <div className="hc-goals__head">
-          <div>
-            <span className="hc-eyebrow">Objectifs</span>
-            <h3 id="hc-goals-title">{data.goalsTitle}</h3>
-          </div>
-        </div>
-        <ol className="hc-stack">
-          {data.goals.map((g, i) => {
-            const floating = data.slides[i].layers.filter((l) => l.kind !== 'bg')
-            const panels = data.slides[i].layers.filter((l) => l.kind === 'bg')
-            return (
-              <li className="hc-goal" key={g.n} style={{ ['--i' as string]: i, ['--card-bg' as string]: cardBg(project, i) }}>
-                <div className="hc-goal__card">
-                  <span className="hc-goal__ghost" aria-hidden="true">
-                    {g.n}
-                  </span>
-                  <div className="hc-goal__body">
-                    <span className="hc-goal__n">{g.n} / 03</span>
-                    <div>
-                      <strong>{g.title}</strong>
-                      <p>{g.text}</p>
-                    </div>
-                  </div>
-                  <div className="hc-goal__art" aria-hidden="true">
-                    {floating.length ? (
-                      <div className="ga-peek">
-                        {floating.map((l) => (
-                          <Pic key={l.f} data={data} f={l.f} iw={l.iw} ih={l.ih} lazy className={l.kind === 'mod' ? 'pk--mod' : 'pk--shape'} style={place(l)} />
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="ga-peek ga-peek--panel">
-                        {panels.map((l) => (
-                          <Pic key={l.f} data={data} f={l.f} iw={l.iw} ih={l.ih} lazy />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <i className="hc-goal__shade" />
-                </div>
-              </li>
-            )
-          })}
-        </ol>
-      </section>
-
-      {/* 01 · 02 · 03 — the three objective slides, rebuilt */}
-      {data.slides.map((s, si) => (
-        <section className={`hc-slide${s.bleed ? ' hc-slide--bleed' : ''}`} key={s.n} aria-labelledby={`hc-s${si}-title`}>
-          <div className="hc-slide__copy">
-            <span className="hc-slide__n">{s.n}</span>
-            <div>
-              <h3 id={`hc-s${si}-title`}>{s.title}</h3>
-              <p>{s.text}</p>
-            </div>
-          </div>
-          <div className="hc-slide__stage" style={{ ['--stage' as string]: s.stage }}>
-            {s.layers.map((l) => (
-              <div
-                className={`hl hl--${l.kind}${cuts(l)}`}
-                key={l.f}
-                data-depth={l.d}
-                style={l.kind === 'bg' ? { zIndex: 0 } : { ...place(l), zIndex: l.z }}
-                aria-hidden={l.alt ? undefined : true}
-              >
-                <div className="hl__s">
-                  <Pic data={data} f={l.f} iw={l.iw} ih={l.ih} alt={l.alt} lazy />
-                </div>
+      {/* 01 · 02 · 03 — the three objective slides, rebuilt; they are the cards that stack */}
+      <div className="hc-stack" style={{ ['--shade' as string]: project.bg }}>
+        {data.slides.map((s, si) => (
+          <section className={`hc-slide hc-slide--card${s.bleed ? ' hc-slide--bleed' : ''}`} key={s.n} aria-labelledby={`hc-s${si}-title`}>
+            <div className="hc-slide__copy">
+              <span className="hc-slide__n">{s.n}</span>
+              <div>
+                <h3 id={`hc-s${si}-title`}>{s.title}</h3>
+                <p>{s.text}</p>
               </div>
-            ))}
-          </div>
-        </section>
-      ))}
+            </div>
+            <div className="hc-slide__stage" style={{ ['--stage' as string]: s.stage }}>
+              {s.layers.map((l) => (
+                <div
+                  className={`hl hl--${l.kind}${cuts(l)}`}
+                  key={l.f}
+                  data-depth={l.d}
+                  style={l.kind === 'bg' ? { zIndex: 0 } : { ...place(l), zIndex: l.z }}
+                  aria-hidden={l.alt ? undefined : true}
+                >
+                  <div className="hl__s">
+                    <Pic data={data} f={l.f} iw={l.iw} ih={l.ih} alt={l.alt} lazy />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <i className="hc-slide__shade" />
+          </section>
+        ))}
+      </div>
     </div>
   )
 }

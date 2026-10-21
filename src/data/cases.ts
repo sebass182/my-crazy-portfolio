@@ -7,7 +7,6 @@ export type CaseLayer = { f: string; iw: number; ih: number; x: number; y: numbe
 export type CaseSlide = { n: string; title: string; text: string; stage: string; bleed?: boolean; layers: CaseLayer[] }
 export type CaseImg = { f: string; iw: number; ih: number; alt: string }
 export type CaseMeta = { role: string; agency: string; scope: string; tools: string }
-export type CaseGoal = { n: string; title: string; text: string }
 // a goal chip floating over the context photo: x / y / w / h are % of the photo's width (y of its height)
 export type CaseChip = { n: string; text: string; x: number; y: number; w: number; h: number }
 export type CaseData = {
@@ -16,8 +15,6 @@ export type CaseData = {
   // the project's screen; x / y / w place it inside the laptop (% of the laptop's box)
   hero: CaseImg & { x: number; y: number; w: number }
   intro: { lead: string; photo: CaseImg; chips: CaseChip[] }
-  goalsTitle: string
-  goals: CaseGoal[]
   slides: CaseSlide[]
 }
 
@@ -74,24 +71,6 @@ export const cases: Record<string, CaseData> = {
     }
    ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Optimiser la recherche et la découverte de terrains",
-    "text": "Structure d'une interface de recherche intuitive permettant d'explorer les terrains par région, promotions ou équipements."
-   },
-   {
-    "n": "02",
-    "title": "Numériser la Zone Exploitant et l'adhésion B2B",
-    "text": "Création des gabarits complexes de la Zone Exploitant."
-   },
-   {
-    "n": "03",
-    "title": "Enrichir le contenu décisionnel et l'expérience mobile",
-    "text": "Déploiement des gabarits d'exploration (Explore, Promotions, Outils Camping et Blogue)."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -305,24 +284,6 @@ export const cases: Record<string, CaseData> = {
     }
    ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Identité de marque & direction artistique",
-    "text": "En s'appuyant sur Midjourney et Ideogram, j'ai développé une esthétique visuelle distincte pour chaque sortie tout en maintenant une signature de marque reconnaissable à travers l'ensemble du catalogue, nourrie par plus de 20 ans d'expérience en photographie et en design."
-   },
-   {
-    "n": "02",
-    "title": "Production de contenu vidéo & présence multiplateforme",
-    "text": "Chaque chanson est accompagnée d'une vidéo dédiée et de formats courts pensés pour les réseaux sociaux et diffusés sur l'ensemble des plateformes."
-   },
-   {
-    "n": "03",
-    "title": "Distribution & croissance d'audience",
-    "text": "Le projet est distribué sur toutes les plateformes de streaming, cumulant plus de 150 000 écoutes sur Spotify."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -624,24 +585,6 @@ export const cases: Record<string, CaseData> = {
     }
    ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Redessiner l'en-tête et l'expérience de recherche (Ria)",
-    "text": "Intégration de l'agente Ria dans l'en-tête principal et création d'une interface de dialogue plein écran immersive."
-   },
-   {
-    "n": "02",
-    "title": "Générer des landing pages dynamiques par destination",
-    "text": "Conception de gabarits de pages d'atterrissage riches (ex."
-   },
-   {
-    "n": "03",
-    "title": "Boucler la boucle Inbound via des infolettres personnalisées",
-    "text": "Déploiement des gabarits de courriels transactionnels/Inbound déclenchés après la consultation d'une destination."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -899,24 +842,6 @@ export const cases: Record<string, CaseData> = {
     }
    ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Rehausser l'image de marque",
-    "text": "Élaboration d'un moodboard stratégique pour convaincre l'équipe de faire évoluer la marque."
-   },
-   {
-    "n": "02",
-    "title": "Refondre l'expérience catalogue",
-    "text": "Modernisation complète de l’interface de la boutique."
-   },
-   {
-    "n": "03",
-    "title": "Unifier le tunnel d'achat",
-    "text": "Déclinaison minutieuse de la nouvelle identité visuelle sur le parcours transactionnel standard de l'équipe de développement."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -1045,24 +970,6 @@ export const cases: Record<string, CaseData> = {
     }
    ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Centraliser la gestion multi-portefeuilles",
-    "text": "Un tableau de bord centralisé pour suivre en temps réel les soldes, l’évolution des rendements et basculer instantanément entre plusieurs portefeuilles."
-   },
-   {
-    "n": "02",
-    "title": "Intégrer un calculateur de gains prévisionnels",
-    "text": "Un outil interactif permettant de simuler précisément les retours sur investissement selon l'actif choisi et la durée de staking."
-   },
-   {
-    "n": "03",
-    "title": "Simplifier le suivi des validateurs & alertes",
-    "text": "Une vue détaillée pour comparer les validateurs selon leur rendement (APY) et leur commission, et configurer des alertes personnalisées en un clin d’œil."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -1249,24 +1156,6 @@ export const cases: Record<string, CaseData> = {
     }
    ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Refondre le site web corporatif & les études de cas",
-    "text": "Conception et déploiement de la refonte complète du site web de Globalia (UX/UI et direction artistique) pour aligner la plateforme sur le positionnement de l'agence."
-   },
-   {
-    "n": "02",
-    "title": "Déployer un écosystème de communication cohérent",
-    "text": "Déploiement d'une charte graphique omnicanale : habillage des réseaux sociaux d'agence, design des publications et infolettres Inbound."
-   },
-   {
-    "n": "03",
-    "title": "Concevoir des expériences de marque et culturelles",
-    "text": "Design d'expériences de marque immersives pour la culture d'entreprise : conception du microsite annuel du lac à l'épaule, gabarits du site carrière et développement d'une ligne de vêtements et d'accessoires corporatifs modernes."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -1657,24 +1546,6 @@ export const cases: Record<string, CaseData> = {
     }
    ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Incarner la marque via Midjourney",
-    "text": "Création et génération complète d'une banque de mascottes monstres 3D grâce à un travail rigoureux de prompt engineering sur Midjourney."
-   },
-   {
-    "n": "02",
-    "title": "Articuler les modules ludo-éducatifs",
-    "text": "Structuration des sections de présentation des fonctionnalités clés (gestion de classe, suivi des progrès, personnalisation)."
-   },
-   {
-    "n": "03",
-    "title": "Décliner l'écosystème web complet",
-    "text": "Déclinaison complète du système de pages (Accueil, À propos, Contact, Connexion)."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -1826,24 +1697,6 @@ export const cases: Record<string, CaseData> = {
     }
    ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Incarner l'écosystème féminin B2B",
-    "text": "Livraison d'un guide de normes graphiques exhaustif."
-   },
-   {
-    "n": "02",
-    "title": "Structurer le double parcours d'acquisition",
-    "text": "Conception d'une architecture web optimisée pour générer des leads, structurée autour de deux parcours utilisateurs distincts : l'acquisition de grandes corporations (Acheteurs) et l'intégration d'entreprises féminines (Fournisseurs)."
-   },
-   {
-    "n": "03",
-    "title": "Garantir une expérience mobile fluide",
-    "text": "Déclinaison rigoureuse des interfaces en version mobile (responsive design), garantissant une expérience utilisateur fluide et accessible sur tous les appareils pour maximiser l’acquisition."
-   }
-  ],
   "slides": [
    {
     "n": "01",
