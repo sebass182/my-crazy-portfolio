@@ -304,15 +304,14 @@ export const cases: Record<string, CaseData> = {
      },
      {
       "f": "g1-image9.webp",
-      "iw": 1368,
-      "ih": 1164,
+      "iw": 684,
+      "ih": 582,
       "x": 9.3,
       "y": 46.1,
       "w": 81.5,
       "z": 2,
       "d": 0.5,
-      "kind": "mod",
-      "cut": "b",
+      "kind": "shape",
       "alt": "Direction artistique & univers visuel généré par IA : aperçu de l’interface"
      },
      {
