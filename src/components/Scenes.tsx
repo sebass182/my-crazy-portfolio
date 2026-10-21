@@ -1,11 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import type { Project } from '../data/projects'
 
 const base = import.meta.env.BASE_URL
 const card = (slug: string, file: string, ext = 'webp') => `${base}cards/${slug}/${file}.${ext}`
 
-// Every project gets its own composition for its Work card. They all use real material:
-// the site's actual screen, panels cut from the case-study slides, or (Holo MD) the Figma modules.
+// Every project gets a composition for its Work card, built from real material: the site's actual screen, panels cut
+// from the case-study slides, or (Holo MD) the Figma modules. Six layouts, all square to the frame: nothing is rotated,
+// skewed or cut on a slant — things are aligned on a shared centre line, with one margin and one corner radius.
 // Layers are decorative — the wrapper carries the description.
 type L = { src: string; cls: string }
 
@@ -29,49 +30,53 @@ export default function Scene({ p }: { p: Project }) {
   }, [])
 
   const wrap = (children: React.ReactNode) => (
-    <div ref={root} className={`scene scene--${s.kind}`} role="img" aria-label={s.alt}>
+    <div
+      ref={root}
+      className={`scene scene--${s.kind} scene--${p.slug}${s.flip ? ' scene--flip' : ''}`}
+      style={{ ['--bg' as string]: p.bg } as CSSProperties}
+      role="img"
+      aria-label={s.alt}
+    >
       {children}
     </div>
   )
 
   switch (s.kind) {
-    // Camping Québec — the forest photo runs edge to edge, a portrait panel leans in
+    // The photo runs edge to edge; a panel from the case study sits in the lower right corner, on the frame's margin
     case 'bleed':
       return wrap(
         <Layers
           items={[
             { src: c('screen'), cls: 'sc-bleed__screen' },
-            { src: c('p1'), cls: 'sc-bleed__panel' },
+            { src: c(s.panel ?? 'p1'), cls: 'sc-bleed__panel' },
           ]}
         />,
       )
 
-    // Air Transat — one browser window in perspective, a second panel floating in front
-    case 'tilt':
-      return wrap(
-        <>
-          <div className="sc-tilt__window">
-            <i className="sc-tilt__bar" />
-            <img src={c('screen')} alt="" draggable={false} decoding="async" />
-          </div>
-          <img className="sc-tilt__panel" src={c('p2')} alt="" draggable={false} decoding="async" />
-        </>,
-      )
-
-    // ESSLLL — three posters at different heights over a ghosted channel page
-    case 'posters':
+    // The site's screen and a case-study panel side by side: same height, same top, same bottom
+    case 'duo':
       return wrap(
         <Layers
           items={[
-            { src: c('screen'), cls: 'sc-posters__ghost' },
-            { src: c('p1'), cls: 'sc-posters__a' },
-            { src: c('p2'), cls: 'sc-posters__b' },
-            { src: c('p3'), cls: 'sc-posters__c' },
+            { src: c('screen'), cls: 'sc-duo__screen' },
+            { src: c(s.panel ?? 'p1'), cls: 'sc-duo__panel' },
           ]}
         />,
       )
 
-    // Holo MD — two objects, no clutter: the sign-in screen and the patient app's first screen
+    // Three panels in a row, equal in size and spacing
+    case 'trio':
+      return wrap(
+        <Layers
+          items={[
+            { src: c('p1'), cls: 'sc-trio__a' },
+            { src: c('p2'), cls: 'sc-trio__b' },
+            { src: c('p3'), cls: 'sc-trio__c' },
+          ]}
+        />,
+      )
+
+    // Holo MD — the sign-in screen and the patient app's first screen, centred on one line
     case 'login':
       return wrap(
         <Layers
@@ -82,53 +87,22 @@ export default function Scene({ p }: { p: Project }) {
         />,
       )
 
-    // Maïa — the only laptop: transparent MacBook frame, real screen, mobile card (no fake phone bezel)
+    // Maïa — the only laptop: transparent MacBook frame, real screen, the mobile page beside it on the same baseline
     case 'laptop':
       return wrap(
         <>
           <img className="sc-laptop__pattern" src={`${base}maia/hex.svg`} alt="" draggable={false} />
-          <div className="sc-laptop__device">
-            <img className="sc-laptop__screen" src={`${base}maia/screen-desktop.webp`} alt="" draggable={false} decoding="async" />
-            <img className="sc-laptop__frame" src={`${base}maia/laptop.webp`} alt="" draggable={false} decoding="async" />
+          <div className="sc-laptop__row">
+            <div className="sc-laptop__device">
+              <img className="sc-laptop__screen" src={`${base}maia/screen-desktop.webp`} alt="" draggable={false} decoding="async" />
+              <img className="sc-laptop__frame" src={`${base}maia/laptop.webp`} alt="" draggable={false} decoding="async" />
+            </div>
+            <img className="sc-laptop__mobile" src={`${base}maia/screen-mobile.webp`} alt="" draggable={false} decoding="async" />
           </div>
-          <img className="sc-laptop__mobile" src={`${base}maia/screen-mobile.webp`} alt="" draggable={false} decoding="async" />
         </>,
       )
 
-    // Lavigueur — the watch page sliced on a diagonal, the product sheet beside it
-    case 'diagonal':
-      return wrap(
-        <Layers
-          items={[
-            { src: c('screen'), cls: 'sc-diag__screen' },
-            { src: c('p2'), cls: 'sc-diag__panel' },
-          ]}
-        />,
-      )
-
-    // Intelli Jeunes — a tilted page with game "stickers" stuck around it
-    case 'stickers':
-      return wrap(
-        <Layers
-          items={[
-            { src: c('screen'), cls: 'sc-stk__screen' },
-            { src: c('p1'), cls: 'sc-stk__a' },
-            { src: c('p3'), cls: 'sc-stk__b' },
-          ]}
-        />,
-      )
-
-    // Staking Data — a dashboard in perspective that runs off the card, alerts panel in front
-    case 'dash':
-      return wrap(
-        <>
-          <i className="sc-dash__grid" />
-          <img className="sc-dash__screen" src={c('screen')} alt="" draggable={false} decoding="async" />
-          <img className="sc-dash__panel" src={c('p3')} alt="" draggable={false} decoding="async" />
-        </>,
-      )
-
-    // Globalia — an ecosystem bento: the site plus two brand visuals in tiles
+    // Globalia — a bento on a two-column grid: the site on the left, two brand visuals stacked on the right
     case 'bento':
       return wrap(
         <Layers

@@ -83,27 +83,6 @@ const slides = [
   },
 ]
 
-const goals = [
-  {
-    n: '01',
-    art: 'identity',
-    title: "Forger l'identité de marque et le micro-site d'investissement",
-    text: 'Déployer le logo, la charte visuelle et le site vitrine pour présenter la vision technologique aux investisseurs et cliniques.',
-  },
-  {
-    n: '02',
-    art: 'app',
-    title: "Concevoir l'app patient et l'assistant IA (Dr. Holo™)",
-    text: 'Structurer une interface mobile empathique réalisant un suivi RTM quotidien via SMS/chat conversationnel.',
-  },
-  {
-    n: '03',
-    art: 'dash',
-    title: 'Développer le dashboard clinique et la facturation RTM',
-    text: "Bâtir un outil d'aide à la décision centralisant les métriques de santé mentale et l'intégration des codes de remboursement.",
-  },
-]
-
 export default function HoloCase() {
   const root = useRef<HTMLDivElement>(null)
 
@@ -151,32 +130,25 @@ export default function HoloCase() {
         { clipPath: 'inset(0 0 0% 0)', duration: 1.2, ease: 'expo.out', scrollTrigger: view(q('.hc-photo'), 'top 88%') },
       )
 
-      /* Goals: three cards that stack. Each one is sticky; the next slides over it while the covered card
-         steps back (scale + shade) and its art drifts up — depth from a single scroll. */
-      rise(q('.hc-goals__head').children, q('.hc-goals__head'))
-      const stack = all<HTMLElement>('.hc-goal')
+      /* The three slides are the stacking cards: each one is sticky, the next slides over it while the covered slide
+         steps back (scale + a shade). The sticky offset is clamped so a slide taller than the screen (phones) parks with
+         its bottom edge in view instead of being cut off. (Same as CaseStudy.tsx.) */
+      const phone = window.matchMedia('(max-width: 800px)').matches
+      const stack = all<HTMLElement>('.hc-slide--card')
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+      const park = () =>
+        stack.forEach((li, i) => {
+          const wanted = (phone ? 4.6 + i : 5.6 + i * 1.5) * rem
+          li.style.top = `${Math.min(wanted, scroller.clientHeight - li.offsetHeight - 14)}px`
+        })
+      park()
+      ScrollTrigger.addEventListener('refreshInit', park)
       stack.forEach((li, i) => {
-        const card = li.querySelector<HTMLElement>('.hc-goal__card')!
-        const art = li.querySelector<HTMLElement>('.hc-goal__art')!
-        const ghost = li.querySelector<HTMLElement>('.hc-goal__ghost')!
-        const shade = li.querySelector<HTMLElement>('.hc-goal__shade')!
-        const stuckAt = parseFloat(getComputedStyle(li).top) || 0 // the sticky offset set in CSS
-
-        // arrival: a slight tilt straightens, the art rises into place, the big numeral drifts slower than the card
-        gsap.fromTo(li, { rotate: i % 2 ? -2.2 : 2.2 }, { rotate: 0, ease: 'none', scrollTrigger: { trigger: li, scroller, start: 'top bottom', end: `top ${stuckAt + 160}px`, scrub: true } })
-        gsap.fromTo(art, { y: 110 }, { y: 0, ease: 'none', scrollTrigger: { trigger: li, scroller, start: 'top bottom', end: `top ${stuckAt}px`, scrub: true } })
-        gsap.fromTo(ghost, { y: 70 }, { y: -40, ease: 'none', scrollTrigger: { trigger: li, scroller, start: 'top bottom', end: 'bottom top', scrub: true } })
-        rise(li.querySelectorAll('.hc-goal__n, strong, p'), li, 'top 80%', {}, true)
-
-        // being covered by the next card
         const next = stack[i + 1]
-        if (next) {
-          const nextStuck = parseFloat(getComputedStyle(next).top) || 0
-          const cover = { trigger: next, scroller, start: 'top bottom', end: `top ${nextStuck}px`, scrub: true }
-          gsap.to(card, { scale: 0.92, ease: 'none', scrollTrigger: cover })
-          gsap.to(shade, { opacity: 0.62, ease: 'none', scrollTrigger: cover })
-          gsap.to(art, { yPercent: -12, ease: 'none', scrollTrigger: cover })
-        }
+        if (!next) return
+        const cover = { trigger: next, scroller, start: 'top bottom', end: () => `top ${parseFloat(next.style.top) || 0}px`, scrub: true, invalidateOnRefresh: true }
+        gsap.to(li, { scale: 0.93, ease: 'none', scrollTrigger: cover })
+        gsap.to(li.querySelector('.hc-slide__shade'), { opacity: 0.66, ease: 'none', scrollTrigger: cover })
       })
 
       /* The three slides.
@@ -185,14 +157,13 @@ export default function HoloCase() {
            .hl__s  → scroll parallax (y)
            img     → hover lift (CSS)                                                              */
       const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-      const phone = window.matchMedia('(max-width: 800px)').matches
       const cleanups: Array<() => void> = []
 
       all<HTMLElement>('.hc-slide').forEach((slide) => {
         const stage = slide.querySelector<HTMLElement>('.hc-slide__stage')!
         const layers = all<HTMLElement>('.hl', stage)
 
-        rise(slide.querySelector('.hc-slide__copy')!.children, slide, 'top 78%')
+        rise(slide.querySelector('.hc-slide__copy')!.children, slide, 'top 78%', {}, true) // a parked card is still on screen once "scrolled past"
 
         // entrance: the layers settle in one after another, back to front
         gsap.from(layers, {
@@ -201,7 +172,7 @@ export default function HoloCase() {
           duration: 1.2,
           ease: 'expo.out',
           stagger: 0.09,
-          scrollTrigger: view(slide, 'top 72%'),
+          scrollTrigger: view(slide, 'top 72%', true),
         })
 
         // scroll parallax: the deeper the layer, the further it travels
@@ -254,6 +225,7 @@ export default function HoloCase() {
       Promise.all([...el.querySelectorAll('img')].map((img) => img.decode().catch(() => {}))).then(() => alive && ScrollTrigger.refresh())
       return () => {
         alive = false
+        ScrollTrigger.removeEventListener('refreshInit', park)
         cleanups.forEach((fn) => fn())
       }
     },
@@ -284,83 +256,36 @@ export default function HoloCase() {
         </figure>
       </section>
 
-      {/* Goals */}
-      <section className="hc-goals" aria-labelledby="hc-goals-title">
-        <div className="hc-goals__head">
-          <div>
-            <span className="hc-eyebrow">Objectifs</span>
-            <h3 id="hc-goals-title">Une expérience médicale hautement sécurisée (HIPAA)</h3>
-          </div>
-          <p>Bâtir une expérience médicale hautement sécurisée (HIPAA) qui connecte en continu le patient à son équipe de soins.</p>
-        </div>
-        <ol className="hc-stack">
-          {goals.map((g, i) => (
-            <li className={`hc-goal hc-goal--${g.art}`} key={g.n} style={{ ['--i' as string]: i }}>
-              <div className="hc-goal__card">
-                <span className="hc-goal__ghost" aria-hidden="true">
-                  {g.n}
-                </span>
-                <div className="hc-goal__body">
-                  <span className="hc-goal__n">{g.n} / 03</span>
-                  <div>
-                    <strong>{g.title}</strong>
-                    <p>{g.text}</p>
+      {/* 01 · 02 · 03 — the slides, rebuilt; they are the cards that stack */}
+      <div className="hc-stack">
+        {slides.map((s) => (
+          <section className={`hc-slide hc-slide--card hc-slide--${s.id}`} key={s.id} aria-labelledby={`hc-${s.id}-title`}>
+            <div className="hc-slide__copy">
+              <span className="hc-slide__n">{s.n}</span>
+              <div>
+                <h3 id={`hc-${s.id}-title`}>{s.title}</h3>
+                <p>{s.text}</p>
+              </div>
+            </div>
+            <div className="hc-slide__stage">
+              {s.layers.map((l, i) => (
+                <div
+                  className={`hl hl--${l.kind}`}
+                  key={`${l.k}-${i}`}
+                  data-depth={l.d}
+                  style={{ left: `${l.x}%`, top: `${l.y}%`, width: `${l.w}%`, zIndex: l.z }}
+                  aria-hidden={l.alt ? undefined : true}
+                >
+                  <div className="hl__s">
+                    <Pic k={l.k} alt={l.alt ?? ''} />
                   </div>
                 </div>
-                <div className="hc-goal__art" aria-hidden="true">
-                  {g.art === 'identity' && (
-                    <>
-                      <Pic k="diamond" className="ga ga--diamond" />
-                      <Pic k="gem" className="ga ga--gem" />
-                    </>
-                  )}
-                  {g.art === 'app' && (
-                    <>
-                      <Pic k="history" className="ga ga--phone-b" />
-                      <Pic k="welcome" className="ga ga--phone-a" />
-                    </>
-                  )}
-                  {g.art === 'dash' && (
-                    <>
-                      <Pic k="dash" className="ga ga--screen-b" />
-                      <Pic k="doctor" className="ga ga--screen-a" />
-                    </>
-                  )}
-                </div>
-                <i className="hc-goal__shade" />
-              </div>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* 01 · 02 · 03 — the slides, rebuilt */}
-      {slides.map((s) => (
-        <section className={`hc-slide hc-slide--${s.id}`} key={s.id} aria-labelledby={`hc-${s.id}-title`}>
-          <div className="hc-slide__copy">
-            <span className="hc-slide__n">{s.n}</span>
-            <div>
-              <h3 id={`hc-${s.id}-title`}>{s.title}</h3>
-              <p>{s.text}</p>
+              ))}
             </div>
-          </div>
-          <div className="hc-slide__stage">
-            {s.layers.map((l, i) => (
-              <div
-                className={`hl hl--${l.kind}`}
-                key={`${l.k}-${i}`}
-                data-depth={l.d}
-                style={{ left: `${l.x}%`, top: `${l.y}%`, width: `${l.w}%`, zIndex: l.z }}
-                aria-hidden={l.alt ? undefined : true}
-              >
-                <div className="hl__s">
-                  <Pic k={l.k} alt={l.alt ?? ''} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      ))}
+            <i className="hc-slide__shade" />
+          </section>
+        ))}
+      </div>
     </div>
   )
 }

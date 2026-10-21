@@ -1,89 +1,87 @@
-/* ═════════ Work cards: nine different compositions ═════════
-   Every scene fills the 16:9 card frame. Positions are % of the frame so they scale with the card.
+/* ═════════ Work cards: six square, aligned compositions ═════════
+   Every scene fills the 16:9 card frame, and every size is in cqw (1cqw = 1% of the frame's width) so it scales with the card.
+   One system for all of them: the project's own colour as a ground (a touch lighter than the section so the card reads
+   against it, with a soft glow of the accent at the top), one corner radius, one shadow, one gap — and nothing rotated,
+   skewed or cut on a slant. Layers are laid out by flex / grid and share a centre line, so they line up by construction.
    Transitions live on the scene layers only — GSAP animates the card frame and caption, never these. */
-.scene { position: absolute; inset: 0; overflow: hidden; }
-.scene img { position: absolute; display: block; user-select: none; }
+.scene {
+  --gap: 3cqw;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: inline-size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap);
+  background:
+    radial-gradient(75% 95% at 50% 0%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg, #111) 84%, var(--accent)), color-mix(in srgb, var(--bg, #111) 94%, var(--accent)));
+}
+:where(.scene) img {
+  display: block;
+  flex: none;
+  object-fit: cover;
+  border-radius: 1.3cqw;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 2.2cqw 4cqw -1.8cqw rgba(0, 0, 0, 0.6);
+  user-select: none;
+}
 .scene [class*='__'] { transition: transform 0.9s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.6s; will-change: transform; }
+/* hover: everything lifts together, straight up */
+.card__open:hover .scene img, .card__open:focus-visible .scene img { transform: translateY(-2.2%); }
 
-/* 1 · Camping Québec — full bleed */
-.scene--bleed { background: #003b2d; }
-.sc-bleed__screen { inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* 1 · full bleed + an inset panel (Camping Québec) */
+.scene--bleed { display: block; background: #003b2d; }
+.sc-bleed__screen { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; box-shadow: none; }
 .scene--bleed::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0, 40, 30, 0.8) 0%, rgba(0, 40, 30, 0) 42%); pointer-events: none; }
-.sc-bleed__panel { z-index: 1; right: 5%; bottom: -12%; width: 23%; border-radius: 6% / 4.5%; box-shadow: 0 24px 40px -10px rgba(0, 0, 0, 0.6); transform: rotate(5deg); }
-.card__open:hover .sc-bleed__panel, .card__open:focus-visible .sc-bleed__panel { transform: translateY(-6%) rotate(2deg); }
+.sc-bleed__panel { position: absolute; z-index: 1; right: 4cqw; bottom: 4cqw; width: 19cqw; aspect-ratio: 520 / 669; }
+.card__open:hover .scene .sc-bleed__screen, .card__open:focus-visible .scene .sc-bleed__screen { transform: none; }
 
-/* 2 · Air Transat — browser window in perspective */
-.scene--tilt { background: radial-gradient(90% 120% at 80% 0%, #2d6fb0 0%, rgba(45, 111, 176, 0) 60%), radial-gradient(100% 120% at 0% 100%, #1fa5ea 0%, rgba(31, 165, 234, 0) 50%), #162a54; perspective: 1400px; }
-.sc-tilt__window { position: absolute; left: 12%; top: 13%; width: 70%; aspect-ratio: 1161 / 725; padding-top: 4.2%; border-radius: 2.2% / 3.5%; overflow: hidden; background: #fff; box-shadow: 0 40px 60px -20px rgba(0, 0, 0, 0.6); transform: rotateY(-17deg) rotateX(6deg) rotateZ(1.5deg); transform-origin: 20% 50%; transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1); }
-.sc-tilt__bar { position: absolute; left: 0; right: 0; top: 0; height: 4.2%; background: #eef1f5; }
-.sc-tilt__bar::before { content: ''; position: absolute; left: 2%; top: 50%; width: 1%; aspect-ratio: 1; border-radius: 50%; background: #ff6159; transform: translateY(-50%); box-shadow: 150% 0 0 #ffbd2e, 300% 0 0 #28c940; }
-.sc-tilt__window img { position: static; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.sc-tilt__panel { z-index: 2; right: 5%; bottom: 8%; width: 17%; border-radius: 6% / 4.5%; box-shadow: 0 24px 40px -10px rgba(0, 0, 0, 0.55); transform: rotate(-4deg); }
-.card__open:hover .sc-tilt__window, .card__open:focus-visible .sc-tilt__window { transform: rotateY(-8deg) rotateX(3deg) rotateZ(0.5deg) scale(1.03); }
-.card__open:hover .sc-tilt__panel, .card__open:focus-visible .sc-tilt__panel { transform: translateY(-6%) rotate(-1deg); }
+/* 2 · the site's screen + a panel, side by side (Air Transat, Lavigueur, Intelli Jeunes, Staking Data).
+   60 + 29.2 wide, 3 apart: both are 37.5 tall, so top and bottom line up. */
+.sc-duo__screen { width: 60cqw; aspect-ratio: 1161 / 725; object-position: top; }
+.sc-duo__panel { width: 29.2cqw; aspect-ratio: 520 / 669; }
+.scene--flip { flex-direction: row-reverse; }
+/* Staking Data: a fine square grid behind the dashboard */
+.scene--staking-data::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(140, 130, 255, 0.13) 1px, transparent 1px), linear-gradient(90deg, rgba(140, 130, 255, 0.13) 1px, transparent 1px);
+  background-size: 5cqw 5cqw;
+  background-position: center;
+  -webkit-mask-image: radial-gradient(70% 80% at 50% 50%, #000 0%, transparent 78%);
+  mask-image: radial-gradient(70% 80% at 50% 50%, #000 0%, transparent 78%);
+}
+.scene--staking-data img { position: relative; }
 
-/* 3 · ESSLLL — poster triptych */
-.scene--posters { background: radial-gradient(70% 90% at 50% 120%, #4a3d28 0%, rgba(74, 61, 40, 0) 70%), #141414; }
-.sc-posters__ghost { inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.2; filter: blur(2px) grayscale(0.4); }
-.sc-posters__a, .sc-posters__b, .sc-posters__c { width: 25%; border-radius: 3% / 2.3%; box-shadow: 0 30px 50px -14px rgba(0, 0, 0, 0.8); }
-.sc-posters__a { left: 15%; top: 14%; transform: rotate(-3deg); }
-.sc-posters__b { left: 37.5%; top: -8%; z-index: 1; transform: rotate(1.5deg); }
-.sc-posters__c { left: 60%; top: 20%; transform: rotate(3.5deg); }
-.card__open:hover .sc-posters__a, .card__open:focus-visible .sc-posters__a { transform: translateY(-5%) rotate(-5deg); }
-.card__open:hover .sc-posters__b, .card__open:focus-visible .sc-posters__b { transform: translateY(5%) rotate(0.5deg); }
-.card__open:hover .sc-posters__c, .card__open:focus-visible .sc-posters__c { transform: translateY(-5%) rotate(5.5deg); }
+/* 3 · three panels in a row (ESSLLL): equal size, equal spacing */
+.scene--trio { --gap: 2cqw; }
+.sc-trio__a, .sc-trio__b, .sc-trio__c { width: 28.5cqw; aspect-ratio: 520 / 669; }
 
-/* 4 · Holo MD — sign-in screen and the first app screen, nothing else */
-.scene--login { background: radial-gradient(90% 120% at 85% 0%, #3a1fa8 0%, rgba(58, 31, 168, 0) 60%), radial-gradient(120% 130% at 10% 100%, #5b21d6 0%, rgba(91, 33, 214, 0) 55%), #000131; }
-.sc-login__screen { left: 7%; top: 13%; width: 64%; border-radius: 1.8% / 2.8%; box-shadow: 0 36px 60px -22px rgba(0, 0, 8, 0.75); }
-.sc-login__phone { right: 8%; top: 9%; width: 25%; filter: drop-shadow(0 30px 36px rgba(0, 0, 8, 0.6)); }
-.card__open:hover .sc-login__screen, .card__open:focus-visible .sc-login__screen { transform: translateX(-2%); }
-.card__open:hover .sc-login__phone, .card__open:focus-visible .sc-login__phone { transform: translateY(-4%); }
+/* 4 · Holo MD — sign-in screen and the patient app's first screen, on one centre line */
+.sc-login__screen { width: 60cqw; aspect-ratio: 1600 / 1021; }
+.sc-login__phone { width: 22cqw; aspect-ratio: 520 / 1127; border-radius: 0; box-shadow: none; object-fit: contain; filter: drop-shadow(0 2cqw 2.6cqw rgba(0, 0, 8, 0.55)); }
 
-/* 5 · Maïa — the only laptop. Transparent frame; the screen sits in its see-through area (1141×713 at 180,162 of 1500×1110) */
-.scene--laptop { background: radial-gradient(120% 130% at 18% 0%, #0b4a52 0%, #032d32 52%, #011c1f 100%); }
-.sc-laptop__pattern { left: 0; top: -8%; width: 100%; height: 116%; object-fit: cover; opacity: 0.7; }
-.sc-laptop__device { position: absolute; left: 4%; top: 8%; width: 68%; aspect-ratio: 1500 / 1110; filter: drop-shadow(0 28px 36px rgba(0, 0, 0, 0.55)); transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1); }
-.sc-laptop__screen { left: 12%; top: 14.595%; width: 76.07%; height: 64.23%; object-fit: cover; object-position: top; border-radius: 0.9% / 1.3%; }
-.sc-laptop__frame { inset: 0; width: 100%; height: 100%; }
-.sc-laptop__mobile { right: 6%; bottom: -8%; width: 20%; border-radius: 9% / 4.7%; box-shadow: 0 30px 50px -10px rgba(0, 0, 0, 0.65); transform: rotate(5deg); }
-.card__open:hover .sc-laptop__device, .card__open:focus-visible .sc-laptop__device { transform: translateY(-2.5%) scale(1.012); }
-.card__open:hover .sc-laptop__mobile, .card__open:focus-visible .sc-laptop__mobile { transform: translateY(-7%) rotate(2deg); }
+/* 5 · Maïa — the only laptop. Transparent frame; the screen sits in its see-through area (1141×713 at 180,162 of 1500×1110).
+   The laptop and the mobile page stand on the same baseline. */
+.sc-laptop__pattern { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; box-shadow: none; opacity: 0.55; }
+.sc-laptop__row { position: relative; display: flex; align-items: flex-end; gap: var(--gap); }
+.sc-laptop__device { position: relative; width: 60cqw; aspect-ratio: 1500 / 1110; filter: drop-shadow(0 2cqw 2.6cqw rgba(0, 0, 0, 0.5)); transition: transform 0.9s cubic-bezier(0.19, 1, 0.22, 1); }
+.scene .sc-laptop__screen { position: absolute; left: 12%; top: 14.595%; width: 76.07%; height: 64.23%; object-position: top; border-radius: 0.5cqw; box-shadow: none; }
+.scene .sc-laptop__frame { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; box-shadow: none; object-fit: contain; }
+.sc-laptop__mobile { width: 18.5cqw; aspect-ratio: 988 / 1874; object-position: top; }
+.card__open:hover .scene .sc-laptop__screen, .card__open:hover .scene .sc-laptop__frame,
+.card__open:focus-visible .scene .sc-laptop__screen, .card__open:focus-visible .scene .sc-laptop__frame { transform: none; } /* the device moves as one */
+.card__open:hover .sc-laptop__device, .card__open:focus-visible .sc-laptop__device { transform: translateY(-2.2%); }
 
-/* 6 · Lavigueur — diagonal cut */
-.scene--diagonal { background: #011331; }
-.sc-diag__screen { left: 0; top: 0; width: 80%; height: 100%; object-fit: cover; object-position: 8% center; clip-path: polygon(0 0, 100% 0, 80% 100%, 0 100%); }
-.sc-diag__panel { right: 5%; top: 9%; width: 26%; border-radius: 5% / 3.8%; box-shadow: 0 28px 44px -12px rgba(0, 0, 0, 0.7); }
-.scene--diagonal::before { content: ''; position: absolute; left: 62%; top: -10%; width: 1px; height: 130%; background: linear-gradient(0deg, transparent, #5b8dff, transparent); transform: rotate(14deg); transform-origin: top; }
-.card__open:hover .sc-diag__screen, .card__open:focus-visible .sc-diag__screen { transform: scale(1.04); }
-.card__open:hover .sc-diag__panel, .card__open:focus-visible .sc-diag__panel { transform: translateY(-4%); }
-
-/* 7 · Intelli Jeunes — playful stickers */
-.scene--stickers { background: radial-gradient(60% 80% at 15% 15%, #ffd23a 0%, rgba(255, 210, 58, 0) 60%), radial-gradient(70% 90% at 95% 100%, #ff5fa8 0%, rgba(255, 95, 168, 0) 60%), #600177; }
-.sc-stk__screen { left: 7%; top: 12%; width: 62%; border: 0.7vw solid #fff; border-radius: 3.4% / 5%; box-shadow: 0 30px 44px -12px rgba(30, 0, 40, 0.65); transform: rotate(-3deg); box-sizing: content-box; }
-.sc-stk__a { z-index: 1; right: 6%; top: 7%; width: 20%; border: 0.5vw solid #fff; border-radius: 8% / 6%; box-shadow: 0 20px 34px -10px rgba(30, 0, 40, 0.6); transform: rotate(7deg); box-sizing: content-box; }
-.sc-stk__b { z-index: 2; right: 18%; bottom: -10%; width: 18%; border: 0.5vw solid #fff; border-radius: 8% / 6%; box-shadow: 0 20px 34px -10px rgba(30, 0, 40, 0.6); transform: rotate(-6deg); box-sizing: content-box; }
-.card__open:hover .sc-stk__screen, .card__open:focus-visible .sc-stk__screen { transform: rotate(-1deg) scale(1.02); }
-.card__open:hover .sc-stk__a, .card__open:focus-visible .sc-stk__a { transform: translateY(-6%) rotate(11deg); }
-.card__open:hover .sc-stk__b, .card__open:focus-visible .sc-stk__b { transform: translateY(-8%) rotate(-10deg); }
-
-/* 8 · Staking Data — dashboard that runs off the card */
-.scene--dash { background: #08183a; perspective: 1500px; }
-.sc-dash__grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(122, 109, 255, 0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(122, 109, 255, 0.14) 1px, transparent 1px); background-size: 5% 8.9%; -webkit-mask-image: radial-gradient(80% 90% at 70% 40%, #000 0%, transparent 75%); mask-image: radial-gradient(80% 90% at 70% 40%, #000 0%, transparent 75%); }
-.sc-dash__screen { left: 24%; top: 17%; width: 92%; border-radius: 1.5% / 2.4%; box-shadow: 0 40px 60px -20px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.12); transform: rotateX(16deg) rotateY(10deg) rotateZ(-6deg); transform-origin: 0 0; }
-.sc-dash__panel { z-index: 2; left: 8%; top: 9%; width: 21%; border-radius: 5% / 3.8%; box-shadow: 0 28px 44px -12px rgba(0, 0, 0, 0.7); transform: rotate(-4deg); }
-.card__open:hover .sc-dash__screen, .card__open:focus-visible .sc-dash__screen { transform: rotateX(8deg) rotateY(5deg) rotateZ(-3deg) translateY(-3%); }
-.card__open:hover .sc-dash__panel, .card__open:focus-visible .sc-dash__panel { transform: translateY(-5%) rotate(-1deg); }
-
-/* 9 · Globalia — ecosystem bento */
-.scene--bento { background: #162a54; }
-.scene--bento img { border-radius: 2.4% / 4%; object-fit: cover; box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5); }
-.sc-bento__main { left: 3%; top: 4.5%; width: 62%; height: 91%; object-position: center top; }
-.sc-bento__a { right: 3%; top: 4.5%; width: 31%; height: 44.5%; object-position: center 30%; }
-.sc-bento__b { right: 3%; bottom: 4.5%; width: 31%; height: 44.5%; object-position: center 40%; }
-.card__open:hover .sc-bento__main, .card__open:focus-visible .sc-bento__main { transform: scale(0.985); }
-.card__open:hover .sc-bento__a, .card__open:focus-visible .sc-bento__a { transform: translateX(-3%) scale(1.04); }
-.card__open:hover .sc-bento__b, .card__open:focus-visible .sc-bento__b { transform: translateX(-3%) scale(1.04); }
+/* 6 · Globalia — a bento on a two-column grid; the same gap between every tile and as the margin's smaller sibling */
+.scene--bento { display: grid; grid-template-columns: 62fr 31fr; grid-template-rows: 1fr 1fr; gap: 1.6cqw; padding: 3cqw; }
+.scene--bento img { width: 100%; height: 100%; min-height: 0; }
+.sc-bento__main { grid-row: 1 / span 2; object-position: center top; }
+.sc-bento__a { object-position: center 30%; }
+.sc-bento__b { object-position: center 40%; }
+.card__open:hover .scene--bento img, .card__open:focus-visible .scene--bento img { transform: scale(1.015); }
 
 @media (prefers-reduced-motion: reduce) {
   .scene [class*='__'] { transition: none; }

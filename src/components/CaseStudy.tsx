@@ -138,13 +138,6 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
             x: gsap.quickTo(l, 'x', { duration: 0.9, ease: 'power3.out' }),
             y: gsap.quickTo(l, 'y', { duration: 0.9, ease: 'power3.out' }),
           }))
-          // the laptop also leans towards the cursor
-          const dev = stage.querySelector<HTMLElement>('.dev')
-          const lean = dev && {
-            ry: gsap.quickTo(dev, 'rotationY', { duration: 1, ease: 'power3.out' }),
-            rx: gsap.quickTo(dev, 'rotationX', { duration: 1, ease: 'power3.out' }),
-          }
-          if (dev) gsap.set(dev, { transformPerspective: 1300, transformOrigin: '50% 70%' })
           let raf = 0
           const onMove = (e: PointerEvent) => {
             const r = stage.getBoundingClientRect()
@@ -154,8 +147,6 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
               m.x(-nx * m.d * 26)
               m.y(-ny * m.d * 26)
             })
-            lean?.ry(nx * 9)
-            lean?.rx(-ny * 6)
             if (!raf)
               raf = requestAnimationFrame(() => {
                 raf = 0
@@ -165,8 +156,6 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
           }
           const onLeave = () => {
             movers.forEach((m) => (m.x(0), m.y(0)))
-            lean?.ry(0)
-            lean?.rx(0)
           }
           stage.addEventListener('pointermove', onMove)
           stage.addEventListener('pointerleave', onLeave)

@@ -15,8 +15,9 @@ export type Project = {
 }
 
 // Each Work card has its own composition (see components/Scenes.tsx)
-export type SceneKind = 'bleed' | 'tilt' | 'posters' | 'login' | 'laptop' | 'diagonal' | 'stickers' | 'dash' | 'bento'
-export type Scene = { kind: SceneKind; alt: string }
+export type SceneKind = 'bleed' | 'duo' | 'trio' | 'login' | 'laptop' | 'bento'
+// panel = which case-study panel (p1 / p2 / p3) sits beside the screen; flip = panel on the left
+export type Scene = { kind: SceneKind; alt: string; panel?: 'p1' | 'p2' | 'p3'; flip?: boolean }
 
 // Read off each deck cover slide
 export type Meta = { role: string; agency: string; scope: string; tools: string }
@@ -76,7 +77,7 @@ export const projects: Project[] = [
     bg: '#162a54',
     accent: '#1fa5ea',
     cover: 12,
-    scene: { kind: 'tilt', alt: 'Site Air Transat : la page « Soyez prêt pour votre voyage familial en Jamaïque » dans une fenêtre de navigateur inclinée' },
+    scene: { kind: 'duo', panel: 'p3', alt: 'Site Air Transat : la page « Soyez prêt pour votre voyage familial en Jamaïque » à côté de sa version mobile' },
     details: [
       'Inbound AI et recherche conversationnelle avec Ria',
       'landings de destinations hyper-personnalisées',
@@ -92,7 +93,7 @@ export const projects: Project[] = [
     bg: '#1f1f1f',
     accent: '#b89b6a',
     cover: 19,
-    scene: { kind: 'posters', alt: 'ESSLLL : trois visuels de la marque musicale en triptyque, sur fond de chaîne YouTube' },
+    scene: { kind: 'trio', alt: 'ESSLLL : trois visuels de la marque musicale alignés en triptyque' },
     details: [
       'direction artistique et univers visuel généré par IA',
       'production multimédia et déclinaisons de contenus vidéo',
@@ -163,7 +164,7 @@ export const projects: Project[] = [
     bg: '#011331',
     accent: '#5b8dff',
     cover: 40,
-    scene: { kind: 'diagonal', alt: 'Bijouterie Lavigueur : page d’accueil de la montre Alpina découpée en diagonale et fiche produit mobile' },
+    scene: { kind: 'duo', panel: 'p2', flip: true, alt: 'Bijouterie Lavigueur : page d’accueil de la montre Alpina et fiche produit mobile' },
     details: ['direction artistique et vision luxe', "l'expérience catalogue", 'habillage du tunnel de commande standardisé'],
   },
   {
@@ -176,7 +177,7 @@ export const projects: Project[] = [
     bg: '#600177',
     accent: '#ffa11f',
     cover: 47,
-    scene: { kind: 'stickers', alt: 'Intelli Jeunes : page d’accueil du portail éducatif avec mascotte, entourée de vignettes de jeux' },
+    scene: { kind: 'duo', panel: 'p1', alt: 'Intelli Jeunes : page d’accueil du portail éducatif avec mascotte, à côté de la grille des mascottes' },
     details: [
       'mascottes 3D et prompt engineering via Midjourney',
       'modules ludiques et outils enseignants',
@@ -193,7 +194,7 @@ export const projects: Project[] = [
     bg: '#08183a',
     accent: '#8c82ff',
     cover: 54,
-    scene: { kind: 'dash', alt: 'Staking Data : tableau de bord des actifs en perspective et écran d’alertes mobile' },
+    scene: { kind: 'duo', panel: 'p3', flip: true, alt: 'Staking Data : tableau de bord des actifs et écran d’alertes mobile' },
     details: ['gestion de portfolio unifiée', 'calculateur de gains intelligent', 'suivi des validateurs et alertes'],
   },
   {
