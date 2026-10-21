@@ -1,17 +1,20 @@
 // Built from the Figma deck (final v4 — fr): every module's position, stacking order and the deck's own copy.
 // It is plain data now — edit it by hand to nudge a layer. x / y / w are % of the slide's right-hand stage (839×1080);
 // z = stacking order; d = parallax depth (back ≈ 0.15, front ≈ 2).
-export type CaseLayer = { f: string; iw: number; ih: number; x: number; y: number; w: number; z: number; d: number; kind: 'bg' | 'mod'; alt?: string }
+//   kind  bg    a full-panel ground (never moves)      mod    a rectangular screen / photo / card (rounded corners + shadow)
+//         shape a see-through cut-out (phone, sticker…) cut   the edges where a module runs off the slide: t b l r (kept square)
+export type CaseLayer = { f: string; iw: number; ih: number; x: number; y: number; w: number; z: number; d: number; kind: 'bg' | 'mod' | 'shape'; cut?: string; alt?: string }
 export type CaseSlide = { n: string; title: string; text: string; stage: string; bleed?: boolean; layers: CaseLayer[] }
 export type CaseImg = { f: string; iw: number; ih: number; alt: string }
 export type CaseMeta = { role: string; agency: string; scope: string; tools: string }
+// the goal chips floating over the context photo: x / y / w / h are % of the stage
+export type CaseChip = { n: string; text: string; x: number; y: number; w: number; h: number }
 export type CaseData = {
   base: string
   meta: CaseMeta
-  hero: CaseImg
-  intro: { lead: string; photo: CaseImg }
-  goalsTitle: string
-  goals: { n: string; title: string; text: string }[]
+  // the project's screen; x / y / w place it inside the laptop (% of the laptop's box)
+  hero: CaseImg & { x: number; y: number; w: number }
+  intro: { lead: string; photo: CaseImg; chips: CaseChip[] }
   slides: CaseSlide[]
 }
 
@@ -28,7 +31,10 @@ export const cases: Record<string, CaseData> = {
    "f": "hero.webp",
    "iw": 2382,
    "ih": 1494,
-   "alt": "Page d’accueil — Camping Québec"
+   "alt": "Page d’accueil — Camping Québec",
+   "x": 9.6,
+   "y": 6.2,
+   "w": 80.9
   },
   "intro": {
    "lead": "Le projet visait à restructurer un écosystème à double enjeu : un portail B2C fluide orienté sur la découverte et la recherche de terrains, ainsi qu'une Zone Exploitant complète pour la gestion des adhésions et des fiches d'établissements.",
@@ -37,26 +43,34 @@ export const cases: Record<string, CaseData> = {
     "iw": 1678,
     "ih": 2160,
     "alt": "Une tente orange éclairée sous un ciel étoilé, au milieu de la forêt"
-   }
+   },
+   "chips": [
+    {
+     "n": "01",
+     "text": "Optimiser la recherche et la découverte de terrains",
+     "x": -11.7,
+     "y": 10.5,
+     "w": 46.1,
+     "h": 15
+    },
+    {
+     "n": "02",
+     "text": "Numériser la Zone Exploitant et l'adhésion B2B",
+     "x": 45.2,
+     "y": 30,
+     "w": 46.1,
+     "h": 15
+    },
+    {
+     "n": "03",
+     "text": "Enrichir le contenu décisionnel et l'expérience mobile",
+     "x": -5.4,
+     "y": 56.6,
+     "w": 46.1,
+     "h": 15
+    }
+   ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Optimiser la recherche et la découverte de terrains",
-    "text": "Structure d'une interface de recherche intuitive permettant d'explorer les terrains par région, promotions ou équipements."
-   },
-   {
-    "n": "02",
-    "title": "Numériser la Zone Exploitant et l'adhésion B2B",
-    "text": "Création des gabarits complexes de la Zone Exploitant."
-   },
-   {
-    "n": "03",
-    "title": "Enrichir le contenu décisionnel et l'expérience mobile",
-    "text": "Déploiement des gabarits d'exploration (Explore, Promotions, Outils Camping et Blogue)."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -74,6 +88,7 @@ export const cases: Record<string, CaseData> = {
       "z": 1,
       "d": 0.5,
       "kind": "mod",
+      "cut": "b",
       "alt": "Recherche géolocalisée & système de favoris : aperçu de l’interface"
      },
      {
@@ -86,6 +101,7 @@ export const cases: Record<string, CaseData> = {
       "z": 2,
       "d": 0.5,
       "kind": "mod",
+      "cut": "b",
       "alt": "Recherche géolocalisée & système de favoris : aperçu de l’interface"
      }
     ]
@@ -128,7 +144,8 @@ export const cases: Record<string, CaseData> = {
       "w": 51.5,
       "z": 3,
       "d": 1.9,
-      "kind": "mod"
+      "kind": "mod",
+      "cut": "l"
      },
      {
       "f": "g2-f2608727.webp",
@@ -140,6 +157,7 @@ export const cases: Record<string, CaseData> = {
       "z": 4,
       "d": 1.7,
       "kind": "mod",
+      "cut": "l",
       "alt": "Espace propriétaire & gestion des adhésions : aperçu de l’interface"
      },
      {
@@ -151,7 +169,7 @@ export const cases: Record<string, CaseData> = {
       "w": 20.6,
       "z": 5,
       "d": 1.9,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Espace propriétaire & gestion des adhésions : aperçu de l’interface"
      },
      {
@@ -182,7 +200,7 @@ export const cases: Record<string, CaseData> = {
       "w": 44.3,
       "z": 1,
       "d": 1.2,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Contenus inspirationnels & outils pour campeurs : aperçu de l’interface"
      },
      {
@@ -207,6 +225,7 @@ export const cases: Record<string, CaseData> = {
       "z": 3,
       "d": 0.5,
       "kind": "mod",
+      "cut": "b",
       "alt": "Contenus inspirationnels & outils pour campeurs : aperçu de l’interface"
      }
     ]
@@ -225,7 +244,10 @@ export const cases: Record<string, CaseData> = {
    "f": "hero.webp",
    "iw": 2346,
    "ih": 1532,
-   "alt": "Page d’accueil — ESSLLL"
+   "alt": "Page d’accueil — ESSLLL",
+   "x": 10.3,
+   "y": 5.9,
+   "w": 79.7
   },
   "intro": {
    "lead": "Projet personnel né de la rencontre entre 15 ans dans un groupe de musique, une formation en photographie et un parcours de designer UI/UX. ESSLLL est un groupe de metalcore entièrement conçu à l'aide de l'intelligence artificielle : paroles, composition musicale, imagerie et identité de marque. De la direction artistique jusqu'à la distribution, chaque aspect du projet a été pensé et exécuté en solo.",
@@ -234,26 +256,34 @@ export const cases: Record<string, CaseData> = {
     "iw": 1678,
     "ih": 2160,
     "alt": "Une silhouette en cape sur une falaise battue par la tempête"
-   }
+   },
+   "chips": [
+    {
+     "n": "01",
+     "text": "Identité de marque & direction artistique",
+     "x": 10.4,
+     "y": 5.4,
+     "w": 46.1,
+     "h": 13.1
+    },
+    {
+     "n": "02",
+     "text": "Production de contenu vidéo & présence multiplateforme",
+     "x": -12,
+     "y": 43,
+     "w": 47.7,
+     "h": 15
+    },
+    {
+     "n": "03",
+     "text": "Distribution & croissance d'audience",
+     "x": 42.8,
+     "y": 65,
+     "w": 45.8,
+     "h": 13.1
+    }
+   ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Identité de marque & direction artistique",
-    "text": "En s'appuyant sur Midjourney et Ideogram, j'ai développé une esthétique visuelle distincte pour chaque sortie tout en maintenant une signature de marque reconnaissable à travers l'ensemble du catalogue, nourrie par plus de 20 ans d'expérience en photographie et en design."
-   },
-   {
-    "n": "02",
-    "title": "Production de contenu vidéo & présence multiplateforme",
-    "text": "Chaque chanson est accompagnée d'une vidéo dédiée et de formats courts pensés pour les réseaux sociaux et diffusés sur l'ensemble des plateformes."
-   },
-   {
-    "n": "03",
-    "title": "Distribution & croissance d'audience",
-    "text": "Le projet est distribué sur toutes les plateformes de streaming, cumulant plus de 150 000 écoutes sur Spotify."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -282,6 +312,7 @@ export const cases: Record<string, CaseData> = {
       "z": 2,
       "d": 0.5,
       "kind": "mod",
+      "cut": "b",
       "alt": "Direction artistique & univers visuel généré par IA : aperçu de l’interface"
      },
      {
@@ -394,7 +425,8 @@ export const cases: Record<string, CaseData> = {
       "w": 38.6,
       "z": 5,
       "d": 1.8,
-      "kind": "mod"
+      "kind": "mod",
+      "cut": "l"
      },
      {
       "f": "g2-image16.webp",
@@ -405,7 +437,8 @@ export const cases: Record<string, CaseData> = {
       "w": 14.3,
       "z": 6,
       "d": 2,
-      "kind": "mod"
+      "kind": "mod",
+      "cut": "l"
      },
      {
       "f": "g2-image18.webp",
@@ -459,6 +492,7 @@ export const cases: Record<string, CaseData> = {
       "z": 3,
       "d": 0.5,
       "kind": "mod",
+      "cut": "b",
       "alt": "Distribution, streaming & communauté Patreon : aperçu de l’interface"
      },
      {
@@ -511,7 +545,10 @@ export const cases: Record<string, CaseData> = {
    "f": "hero.webp",
    "iw": 2340,
    "ih": 1492,
-   "alt": "Page d’accueil — Air Transat / Ria"
+   "alt": "Page d’accueil — Air Transat / Ria",
+   "x": 10.3,
+   "y": 6.2,
+   "w": 79.5
   },
   "intro": {
    "lead": "Projet de démonstration/pitch d'innovation développé pour Air Transat. L'objectif était de réinventer l'engagement des voyageurs grâce à Ria, une agente conversationnelle IA intégrée directement au site, capable de déclencher des parcours d'exploration et des campagnes marketing automatisées hyper-personnalisées.",
@@ -520,26 +557,34 @@ export const cases: Record<string, CaseData> = {
     "iw": 1678,
     "ih": 2160,
     "alt": "Vue aérienne d’une côte tropicale"
-   }
+   },
+   "chips": [
+    {
+     "n": "01",
+     "text": "Redessiner l'en-tête et l'expérience de recherche (Ria)",
+     "x": 8,
+     "y": 28.1,
+     "w": 43.3,
+     "h": 15
+    },
+    {
+     "n": "02",
+     "text": "Générer des landing pages dynamiques par destination",
+     "x": 44.9,
+     "y": 53.3,
+     "w": 46.1,
+     "h": 15
+    },
+    {
+     "n": "03",
+     "text": "Boucler la boucle Inbound via des infolettres personnalisées",
+     "x": -7.5,
+     "y": 76.7,
+     "w": 50.4,
+     "h": 15
+    }
+   ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Redessiner l'en-tête et l'expérience de recherche (Ria)",
-    "text": "Intégration de l'agente Ria dans l'en-tête principal et création d'une interface de dialogue plein écran immersive."
-   },
-   {
-    "n": "02",
-    "title": "Générer des landing pages dynamiques par destination",
-    "text": "Conception de gabarits de pages d'atterrissage riches (ex."
-   },
-   {
-    "n": "03",
-    "title": "Boucler la boucle Inbound via des infolettres personnalisées",
-    "text": "Déploiement des gabarits de courriels transactionnels/Inbound déclenchés après la consultation d'une destination."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -592,7 +637,8 @@ export const cases: Record<string, CaseData> = {
       "w": 17.5,
       "z": 4,
       "d": 1.9,
-      "kind": "mod"
+      "kind": "mod",
+      "cut": "l"
      },
      {
       "f": "g1-frame69.webp",
@@ -614,7 +660,7 @@ export const cases: Record<string, CaseData> = {
       "w": 58,
       "z": 6,
       "d": 1.7,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "IA inbound & recherche conversationnelle (Ria) : aperçu de l’interface"
      }
     ]
@@ -634,7 +680,7 @@ export const cases: Record<string, CaseData> = {
       "w": 128.6,
       "z": 1,
       "d": 0.5,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Landing pages par destination hyper-personnalisées : aperçu de l’interface"
      },
      {
@@ -647,6 +693,7 @@ export const cases: Record<string, CaseData> = {
       "z": 2,
       "d": 0.5,
       "kind": "mod",
+      "cut": "b",
       "alt": "Landing pages par destination hyper-personnalisées : aperçu de l’interface"
      },
      {
@@ -670,7 +717,8 @@ export const cases: Record<string, CaseData> = {
       "w": 30.9,
       "z": 4,
       "d": 2,
-      "kind": "mod"
+      "kind": "mod",
+      "cut": "l"
      }
     ]
    },
@@ -689,7 +737,7 @@ export const cases: Record<string, CaseData> = {
       "w": 128.6,
       "z": 1,
       "d": 0.5,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Retargeting automatisé & infolettres personnalisées : aperçu de l’interface"
      },
      {
@@ -713,7 +761,7 @@ export const cases: Record<string, CaseData> = {
       "w": 39.1,
       "z": 3,
       "d": 1.9,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Retargeting automatisé & infolettres personnalisées : aperçu de l’interface"
      },
      {
@@ -725,7 +773,7 @@ export const cases: Record<string, CaseData> = {
       "w": 39.1,
       "z": 4,
       "d": 1.9,
-      "kind": "mod"
+      "kind": "shape"
      },
      {
       "f": "g3-frame86.webp",
@@ -736,7 +784,7 @@ export const cases: Record<string, CaseData> = {
       "w": 39.1,
       "z": 5,
       "d": 1.9,
-      "kind": "mod"
+      "kind": "shape"
      }
     ]
    }
@@ -754,7 +802,10 @@ export const cases: Record<string, CaseData> = {
    "f": "hero.webp",
    "iw": 2360,
    "ih": 1526,
-   "alt": "Page d’accueil — Bijouterie Lavigueur"
+   "alt": "Page d’accueil — Bijouterie Lavigueur",
+   "x": 9.7,
+   "y": 4.5,
+   "w": 80.2
   },
   "intro": {
    "lead": "Collaboration étroite avec l'équipe e-commerce pour moderniser la plateforme Magento de la Bijouterie Lavigueur. L'objectif était d'aligner l'expérience numérique avec le prestige de leurs collections de haute joaillerie.",
@@ -763,26 +814,34 @@ export const cases: Record<string, CaseData> = {
     "iw": 1678,
     "ih": 2160,
     "alt": "Une bague en diamants posée sur une roche noire"
-   }
+   },
+   "chips": [
+    {
+     "n": "01",
+     "text": "Rehausser l'image de marque",
+     "x": 40.5,
+     "y": 10.4,
+     "w": 42.7,
+     "h": 13.1
+    },
+    {
+     "n": "02",
+     "text": "Refondre l'expérience catalogue",
+     "x": 7,
+     "y": 58.5,
+     "w": 47.9,
+     "h": 13.1
+    },
+    {
+     "n": "03",
+     "text": "Unifier le tunnel d'achat",
+     "x": 36.4,
+     "y": 80.9,
+     "w": 50.9,
+     "h": 13.1
+    }
+   ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Rehausser l'image de marque",
-    "text": "Élaboration d'un moodboard stratégique pour convaincre l'équipe de faire évoluer la marque."
-   },
-   {
-    "n": "02",
-    "title": "Refondre l'expérience catalogue",
-    "text": "Modernisation complète de l’interface de la boutique."
-   },
-   {
-    "n": "03",
-    "title": "Unifier le tunnel d'achat",
-    "text": "Déclinaison minutieuse de la nouvelle identité visuelle sur le parcours transactionnel standard de l'équipe de développement."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -819,6 +878,7 @@ export const cases: Record<string, CaseData> = {
       "z": 1,
       "d": 0.5,
       "kind": "mod",
+      "cut": "b",
       "alt": "L'expérience catalogue : aperçu de l’interface"
      },
      {
@@ -830,7 +890,7 @@ export const cases: Record<string, CaseData> = {
       "w": 72.9,
       "z": 2,
       "d": 0.5,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "L'expérience catalogue : aperçu de l’interface"
      }
     ]
@@ -851,6 +911,7 @@ export const cases: Record<string, CaseData> = {
       "z": 1,
       "d": 0.5,
       "kind": "mod",
+      "cut": "b",
       "alt": "Habillage du tunnel standardisé : aperçu de l’interface"
      }
     ]
@@ -869,7 +930,10 @@ export const cases: Record<string, CaseData> = {
    "f": "hero.webp",
    "iw": 2400,
    "ih": 1470,
-   "alt": "Page d’accueil — Staking Data / View"
+   "alt": "Page d’accueil — Staking Data / View",
+   "x": 8.2,
+   "y": 5.2,
+   "w": 83.6
   },
   "intro": {
    "lead": "Staking Data est un concept issu du processus d'incubation R&D interne de Globalia, visant à concevoir une plateforme SaaS unifiée de staking de crypto-actifs. Le mandat visait à structurer la gestion de portefeuilles multiples, la visualisation de données financières complexes et la simulation de rendements.",
@@ -878,26 +942,34 @@ export const cases: Record<string, CaseData> = {
     "iw": 1678,
     "ih": 2160,
     "alt": "Abstraction fluide rose et violette"
-   }
+   },
+   "chips": [
+    {
+     "n": "01",
+     "text": "Centraliser la gestion multi-portefeuilles",
+     "x": -13.2,
+     "y": 6.8,
+     "w": 42.7,
+     "h": 15
+    },
+    {
+     "n": "02",
+     "text": "Intégrer un calculateur de gains prévisionnels",
+     "x": 45.6,
+     "y": 48.7,
+     "w": 48.4,
+     "h": 13.1
+    },
+    {
+     "n": "03",
+     "text": "Simplifier le suivi des validateurs & alertes",
+     "x": 15.9,
+     "y": 85.7,
+     "w": 48,
+     "h": 13.1
+    }
+   ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Centraliser la gestion multi-portefeuilles",
-    "text": "Un tableau de bord centralisé pour suivre en temps réel les soldes, l’évolution des rendements et basculer instantanément entre plusieurs portefeuilles."
-   },
-   {
-    "n": "02",
-    "title": "Intégrer un calculateur de gains prévisionnels",
-    "text": "Un outil interactif permettant de simuler précisément les retours sur investissement selon l'actif choisi et la durée de staking."
-   },
-   {
-    "n": "03",
-    "title": "Simplifier le suivi des validateurs & alertes",
-    "text": "Une vue détaillée pour comparer les validateurs selon leur rendement (APY) et leur commission, et configurer des alertes personnalisées en un clin d’œil."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -914,7 +986,7 @@ export const cases: Record<string, CaseData> = {
       "w": 29.1,
       "z": 1,
       "d": 2,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Gestion de portefeuilles unifiée : aperçu de l’interface"
      },
      {
@@ -926,7 +998,7 @@ export const cases: Record<string, CaseData> = {
       "w": 94.5,
       "z": 2,
       "d": 0.5,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Gestion de portefeuilles unifiée : aperçu de l’interface"
      },
      {
@@ -938,7 +1010,7 @@ export const cases: Record<string, CaseData> = {
       "w": 26.9,
       "z": 3,
       "d": 2,
-      "kind": "mod"
+      "kind": "shape"
      },
      {
       "f": "g1-popup.webp",
@@ -992,7 +1064,7 @@ export const cases: Record<string, CaseData> = {
       "w": 91.5,
       "z": 3,
       "d": 0.5,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Calculateur de gains intelligent : aperçu de l’interface"
      }
     ]
@@ -1013,6 +1085,7 @@ export const cases: Record<string, CaseData> = {
       "z": 1,
       "d": 0.5,
       "kind": "mod",
+      "cut": "b",
       "alt": "Suivi des validateurs et alertes : aperçu de l’interface"
      },
      {
@@ -1024,7 +1097,7 @@ export const cases: Record<string, CaseData> = {
       "w": 72.9,
       "z": 2,
       "d": 0.5,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Suivi des validateurs et alertes : aperçu de l’interface"
      }
     ]
@@ -1043,7 +1116,10 @@ export const cases: Record<string, CaseData> = {
    "f": "hero.webp",
    "iw": 2333,
    "ih": 1502,
-   "alt": "Page d’accueil — Globalia Brand Identity"
+   "alt": "Page d’accueil — Globalia Brand Identity",
+   "x": 10.6,
+   "y": 6.3,
+   "w": 79.2
   },
   "intro": {
    "lead": "Mandat continu de direction artistique interne chez Globalia. Le projet visait à harmoniser l'écosystème de marque à tous les points de contact : site web, présentations de vente, gabarits LinkedIn, documents RH et événements d'équipe (microsite du lac à l'épaule, marchandise).",
@@ -1052,26 +1128,34 @@ export const cases: Record<string, CaseData> = {
     "iw": 1678,
     "ih": 2160,
     "alt": "Deux collègues autour d’un ordinateur portable, souriantes"
-   }
+   },
+   "chips": [
+    {
+     "n": "01",
+     "text": "Refondre le site web corporatif & les études de cas",
+     "x": -11.6,
+     "y": 11.9,
+     "w": 44.1,
+     "h": 15
+    },
+    {
+     "n": "02",
+     "text": "Déployer un écosystème de communication cohérent",
+     "x": 37.1,
+     "y": 54.6,
+     "w": 53,
+     "h": 13.1
+    },
+    {
+     "n": "03",
+     "text": "Concevoir des expériences de marque et culturelles",
+     "x": 18.5,
+     "y": 83.8,
+     "w": 52.8,
+     "h": 13.1
+    }
+   ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Refondre le site web corporatif & les études de cas",
-    "text": "Conception et déploiement de la refonte complète du site web de Globalia (UX/UI et direction artistique) pour aligner la plateforme sur le positionnement de l'agence."
-   },
-   {
-    "n": "02",
-    "title": "Déployer un écosystème de communication cohérent",
-    "text": "Déploiement d'une charte graphique omnicanale : habillage des réseaux sociaux d'agence, design des publications et infolettres Inbound."
-   },
-   {
-    "n": "03",
-    "title": "Concevoir des expériences de marque et culturelles",
-    "text": "Design d'expériences de marque immersives pour la culture d'entreprise : conception du microsite annuel du lac à l'épaule, gabarits du site carrière et développement d'une ligne de vêtements et d'accessoires corporatifs modernes."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -1123,7 +1207,7 @@ export const cases: Record<string, CaseData> = {
       "w": 69.4,
       "z": 4,
       "d": 0.5,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Refonte intégrale du site corporatif & études de cas : aperçu de l’interface"
      },
      {
@@ -1168,7 +1252,7 @@ export const cases: Record<string, CaseData> = {
       "w": 34.7,
       "z": 8,
       "d": 2.1,
-      "kind": "mod"
+      "kind": "shape"
      }
     ]
    },
@@ -1199,7 +1283,8 @@ export const cases: Record<string, CaseData> = {
       "w": 25,
       "z": 2,
       "d": 1.9,
-      "kind": "mod"
+      "kind": "mod",
+      "cut": "r"
      },
      {
       "f": "g2-c8.webp",
@@ -1221,7 +1306,7 @@ export const cases: Record<string, CaseData> = {
       "w": 25.1,
       "z": 4,
       "d": 1.9,
-      "kind": "mod"
+      "kind": "shape"
      },
      {
       "f": "g2-c1.webp",
@@ -1232,7 +1317,8 @@ export const cases: Record<string, CaseData> = {
       "w": 15,
       "z": 5,
       "d": 2,
-      "kind": "mod"
+      "kind": "mod",
+      "cut": "l"
      },
      {
       "f": "g2-c2b.webp",
@@ -1243,7 +1329,7 @@ export const cases: Record<string, CaseData> = {
       "w": 17,
       "z": 6,
       "d": 2,
-      "kind": "mod"
+      "kind": "shape"
      },
      {
       "f": "g2-c3.webp",
@@ -1254,7 +1340,7 @@ export const cases: Record<string, CaseData> = {
       "w": 17,
       "z": 7,
       "d": 2,
-      "kind": "mod"
+      "kind": "shape"
      },
      {
       "f": "g2-k12.webp",
@@ -1265,7 +1351,7 @@ export const cases: Record<string, CaseData> = {
       "w": 46.7,
       "z": 8,
       "d": 1.3,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Écosystème réseaux sociaux, documents RH & outils de vente : aperçu de l’interface"
      },
      {
@@ -1289,7 +1375,7 @@ export const cases: Record<string, CaseData> = {
       "w": 46.6,
       "z": 10,
       "d": 1.8,
-      "kind": "mod"
+      "kind": "shape"
      }
     ]
    },
@@ -1308,7 +1394,7 @@ export const cases: Record<string, CaseData> = {
       "w": 67.7,
       "z": 1,
       "d": 0.5,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Microsite événementiel, site carrière & swag : aperçu de l’interface"
      },
      {
@@ -1343,7 +1429,8 @@ export const cases: Record<string, CaseData> = {
       "w": 21.7,
       "z": 4,
       "d": 2,
-      "kind": "mod"
+      "kind": "mod",
+      "cut": "l"
      },
      {
       "f": "g3-group2609936.webp",
@@ -1354,7 +1441,7 @@ export const cases: Record<string, CaseData> = {
       "w": 28.7,
       "z": 5,
       "d": 2.1,
-      "kind": "mod"
+      "kind": "shape"
      },
      {
       "f": "g3-f2608682.webp",
@@ -1365,7 +1452,7 @@ export const cases: Record<string, CaseData> = {
       "w": 24.8,
       "z": 6,
       "d": 2,
-      "kind": "mod"
+      "kind": "shape"
      },
      {
       "f": "g3-group2608634.webp",
@@ -1376,7 +1463,8 @@ export const cases: Record<string, CaseData> = {
       "w": 18.6,
       "z": 7,
       "d": 1.9,
-      "kind": "mod"
+      "kind": "mod",
+      "cut": "l"
      },
      {
       "f": "g3-untitled1.webp",
@@ -1399,6 +1487,7 @@ export const cases: Record<string, CaseData> = {
       "z": 9,
       "d": 1.9,
       "kind": "mod",
+      "cut": "t",
       "alt": "Microsite événementiel, site carrière & swag : aperçu de l’interface"
      }
     ]
@@ -1417,7 +1506,10 @@ export const cases: Record<string, CaseData> = {
    "f": "hero.webp",
    "iw": 2362,
    "ih": 1482,
-   "alt": "Page d’accueil — Intelli Jeunes"
+   "alt": "Page d’accueil — Intelli Jeunes",
+   "x": 10.1,
+   "y": 6.2,
+   "w": 80.2
   },
   "intro": {
    "lead": "Développé chez Globalia en collaboration avec le directeur IA, Intelli Jeunes est un concept de plateforme ludo-éducative propulsée par l'intelligence artificielle. Le mandat visait à créer la direction artistique de zéro, générer l'univers visuel par IA et concevoir l'ensemble de la plateforme web éducative.",
@@ -1426,26 +1518,34 @@ export const cases: Record<string, CaseData> = {
     "iw": 1678,
     "ih": 2160,
     "alt": "Une mascotte monstre 3D violette et bleue, aux grandes cornes"
-   }
+   },
+   "chips": [
+    {
+     "n": "01",
+     "text": "Incarner la marque via Midjourney",
+     "x": -11.3,
+     "y": 7.2,
+     "w": 42.7,
+     "h": 13.1
+    },
+    {
+     "n": "02",
+     "text": "Articuler les modules ludo-éducatifs",
+     "x": 31.3,
+     "y": 63.1,
+     "w": 48.4,
+     "h": 13.1
+    },
+    {
+     "n": "03",
+     "text": "Décliner l'écosystème web complet",
+     "x": -5,
+     "y": 85,
+     "w": 48,
+     "h": 13.1
+    }
+   ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Incarner la marque via Midjourney",
-    "text": "Création et génération complète d'une banque de mascottes monstres 3D grâce à un travail rigoureux de prompt engineering sur Midjourney."
-   },
-   {
-    "n": "02",
-    "title": "Articuler les modules ludo-éducatifs",
-    "text": "Structuration des sections de présentation des fonctionnalités clés (gestion de classe, suivi des progrès, personnalisation)."
-   },
-   {
-    "n": "03",
-    "title": "Décliner l'écosystème web complet",
-    "text": "Déclinaison complète du système de pages (Accueil, À propos, Contact, Connexion)."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -1481,7 +1581,7 @@ export const cases: Record<string, CaseData> = {
       "w": 63.4,
       "z": 1,
       "d": 0.9,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Modules ludiques & outils enseignants : aperçu de l’interface"
      },
      {
@@ -1493,7 +1593,7 @@ export const cases: Record<string, CaseData> = {
       "w": 74,
       "z": 2,
       "d": 1.2,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Modules ludiques & outils enseignants : aperçu de l’interface"
      },
      {
@@ -1505,7 +1605,7 @@ export const cases: Record<string, CaseData> = {
       "w": 78.8,
       "z": 3,
       "d": 1.2,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Modules ludiques & outils enseignants : aperçu de l’interface"
      }
     ]
@@ -1538,6 +1638,7 @@ export const cases: Record<string, CaseData> = {
       "z": 2,
       "d": 0.5,
       "kind": "mod",
+      "cut": "b",
       "alt": "Écosystème web & parcours d’accès : aperçu de l’interface"
      }
     ]
@@ -1556,7 +1657,10 @@ export const cases: Record<string, CaseData> = {
    "f": "hero.webp",
    "iw": 2384,
    "ih": 1534,
-   "alt": "Page d’accueil — Maïa"
+   "alt": "Page d’accueil — Maïa",
+   "x": 9.7,
+   "y": 4.5,
+   "w": 81
   },
   "intro": {
    "lead": "Soutenu par des fonds gouvernementaux, Maïa est un projet ambitieux visant à démocratiser l'accès aux opportunités d'affaires pour les femmes entrepreneures. Le projet a été divisé en deux phases stratégiques : une V1 axée sur l'acquisition (HubSpot) et une V2 future intégrant le système d'appels d'offres B2B.",
@@ -1565,26 +1669,34 @@ export const cases: Record<string, CaseData> = {
     "iw": 1678,
     "ih": 2160,
     "alt": "Une femme aux cheveux courts qui travaille sur son ordinateur portable"
-   }
+   },
+   "chips": [
+    {
+     "n": "01",
+     "text": "Incarner l'écosystème féminin B2B",
+     "x": 5,
+     "y": 16.1,
+     "w": 46.1,
+     "h": 13.1
+    },
+    {
+     "n": "02",
+     "text": "Structurer le double parcours d'acquisition",
+     "x": -10.4,
+     "y": 44.8,
+     "w": 50.5,
+     "h": 13.1
+    },
+    {
+     "n": "03",
+     "text": "Garantir une expérience mobile fluide",
+     "x": 25.3,
+     "y": 65.2,
+     "w": 50.9,
+     "h": 13.1
+    }
+   ]
   },
-  "goalsTitle": "Trois objectifs",
-  "goals": [
-   {
-    "n": "01",
-    "title": "Incarner l'écosystème féminin B2B",
-    "text": "Livraison d'un guide de normes graphiques exhaustif."
-   },
-   {
-    "n": "02",
-    "title": "Structurer le double parcours d'acquisition",
-    "text": "Conception d'une architecture web optimisée pour générer des leads, structurée autour de deux parcours utilisateurs distincts : l'acquisition de grandes corporations (Acheteurs) et l'intégration d'entreprises féminines (Fournisseurs)."
-   },
-   {
-    "n": "03",
-    "title": "Garantir une expérience mobile fluide",
-    "text": "Déclinaison rigoureuse des interfaces en version mobile (responsive design), garantissant une expérience utilisateur fluide et accessible sur tous les appareils pour maximiser l’acquisition."
-   }
-  ],
   "slides": [
    {
     "n": "01",
@@ -1612,7 +1724,7 @@ export const cases: Record<string, CaseData> = {
       "w": 72.9,
       "z": 2,
       "d": 1.4,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Concevoir une identité forte : aperçu de l’interface"
      },
      {
@@ -1624,7 +1736,7 @@ export const cases: Record<string, CaseData> = {
       "w": 37.5,
       "z": 3,
       "d": 1.6,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Concevoir une identité forte : aperçu de l’interface"
      },
      {
@@ -1636,7 +1748,7 @@ export const cases: Record<string, CaseData> = {
       "w": 25.6,
       "z": 4,
       "d": 1.8,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Concevoir une identité forte : aperçu de l’interface"
      }
     ]
@@ -1656,7 +1768,7 @@ export const cases: Record<string, CaseData> = {
       "w": 61,
       "z": 1,
       "d": 0.8,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Parcours d'acquisition : aperçu de l’interface"
      },
      {
@@ -1668,7 +1780,7 @@ export const cases: Record<string, CaseData> = {
       "w": 75.7,
       "z": 2,
       "d": 0.7,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Parcours d'acquisition : aperçu de l’interface"
      },
      {
@@ -1680,7 +1792,7 @@ export const cases: Record<string, CaseData> = {
       "w": 91.5,
       "z": 3,
       "d": 0.5,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Parcours d'acquisition : aperçu de l’interface"
      },
      {
@@ -1692,7 +1804,7 @@ export const cases: Record<string, CaseData> = {
       "w": 9.4,
       "z": 4,
       "d": 2.1,
-      "kind": "mod"
+      "kind": "shape"
      }
     ]
    },
@@ -1723,6 +1835,7 @@ export const cases: Record<string, CaseData> = {
       "z": 2,
       "d": 0.5,
       "kind": "mod",
+      "cut": "b",
       "alt": "Expérience mobile optimisée : aperçu de l’interface"
      }
     ]
