@@ -7,7 +7,7 @@ import Scene from './Scenes'
 const INK = '#0a0a0f'
 
 // How small and how dim a card gets when it is far from the centre of the screen (the centred one is 1 / 1)
-const FOCUS = { scale: 0.78, opacity: 0.42 }
+const FOCUS = { scale: 0.78, opacity: 0.7 }
 
 // Keep in sync with the desktop block in index.css: only there does the section pin and slide sideways.
 const DESKTOP = '(min-width: 801px) and (prefers-reduced-motion: no-preference)'
