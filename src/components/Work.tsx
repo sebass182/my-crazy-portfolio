@@ -6,6 +6,9 @@ import Scene from './Scenes'
 
 const INK = '#0a0a0f'
 
+// How small and how dim a card gets when it is far from the centre of the screen (the centred one is 1 / 1)
+const FOCUS = { scale: 0.78, opacity: 0.42 }
+
 // Keep in sync with the desktop block in index.css: only there does the section pin and slide sideways.
 const DESKTOP = '(min-width: 801px) and (prefers-reduced-motion: no-preference)'
 const STACKED = '(max-width: 800px), (prefers-reduced-motion: reduce)'
@@ -66,8 +69,8 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
           }),
         )
 
-        // Caption slides up as each card arrives (the picture itself stays at its true size — no zoom)
         cards.forEach((card) => {
+          // Caption slides up as each card arrives
           gsap.from(card.querySelectorAll('.card__meta > *'), {
             y: 40,
             opacity: 0,
@@ -75,6 +78,16 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
             ease: 'power3.out',
             scrollTrigger: { trigger: card, containerAnimation: scroll, start: 'left 85%', end: 'right left', toggleActions: 'play reverse play reverse' },
           })
+
+          // Focus: the card in the middle of the screen is the biggest and brightest, the ones either side shrink and dim.
+          // Scrubbed along the slider itself, from the card entering on the right to leaving on the left — its midpoint is
+          // exactly "centred" — so it swells in, peaks softly (sine ease, no kink) and fades back out as it goes.
+          gsap
+            .timeline({
+              scrollTrigger: { trigger: card, containerAnimation: scroll, start: 'left right', end: 'right left', scrub: true },
+            })
+            .fromTo(card, { scale: FOCUS.scale, opacity: FOCUS.opacity }, { scale: 1, opacity: 1, ease: 'sine.out' })
+            .to(card, { scale: FOCUS.scale, opacity: FOCUS.opacity, ease: 'sine.in' })
         })
       })
 
@@ -155,9 +168,6 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
           >
             Passer les travaux →
           </a>
-          <span className="work__hint" aria-hidden="true">
-            Défiler ↓
-          </span>
         </span>
       </div>
       <div className="work__bar" aria-hidden="true" />
