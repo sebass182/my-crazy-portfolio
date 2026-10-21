@@ -184,12 +184,12 @@
 .hc--x .hl--device img { transition: none; }
 .hc--x .hl--device:hover img { transform: none; }
 
-/* 2 · the context: the paragraph on the cream, the photo on the stage, the three goals floating across the edge */
-.hc-slide__copy--intro { grid-template-rows: none; align-content: center; gap: clamp(1rem, 2vw, 1.8rem); padding: 7% 8% 7% 8.5%; }
-.hc-tag { justify-self: start; display: inline-block; padding: 0.4rem 0.7rem; border-radius: 6px; background: var(--accent); color: #0a0a0f; font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; line-height: 1; }
-.hc-slide--intro .hc-lead { margin: 0; font-size: clamp(1.02rem, 1.75vw, 1.6rem); font-weight: 500; line-height: 1.42; letter-spacing: -0.02em; color: #0a0a0f; }
+/* 2 · À propos: as on Holo MD (the paragraph, the photo), with the three goals floating over the photo as on the deck.
+   The photo's box is not clipped — a chip crosses its edge — the picture inside it is. */
+.hc--x .hc-photo { position: relative; overflow: visible; border-radius: 0; aspect-ratio: auto; container-type: inline-size; }
+.hc-photo__frame { overflow: hidden; border-radius: 24px; aspect-ratio: 839 / 1080; }
 .chips { list-style: none; }
-.hl--chip { left: calc(var(--x) * 1%); } /* on a phone the photo has no cream panel beside it: a chip is kept inside the card */
+.hl--chip { left: calc(var(--x) * 1%); } /* on a phone a chip is kept inside the card (see below) */
 .chip {
   display: flex;
   align-items: center;
@@ -208,6 +208,13 @@
 .chip__n { flex: none; font-family: var(--mono); font-size: max(4.7cqw, 1.15rem); font-weight: 300; line-height: 1; color: var(--accent); }
 .chip__t { font-size: max(2.35cqw, 0.72rem); font-weight: 600; line-height: 1.32; letter-spacing: -0.01em; }
 .hl--chip:hover .chip { transform: translateY(-4%); }
+
+/* goal cards: a window onto the slide's own composition, peeking in from the corner (rounded modules, outlined shapes) */
+.ga-peek { position: absolute; left: 4%; top: 10%; width: 100%; aspect-ratio: 839 / 1080; transition: transform 0.9s cubic-bezier(0.19, 1, 0.22, 1); }
+.ga-peek .pk--mod { border-radius: 9px; box-shadow: 0 22px 40px -18px rgba(0, 0, 8, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08); }
+.ga-peek .pk--shape { filter: drop-shadow(0 18px 24px rgba(0, 0, 8, 0.45)); }
+.ga-peek--panel img { position: static; width: 100%; border-radius: 16px; box-shadow: 0 30px 60px -26px rgba(0, 0, 8, 0.8); }
+.hc-goal__card:hover .ga-peek { transform: translateY(-3%) rotate(-1deg); }
 
 /* hover: the layer lifts, its neighbours step back */
 .hl:hover img { transform: translateY(-1.8%) scale(1.04); }
