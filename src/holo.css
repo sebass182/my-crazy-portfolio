@@ -86,7 +86,7 @@
 
 /* per-kind rounding + shadow (the cutouts carry their own alpha; these make the shadow follow the corners) */
 .hl--page img { border-radius: 3.8% / 2.7%; box-shadow: 0 40px 80px -30px rgba(0, 0, 8, 0.85); }
-.hl--card img { border-radius: 9% / 4.6%; box-shadow: 0 26px 50px -22px rgba(0, 0, 8, 0.85); }
+.hl--card img { border-radius: 5.5% / 3%; box-shadow: 0 26px 50px -22px rgba(0, 0, 8, 0.85); }
 .hl--phone img { border-radius: 7.6% / 3.5%; box-shadow: 0 30px 60px -26px rgba(0, 0, 8, 0.9); }
 .hl--screen img { border-radius: 1.2% / 2.4%; box-shadow: 0 30px 60px -28px rgba(0, 0, 8, 0.9); }
 
