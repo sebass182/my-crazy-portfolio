@@ -742,14 +742,14 @@ export const cases: Record<string, CaseData> = {
      },
      {
       "f": "g3-image45.webp",
-      "iw": 904,
-      "ih": 1746,
+      "iw": 452,
+      "ih": 873,
       "x": 23.1,
       "y": 9.5,
       "w": 53.9,
       "z": 2,
       "d": 0.5,
-      "kind": "mod",
+      "kind": "shape",
       "alt": "Retargeting automatisé & infolettres personnalisées : aperçu de l’interface"
      },
      {
