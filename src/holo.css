@@ -168,9 +168,14 @@
 .hc--x .hc-slide__stage:has(.hl:hover) .hl--mod:not(:hover) img { filter: brightness(0.8) saturate(0.9); }
 .hc--x .hc-slide__stage:has(.hl:hover) .hl--shape:not(:hover) img { filter: drop-shadow(0 22px 28px rgba(0, 0, 8, 0.45)) brightness(0.8) saturate(0.9); }
 .hc--x .hc-slide__stage:has(.hl:hover) .hl--bg img { filter: none; }
-/* the context photo's panel and a module that crosses onto the copy (the three goals, the clouds on Air Transat's first slide) */
+/* a module that crosses onto the cream copy panel sits on top of it: the stage stops clipping and rises above the copy
+   (the slide's own rounded edge still clips what runs off the far side) */
 .hc-slide--bleed .hc-slide__stage { overflow: visible; z-index: 1; }
 .hc-slide--bleed .hc-slide__stage::before { border-radius: 0 32px 32px 0; }
+/* that left edge is a real one on a wide screen, so it is rounded again (on a phone the panel's edge is the slide's: it stays square) */
+@media (min-width: 801px) {
+  .hc--x .ov-l img { border-top-left-radius: 1.9cqw; border-bottom-left-radius: 1.9cqw; }
+}
 /* the numeral on the cream panel: the project's accent, darkened so it reads on cream */
 .hc--x .hc-slide__n { color: color-mix(in srgb, var(--accent) 55%, #000); }
 

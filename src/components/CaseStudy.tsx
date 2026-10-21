@@ -18,8 +18,10 @@ function Pic({ data, f, iw, ih, alt = '', lazy = false, className, style }: { da
 }
 
 const place = (l: Pick<CaseLayer, 'x' | 'y' | 'w'>): CSSProperties => ({ left: `${l.x}%`, top: `${l.y}%`, width: `${l.w}%` })
-// where a module runs off the slide its edge stays square (the deck crops it there); everywhere else it is rounded
-const cuts = (l: CaseLayer) => (l.cut ? ' ' + [...l.cut].map((c) => `cut-${c}`).join(' ') : '')
+// where a module runs off the slide its edge stays square (the deck crops it there); everywhere else it is rounded.
+// A module that starts left of its panel crosses onto the cream copy panel: on a wide screen that edge is a real one (ov-l → rounded again)
+const cuts = (l: CaseLayer) => (l.cut ? ' ' + [...l.cut].map((c) => `cut-${c}`).join(' ') : '') + (l.x < 0 ? ' ov-l' : '')
+const crossesOver = (layers: CaseLayer[]) => layers.some((l) => l.kind !== 'bg' && l.x < 0)
 
 // the laptop of every hero slide: same image, same spot (x, y, w in % of the slide)
 const LAPTOP = { f: 'cases/_shared/laptop.webp', iw: 2400, ih: 1500, x: 11.7, y: 7.4, w: 76.7 }
@@ -239,7 +241,7 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
       {/* 01 · 02 · 03 — the three objective slides, rebuilt; they are the cards that stack */}
       <div className="hc-stack" style={{ ['--shade' as string]: project.bg }}>
         {data.slides.map((s, si) => (
-          <section className={`hc-slide hc-slide--card${s.bleed ? ' hc-slide--bleed' : ''}`} key={s.n} aria-labelledby={`hc-s${si}-title`}>
+          <section className={`hc-slide hc-slide--card${s.bleed || crossesOver(s.layers) ? ' hc-slide--bleed' : ''}`} key={s.n} aria-labelledby={`hc-s${si}-title`}>
             <div className="hc-slide__copy">
               <span className="hc-slide__n">{s.n}</span>
               <div>
