@@ -444,30 +444,19 @@ a:focus-visible, button:focus-visible { outline: 2px solid #fff; outline-offset:
 /* ───────── Autres projets: the zoom-through scroll section (before the footer) ───────── */
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .others { position: relative; background: var(--paper); color: var(--ink); }
-.others__stage { position: relative; height: 100svh; overflow: hidden; perspective: 100svh; perspective-origin: 50% 50%; }
-/* the footer's world, opened from the centre at the end: its yellow / cyan / peach on the same base, gathered in the upper part and
-   settling to the plain base at the bottom edge. The footer's own backdrop fades in from that same base (see .contact below), so
-   the two meet without a seam and the colour seems to bloom as the footer comes up. */
-.others__portal {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(40% 48% at 46% 24%, #f3ff2e 0%, rgba(243, 255, 46, 0) 70%),
-    radial-gradient(36% 52% at 98% 10%, #8ff4ff 0%, rgba(143, 244, 255, 0) 70%),
-    radial-gradient(38% 50% at 0% 40%, #ffcdbd 0%, rgba(255, 205, 189, 0) 70%),
-    #eae6e3;
-}
+.others__stage { position: relative; height: 100svh; overflow: hidden; }
+.others__scene { position: absolute; inset: 0; perspective: 100svh; perspective-origin: 50% 50%; }
 .others__title {
   position: absolute;
   left: 50%;
   top: 50%;
   translate: -50% -50%;
-  width: min(62%, 60rem);
+  width: min(54%, 50rem);
   text-align: center;
-  font-size: clamp(2.2rem, 5.4vw, 6.4rem);
+  font-size: clamp(1.8rem, 4.1vw, 5rem);
   font-weight: 700;
-  line-height: 0.98;
-  letter-spacing: -0.05em;
+  line-height: 1;
+  letter-spacing: -0.045em;
   text-wrap: balance;
 }
 /* every picture keeps its own proportions: its height is set, its width follows from the file's ratio */
@@ -480,16 +469,16 @@ a:focus-visible, button:focus-visible { outline: 2px solid #fff; outline-offset:
   translate: -50% -50%;
   will-change: transform;
 }
-/* (the depth blur and the shadow are written on the picture by script; this is the no-script / phone look) */
-.others__img img { display: block; width: 100%; height: 100%; filter: drop-shadow(0 16px 24px rgba(10, 10, 15, 0.2)); }
+.others__img img { display: block; width: 100%; height: 100%; border-radius: 6px; filter: drop-shadow(0 16px 24px rgba(10, 10, 15, 0.2)); }
+
+/* the footer is pulled up one screen over the end of the section's pinned stretch and rises over it, full screen */
+@media (min-width: 801px) and (prefers-reduced-motion: no-preference) {
+  .contact { margin-top: -100svh; z-index: 2; box-shadow: 0 -50px 90px -30px rgba(10, 10, 15, 0.28); }
+}
 
 @media (max-width: 800px), (prefers-reduced-motion: reduce) {
-  .others__stage { height: auto; overflow: visible; perspective: none; padding: 16vh var(--pad) 14vh; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; align-items: start; }
-  .others__portal { display: none; }
+  .others__scene { position: static; perspective: none; display: contents; }
+  .others__stage { height: auto; overflow: visible; padding: 16vh var(--pad) 14vh; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; align-items: start; }
   .others__title { position: static; translate: none; width: auto; grid-column: 1 / -1; margin-bottom: 2rem; text-align: left; }
   .others__img { position: static; translate: none; height: auto; width: 100%; filter: none; box-shadow: 0 14px 30px -18px rgba(10, 10, 15, 0.35); }
 }
-
-/* the footer's backdrop comes up out of the plain base the section above ends on */
-.contact { background: #eae6e3; }
-.contact > .hero__bg { -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 28%); mask-image: linear-gradient(to bottom, transparent 0%, #000 28%); }
