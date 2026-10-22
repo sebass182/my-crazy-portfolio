@@ -33,9 +33,11 @@ export default function Others() {
         const shots = gsap.utils.toArray<HTMLElement>('.others__img', section)
         const words = gsap.utils.toArray<HTMLElement>('.others__title .w', section)
         const P = () => stage.clientHeight // the perspective: one screen height
-        const PIN = () => 3.3 * P() // how long the stage stays pinned while the pictures fly
-        const RISE = () => P() // the last screen height of the pin: the footer rises over it
-
+        const FADE = 0.7 // the title starts to fade at this share of the zoom, and that is when the footer starts to rise over the stage
+        const RISE = () => P() // the footer takes one screen height to come up
+        // the pin lasts until the footer has covered the stage; the zoom runs from the section's entrance (one screen height before the pin)
+        // to the end of the pin, so the fade falls exactly where the footer starts: FADE * (P + PIN) - P = PIN - RISE
+        const PIN = () => (FADE / (1 - FADE)) * P()
         gsap.set(words, { opacity: 0.16 })
         gsap.set(shots, { z: (i) => -behind(others[i].d) * P() })
 
@@ -46,21 +48,24 @@ export default function Others() {
           scrollTrigger: { trigger: section, start: 'top bottom', end: () => `+=${P() + PIN()}`, scrub: 0.7, invalidateOnRefresh: true },
         })
 
-        // every picture makes the same journey at the same pace, from its depth to just in front of the camera: the one with the
-        // furthest to go (the deepest) moves fastest, so it zooms the most, and each one leaves the screen on its own side when it has grown
-        // enough, the ones near the edges first, left and right alike (the perspective is centred and symmetrical)
-        shots.forEach((el) => tl.to(el, { z: () => 0.97 * P(), duration: 1 }, 0))
+        // every picture has its own delay (how long it holds still), pace (the shorter its journey, the faster it goes) and reach (how
+        // close to the camera it gets, so how big it ends up); the deep ones also have the furthest to go. Each leaves the screen on its
+        // own side once it has grown enough, the ones near the edges first.
+        shots.forEach((el, i) => {
+          const o = others[i]
+          tl.to(el, { z: () => o.reach * P(), duration: o.len }, o.delay)
+        })
         // the title lights up word by word, then steps aside before the last pictures go
         tl.to(words, { opacity: 1, duration: 0.04, stagger: 0.035 }, 0.04)
-        tl.to('.others__title', { opacity: 0, y: -40, duration: 0.12 }, 0.6)
+        tl.to('.others__title', { opacity: 0, y: -40, duration: 0.12 }, FADE)
         
-        // the stage stays pinned for the whole zoom and one screen more, during which the footer (pulled up over it, see the CSS)
-        // comes up the screen while the stage drifts up more slowly behind it
-        ScrollTrigger.create({ trigger: section, start: 'top top', end: () => `+=${PIN() + RISE()}`, pin: stage, invalidateOnRefresh: true })
+        // the stage stays pinned until the footer (pulled up over it, see the CSS) has come up the screen over it; the footer starts as the
+        // title starts to fade, and the stage drifts up more slowly behind it meanwhile
+        ScrollTrigger.create({ trigger: section, start: 'top top', end: () => `+=${PIN()}`, pin: stage, invalidateOnRefresh: true })
         gsap.to(scene, {
           yPercent: -22,
           ease: 'none',
-          scrollTrigger: { trigger: section, start: () => `top top-=${PIN()}`, end: () => `+=${RISE()}`, scrub: true, invalidateOnRefresh: true },
+          scrollTrigger: { trigger: section, start: () => `top top-=${PIN() - RISE()}`, end: () => `+=${RISE()}`, scrub: true, invalidateOnRefresh: true },
         })
       })
 
