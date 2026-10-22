@@ -42,12 +42,6 @@
   box-shadow: 0 60px 110px -50px rgba(0, 0, 8, 0.9);
 }
 
-/* on a wide screen a 16:9 slide must still fit the window (the cards park one under another): its width is capped by the
-   height left under the nav, and it is centred in the column */
-@media (min-width: 801px) {
-  .hc-slide { width: min(100%, calc((100dvh - 8rem) * 16 / 9)); margin-inline: auto; }
-}
-
 /* copy panel — the cream is the panel's own, not the slide's: behind the stage there is nothing light left to show through
    as a hairline where the stage's edge falls between two device pixels (or along the slide's rounded corners) */
 .hc-slide__copy { background: #f7f6f2; display: grid; grid-template-rows: auto 1fr; align-content: stretch; padding: 7.2% 11% 6% 11%; min-width: 0; }
