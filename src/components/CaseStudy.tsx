@@ -1,7 +1,8 @@
-import { useRef, type CSSProperties } from 'react'
+import { useMemo, useRef, useState, type CSSProperties } from 'react'
 import { gsap, ScrollTrigger, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import type { CaseData, CaseLayer } from '../data/cases'
 import type { Project } from '../data/projects'
+import Lightbox, { type LightboxItem } from './Lightbox'
 
 /* A case study built the way the Holo MD page is, from the Figma deck:
      the laptop → À propos (the paragraph and the photo, the three goals floating over it) → the three objective
@@ -22,12 +23,24 @@ const place = (l: Pick<CaseLayer, 'x' | 'y' | 'w'>): CSSProperties => ({ left: `
 // A module that starts left of its panel crosses onto the cream copy panel: on a wide screen that edge is a real one (ov-l → rounded again)
 const cuts = (l: CaseLayer) => (l.cut ? ' ' + [...l.cut].map((c) => `cut-${c}`).join(' ') : '') + (l.x < 0 ? ' ov-l' : '')
 const crossesOver = (layers: CaseLayer[]) => layers.some((l) => l.kind !== 'bg' && l.x < 0)
+// what can be enlarged on a slide: every module (the full-panel ground is just a ground)
+const zoomable = (layers: CaseLayer[]) => layers.filter((l) => l.kind !== 'bg')
 
 // the laptop of every hero slide: same image, same spot (x, y, w in % of the slide)
 const LAPTOP = { f: 'cases/_shared/laptop.webp', iw: 2400, ih: 1500, x: 11.7, y: 7.4, w: 76.7 }
 
 export default function CaseStudy({ project, data }: { project: Project; data: CaseData }) {
   const root = useRef<HTMLDivElement>(null)
+
+  // Enlarging: group 0 is the project's main screen, groups 1-3 are the modules of each objective slide
+  const [zoom, setZoom] = useState<{ g: number; i: number } | null>(null)
+  const groups = useMemo<LightboxItem[][]>(() => {
+    const url = (f: string) => `${base}${data.base}${f}`
+    return [
+      [{ src: url(data.hero.f), alt: data.hero.alt, w: data.hero.iw, h: data.hero.ih, round: true }],
+      ...data.slides.map((s) => zoomable(s.layers).map((l, i) => ({ src: url(l.f), alt: l.alt ?? `${s.title} : maquette ${i + 1}`, w: l.iw, h: l.ih, round: l.kind === 'mod' }))),
+    ]
+  }, [data])
 
   useGSAP(
     () => {
@@ -189,7 +202,23 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
       {/* the laptop: the project's screen inside the deck's MacBook, on the same cream */}
       <section className="hc-slide hc-slide--hero" aria-label={`Maquette principale — ${project.name}`}>
         <div className="hc-slide__stage" style={{ ['--stage' as string]: '#f7f6f2' }}>
-          <div className="hl hl--device" data-depth={0.9} style={place(LAPTOP)}>
+          <div
+            className="hl hl--device"
+            data-depth={0.9}
+            data-zoom
+            data-cursor="Agrandir"
+            style={place(LAPTOP)}
+            role="button"
+            tabIndex={0}
+            aria-label="Agrandir la maquette principale"
+            onClick={() => setZoom({ g: 0, i: 0 })}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setZoom({ g: 0, i: 0 })
+              }
+            }}
+          >
             <div className="hl__s">
               <div className="dev">
                 <Pic data={data} f={hero.f} iw={hero.iw} ih={hero.ih} alt={hero.alt} className="dev__screen" style={{ left: `${hero.x}%`, top: `${hero.y}%`, width: `${hero.w}%` }} />
@@ -236,6 +265,9 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
               <div>
                 <h3 id={`hc-s${si}-title`}>{s.title}</h3>
                 <p>{s.text}</p>
+                <button className="hc-zoom" onClick={() => setZoom({ g: si + 1, i: 0 })} aria-label={`Agrandir les maquettes : ${s.title}`}>
+                  Agrandir <span aria-hidden="true">⤢</span>
+                </button>
               </div>
             </div>
             <div className="hc-slide__stage" style={{ ['--stage' as string]: s.stage }}>
@@ -244,8 +276,11 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
                   className={`hl hl--${l.kind}${cuts(l)}`}
                   key={l.f}
                   data-depth={l.d}
+                  data-zoom={l.kind === 'bg' ? undefined : ''}
+                  data-cursor={l.kind === 'bg' ? undefined : 'Agrandir'}
                   style={l.kind === 'bg' ? { zIndex: 0 } : { ...place(l), zIndex: l.z }}
                   aria-hidden={l.alt ? undefined : true}
+                  onClick={l.kind === 'bg' ? undefined : () => setZoom({ g: si + 1, i: zoomable(s.layers).indexOf(l) })}
                 >
                   <div className="hl__s">
                     <Pic data={data} f={l.f} iw={l.iw} ih={l.ih} alt={l.alt} lazy />
@@ -257,6 +292,16 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
           </section>
         ))}
       </div>
+
+      {zoom && (
+        <Lightbox
+          items={groups[zoom.g]}
+          index={zoom.i}
+          label={zoom.g === 0 ? `Maquette principale — ${project.name}` : data.slides[zoom.g - 1].title}
+          onIndex={(i) => setZoom({ g: zoom.g, i })}
+          onClose={() => setZoom(null)}
+        />
+      )}
     </div>
   )
 }

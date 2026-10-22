@@ -1,0 +1,86 @@
+/* ═════════ Lightbox: a case-study picture shown large ═════════ */
+.lb {
+  position: fixed;
+  inset: 0;
+  z-index: 150; /* over the case study (90) and the nav (80), under the custom cursor (200) */
+  display: grid;
+  place-items: center;
+  padding: 4.5rem clamp(1rem, 4vw, 3rem) 5.2rem;
+  color: #fff;
+  background: rgba(6, 8, 10, 0.88);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  animation: lb-fade 0.35s ease-out;
+}
+.lb__fig { display: grid; place-items: center; min-width: 0; min-height: 0; }
+/* as large as the screen allows (never past 2.4x its own size: it would only blur), whatever its shape — --w / --h are its pixels */
+.lb__img {
+  width: min(calc(var(--w) * 2.4px), 92vw, 1240px, calc((100dvh - 10rem) * var(--w) / var(--h)));
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  filter: drop-shadow(0 40px 60px rgba(0, 0, 0, 0.5));
+  animation: lb-pop 0.55s cubic-bezier(0.19, 1, 0.22, 1);
+}
+.lb__img.is-round { border-radius: 14px; }
+
+.lb__close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.7rem 1.1rem;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.lb__bar { position: absolute; left: 0; right: 0; bottom: 1.2rem; display: flex; justify-content: center; align-items: center; gap: 1.2rem; }
+.lb__count { min-width: 5ch; text-align: center; font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; }
+.lb__step {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-size: 1.1rem;
+  transition: background-color 0.3s, color 0.3s;
+}
+.lb__step:hover { background: #fff; color: var(--ink); }
+
+@keyframes lb-fade { from { opacity: 0; } }
+@keyframes lb-pop { from { opacity: 0; transform: scale(0.965); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .lb, .lb__img { animation: none; }
+}
+
+/* what can be enlarged: the modules of a case-study slide (mouse and touch), plus an "Agrandir" button for the keyboard */
+.hc .hl[data-zoom] { cursor: zoom-in; }
+.hc-zoom {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 10, 15, 0.28);
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background-color 0.3s, color 0.3s;
+}
+.hc-zoom:hover { background: var(--ink); color: #f7f6f2; }
+
+/* keyboard focus on the two enlargeable pictures that are not buttons */
+.hc .hl--device:focus-visible, .hc-hero__frame:focus-visible { outline: 2px solid #fff; outline-offset: 6px; box-shadow: 0 0 0 5px var(--ink); border-radius: 14px; }
+.hc .hc-hero__frame[data-zoom] { cursor: zoom-in; }

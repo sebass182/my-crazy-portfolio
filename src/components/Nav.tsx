@@ -70,6 +70,43 @@ export default function Nav({ ready }: { ready: boolean }) {
 
   const close = useCallback(() => setOpen(false), [])
 
+  // ── Show / hide: the bar leaves when you scroll down (it would sit on top of the page's headlines and photos) and comes
+  //    back the moment you scroll up, or when focus reaches it. Away from the top it gets a frosted dark ground, so its
+  //    white text stays readable over anything. At the very top it keeps the difference-blend look over the hero. ──
+  const header = useRef<HTMLElement>(null)
+  const shown = useRef(true)
+  const setShown = useCallback((show: boolean) => {
+    if (shown.current === show || !header.current) return
+    shown.current = show
+    gsap.to(header.current, { yPercent: show ? 0 : -125, duration: prefersReducedMotion() ? 0 : 0.5, ease: 'power3.out', overwrite: 'auto' })
+  }, [])
+
+  useEffect(() => {
+    if (!ready) return
+    const el = header.current
+    if (!el) return
+    let last = window.scrollY
+    let raf = 0
+    const onScroll = () => {
+      if (raf) return
+      raf = requestAnimationFrame(() => {
+        raf = 0
+        const y = window.scrollY
+        const dy = y - last
+        el.classList.toggle('nav--bar', y > 90)
+        if (y <= 90 || dy < -6) setShown(true)
+        else if (dy > 6 && !document.body.classList.contains('is-locked')) setShown(false)
+        if (Math.abs(dy) > 6) last = y
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      cancelAnimationFrame(raf)
+    }
+  }, [ready, setShown])
+
   // ── Home link: a house icon that types out the name on hover/focus, and erases it again on leave ──
   const typed = useRef<HTMLSpanElement>(null)
   const typing = useRef<gsap.core.Tween | null>(null)
@@ -139,7 +176,7 @@ export default function Nav({ ready }: { ready: boolean }) {
 
   return (
     <div className="nav-root" ref={root}>
-      <header className="nav">
+      <header className="nav" ref={header} onFocus={() => setShown(true)}>
         <a
           className="nav__brand"
           href="#top"

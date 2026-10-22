@@ -28,14 +28,14 @@
 }
 .scene [class*='__'] { transition: transform 0.9s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.6s; will-change: transform; }
 /* hover: everything lifts together, straight up */
-.card__open:hover .scene img, .card__open:focus-visible .scene img { transform: translateY(-2.2%); }
+.card:hover .scene img, .card__open:focus-visible .scene img { transform: translateY(-2.2%); }
 
 /* 1 · full bleed + an inset panel (Camping Québec) */
 .scene--bleed { display: block; background: #003b2d; }
 .sc-bleed__screen { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; box-shadow: none; }
 .scene--bleed::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0, 40, 30, 0.8) 0%, rgba(0, 40, 30, 0) 42%); pointer-events: none; }
 .sc-bleed__panel { position: absolute; z-index: 1; right: 4cqw; bottom: 4cqw; width: 19cqw; aspect-ratio: 520 / 669; }
-.card__open:hover .scene .sc-bleed__screen, .card__open:focus-visible .scene .sc-bleed__screen { transform: none; }
+.card:hover .scene .sc-bleed__screen, .card__open:focus-visible .scene .sc-bleed__screen { transform: none; }
 
 /* 2 · the site's screen + a panel, side by side (Air Transat, Lavigueur, Intelli Jeunes, Staking Data).
    60 + 29.2 wide, 3 apart: both are 37.5 tall, so top and bottom line up. */
@@ -71,9 +71,9 @@
 .scene .sc-laptop__screen { position: absolute; left: 12%; top: 14.595%; width: 76.07%; height: 64.23%; object-position: top; border-radius: 0.5cqw; box-shadow: none; }
 .scene .sc-laptop__frame { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; box-shadow: none; object-fit: contain; }
 .sc-laptop__mobile { width: 18.5cqw; aspect-ratio: 988 / 1874; object-position: top; }
-.card__open:hover .scene .sc-laptop__screen, .card__open:hover .scene .sc-laptop__frame,
+.card:hover .scene .sc-laptop__screen, .card:hover .scene .sc-laptop__frame,
 .card__open:focus-visible .scene .sc-laptop__screen, .card__open:focus-visible .scene .sc-laptop__frame { transform: none; } /* the device moves as one */
-.card__open:hover .sc-laptop__device, .card__open:focus-visible .sc-laptop__device { transform: translateY(-2.2%); }
+.card:hover .sc-laptop__device, .card__open:focus-visible .sc-laptop__device { transform: translateY(-2.2%); }
 
 /* 6 · Globalia — a bento on a two-column grid; the same gap between every tile and as the margin's smaller sibling */
 .scene--bento { display: grid; grid-template-columns: 62fr 31fr; grid-template-rows: 1fr 1fr; gap: 1.6cqw; padding: 3cqw; }
@@ -81,7 +81,7 @@
 .sc-bento__main { grid-row: 1 / span 2; object-position: center top; }
 .sc-bento__a { object-position: center 30%; }
 .sc-bento__b { object-position: center 40%; }
-.card__open:hover .scene--bento img, .card__open:focus-visible .scene--bento img { transform: scale(1.015); }
+.card:hover .scene--bento img, .card__open:focus-visible .scene--bento img { transform: scale(1.015); }
 
 @media (prefers-reduced-motion: reduce) {
   .scene [class*='__'] { transition: none; }

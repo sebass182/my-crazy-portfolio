@@ -199,7 +199,16 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
                   <Scene p={p} />
                 </div>
               </button>
-              <div className="card__meta">
+              {/* the caption opens the project too (a mouse / touch target only: the frame's button is the keyboard one),
+                  and focus goes to that button first so closing the case study lands back on the card */}
+              <div
+                className="card__meta"
+                data-cursor="Voir"
+                onClick={(e) => {
+                  e.currentTarget.parentElement?.querySelector<HTMLElement>('.card__open')?.focus({ preventScroll: true })
+                  onOpen(p)
+                }}
+              >
                 <span className="card__n" style={{ color: p.accent }}>
                   {p.n}
                 </span>

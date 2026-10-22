@@ -1,5 +1,6 @@
-import { useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { gsap, ScrollTrigger, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
+import Lightbox, { type LightboxItem } from './Lightbox'
 
 const base = import.meta.env.BASE_URL
 const src = (file: string) => `${base}cards/holo-md/${file}`
@@ -83,8 +84,21 @@ const slides = [
   },
 ]
 
+// what can be enlarged on a slide: the modules (the diamond, gems and swoosh are decoration)
+const zoomable = (layers: Layer[]) => layers.filter((l) => l.kind !== 'free')
+
 export default function HoloCase() {
   const root = useRef<HTMLDivElement>(null)
+
+  // Enlarging: group 0 is the sign-in screen, groups 1-3 are the modules of each slide
+  const [zoom, setZoom] = useState<{ g: number; i: number } | null>(null)
+  const groups = useMemo<LightboxItem[][]>(() => {
+    const item = (k: Key, alt: string, round = false): LightboxItem => ({ src: src(IMG[k][0]), alt, w: IMG[k][1], h: IMG[k][2], round })
+    return [
+      [item('login', 'Écran de connexion Holo MD : « Imagine a New Era of AI-Powered Psychiatric Care »', true)],
+      ...slides.map((s) => zoomable(s.layers).map((l, i) => item(l.k, l.alt ?? `${s.title} : maquette ${i + 1}`, l.kind === 'page'))),
+    ]
+  }, [])
 
   useGSAP(
     () => {
@@ -236,7 +250,21 @@ export default function HoloCase() {
     <div className="hc" ref={root}>
       {/* Hero visual */}
       <section className="hc-hero" aria-label="Écran de connexion de la plateforme Holo MD">
-        <div className="hc-hero__frame">
+        <div
+          className="hc-hero__frame"
+          data-zoom
+          data-cursor="Agrandir"
+          role="button"
+          tabIndex={0}
+          aria-label="Agrandir l'écran de connexion"
+          onClick={() => setZoom({ g: 0, i: 0 })}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              setZoom({ g: 0, i: 0 })
+            }
+          }}
+        >
           <Pic k="login" className="hc-hero__img" alt="Écran de connexion Holo MD : « Imagine a New Era of AI-Powered Psychiatric Care »" />
         </div>
       </section>
@@ -258,13 +286,16 @@ export default function HoloCase() {
 
       {/* 01 · 02 · 03 — the slides, rebuilt; they are the cards that stack */}
       <div className="hc-stack">
-        {slides.map((s) => (
+        {slides.map((s, si) => (
           <section className={`hc-slide hc-slide--card hc-slide--${s.id}`} key={s.id} aria-labelledby={`hc-${s.id}-title`}>
             <div className="hc-slide__copy">
               <span className="hc-slide__n">{s.n}</span>
               <div>
                 <h3 id={`hc-${s.id}-title`}>{s.title}</h3>
                 <p>{s.text}</p>
+                <button className="hc-zoom" onClick={() => setZoom({ g: si + 1, i: 0 })} aria-label={`Agrandir les maquettes : ${s.title}`}>
+                  Agrandir <span aria-hidden="true">⤢</span>
+                </button>
               </div>
             </div>
             <div className="hc-slide__stage">
@@ -273,8 +304,11 @@ export default function HoloCase() {
                   className={`hl hl--${l.kind}`}
                   key={`${l.k}-${i}`}
                   data-depth={l.d}
+                  data-zoom={l.kind === 'free' ? undefined : ''}
+                  data-cursor={l.kind === 'free' ? undefined : 'Agrandir'}
                   style={{ left: `${l.x}%`, top: `${l.y}%`, width: `${l.w}%`, zIndex: l.z }}
                   aria-hidden={l.alt ? undefined : true}
+                  onClick={l.kind === 'free' ? undefined : () => setZoom({ g: si + 1, i: zoomable(s.layers).indexOf(l) })}
                 >
                   <div className="hl__s">
                     <Pic k={l.k} alt={l.alt ?? ''} />
@@ -286,6 +320,16 @@ export default function HoloCase() {
           </section>
         ))}
       </div>
+
+      {zoom && (
+        <Lightbox
+          items={groups[zoom.g]}
+          index={zoom.i}
+          label={zoom.g === 0 ? 'Écran de connexion Holo MD' : slides[zoom.g - 1].title}
+          onIndex={(i) => setZoom({ g: zoom.g, i })}
+          onClose={() => setZoom(null)}
+        />
+      )}
     </div>
   )
 }
