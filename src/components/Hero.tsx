@@ -3,6 +3,7 @@ import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import { projects, mockupOf } from '../data/projects'
 import HeroShader from './HeroShader'
 import { useLang } from '../i18n/context'
+import { magnetic } from '../lib/magnetic'
 
 export default function Hero({ ready }: { ready: boolean }) {
   const { t } = useLang()
@@ -12,7 +13,7 @@ export default function Hero({ ready }: { ready: boolean }) {
 
   // Build the intro once (paused) — the split title stays hidden until the preloader hands over
   useGSAP(
-    () => {
+    (_, contextSafe) => {
       const reduce = prefersReducedMotion()
       const tl = gsap.timeline({ paused: true })
       if (reduce) tl.timeScale(40) // same end state, no visible motion
@@ -51,7 +52,7 @@ export default function Hero({ ready }: { ready: boolean }) {
         '-=1',
       )
 
-      if (reduce) return // no drifting blobs, no endless strip, no scroll-linked fade
+      if (reduce) return // no drifting blobs, no endless strip, no scroll-linked fade, no leaning buttons
 
       // Gradient blobs drift forever
       gsap.utils.toArray<HTMLElement>('.hero .blob').forEach((b, i) => {
@@ -76,6 +77,9 @@ export default function Hero({ ready }: { ready: boolean }) {
         ease: 'none',
         scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true },
       })
+
+      // The two buttons lean towards the pointer, like the footer's
+      return magnetic(gsap.utils.toArray<HTMLElement>('.hero__cta .btn'), contextSafe!)
     },
     { scope: root },
   )

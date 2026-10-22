@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { gsap, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import { jumpTo } from '../lib/jump'
 import { useLang } from '../i18n/context'
+import { magnetic } from '../lib/magnetic'
 
 const hrefs = ['#work', '#about', '#contact'] as const
 
@@ -30,6 +31,12 @@ export default function Nav({ ready }: { ready: boolean }) {
       )
     },
     { dependencies: [ready], scope: root },
+  )
+
+  // The language switch leans towards the pointer, like the footer's buttons
+  useGSAP(
+    (_, contextSafe) => (prefersReducedMotion() ? undefined : magnetic(gsap.utils.toArray<HTMLElement>('.lang-switch'), contextSafe!)),
+    { scope: root },
   )
 
   // Mobile menu timeline, built once and paused. Opening plays it; closing plays it backwards.
