@@ -288,7 +288,7 @@ export const cases: Record<string, CaseData> = {
    {
     "n": "01",
     "title": "Direction artistique & univers visuel généré par IA",
-    "text": "En s'appuyant sur Midjourney et Ideogram, j'ai développé une esthétique visuelle distincte pour chaque sortie tout en maintenant une signature de marque reconnaissable à travers l'ensemble du catalogue, nourrie par plus de 20 ans d'expérience en photographie et en design.",
+    "text": "En s'appuyant sur Midjourney et Ideogram, j'ai développé une esthétique visuelle distincte pour chaque sortie tout en maintenant une signature de marque reconnaissable à travers l'ensemble du catalogue, nourrie par plus de 15 ans d'expérience en photographie et en design.",
     "stage": "#1f1f1f",
     "layers": [
      {
