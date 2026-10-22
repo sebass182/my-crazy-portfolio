@@ -488,3 +488,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid #fff; outline-offset:
   .others__title { position: static; translate: none; width: auto; grid-column: 1 / -1; margin-bottom: 2rem; text-align: left; }
   .others__img { position: static; translate: none; height: auto; width: 100%; filter: none; box-shadow: 0 14px 30px -18px rgba(10, 10, 15, 0.35); }
 }
+
+/* language switch: the other language, in the nav's own voice */
+.lang-switch { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.6rem; font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; color: inherit; opacity: 0.75; transition: opacity 0.3s; }
+.lang-switch:hover, .lang-switch:focus-visible { opacity: 1; }
+.nav .lang-switch { margin-left: 0.4rem; border-left: 1px solid currentColor; padding-left: 1rem; border-radius: 0; }
+.menu__foot .lang-switch--menu { width: fit-content; padding-left: 0; text-transform: none; letter-spacing: 0.04em; font-size: 0.95rem; opacity: 1; text-decoration: underline; text-underline-offset: 4px; }

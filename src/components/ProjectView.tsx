@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { gsap, prefersReducedMotion, useGSAP } from '../lib/gsap'
-import { projects, slidesOf, type Project } from '../data/projects'
-import { cases } from '../data/cases'
+import { slidesOf, type Project } from '../data/projects'
+import { localCase, useProjects } from '../i18n/data'
+import { useLang } from '../i18n/context'
 import HoloCase from './HoloCase'
 import CaseStudy from './CaseStudy'
 
@@ -17,7 +18,9 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
   // the card that opened us, captured before focus moves into the dialog (survives strict-mode re-runs)
   const openerRef = useRef(document.activeElement as HTMLElement | null)
 
-  const study = cases[project.slug] // projects rebuilt from the Figma deck (Holo MD has its own hand-built page)
+  const { lang, t } = useLang()
+  const projects = useProjects()
+  const study = localCase(project.slug, lang) // projects rebuilt from the Figma deck (Holo MD has its own hand-built page)
   const meta = project.meta ?? study?.meta
   const idx = projects.findIndex((p) => p.slug === project.slug)
   const next = projects[(idx + 1) % projects.length]
@@ -120,8 +123,8 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
       aria-label={project.name}
       style={{ background: project.bg, ['--pv-bg' as string]: project.bg, ['--accent' as string]: project.accent }}
     >
-      <button className="pv__close" ref={closeBtn} onClick={close} aria-label="Fermer l'étude de cas">
-        Fermer <span aria-hidden="true">✕</span>
+      <button className="pv__close" ref={closeBtn} onClick={close} aria-label={t.closeAria}>
+        {t.close} <span aria-hidden="true">✕</span>
       </button>
 
       <div className="pv__scroll" ref={scrollRef}>
@@ -135,19 +138,19 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
         {meta && (
           <dl className="pv__meta">
             <div>
-              <dt>Rôle</dt>
+              <dt>{t.role}</dt>
               <dd>{meta.role}</dd>
             </div>
             <div>
-              <dt>Agence</dt>
+              <dt>{t.agency}</dt>
               <dd>{meta.agency}</dd>
             </div>
             <div>
-              <dt>Portée</dt>
+              <dt>{t.scope}</dt>
               <dd>{meta.scope}</dd>
             </div>
             <div>
-              <dt>Outils</dt>
+              <dt>{t.tools}</dt>
               <dd>{meta.tools}</dd>
             </div>
           </dl>
@@ -208,7 +211,7 @@ export default function ProjectView({ project, onClose, onNavigate }: Props) {
       )}
 
       <button className="pv__next" onClick={() => onNavigate(next)}>
-        <span>Projet suivant</span>
+        <span>{t.next}</span>
         <strong>{next.name} →</strong>
       </button>
       </div>

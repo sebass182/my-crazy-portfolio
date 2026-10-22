@@ -1,5 +1,7 @@
 import { useRef } from 'react'
 import { gsap, ScrollTrigger, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
+import { useLang } from '../i18n/context'
+import { holoEn } from '../i18n/content.en'
 
 const base = import.meta.env.BASE_URL
 const src = (file: string) => `${base}cards/holo-md/${file}`
@@ -85,6 +87,8 @@ const slides = [
 
 
 export default function HoloCase() {
+  const { lang, t } = useLang()
+  const en = lang === 'en'
   const root = useRef<HTMLDivElement>(null)
 
   useGSAP(
@@ -236,36 +240,36 @@ export default function HoloCase() {
   return (
     <div className="hc" ref={root}>
       {/* Hero visual */}
-      <section className="hc-hero" aria-label="Écran de connexion de la plateforme Holo MD">
+      <section className="hc-hero" aria-label={en ? holoEn.heroLabel : 'Écran de connexion de la plateforme Holo MD'}>
         <div className="hc-hero__frame">
-          <Pic k="login" className="hc-hero__img" alt="Écran de connexion Holo MD : « Imagine a New Era of AI-Powered Psychiatric Care »" />
+          <Pic k="login" className="hc-hero__img" alt={en ? holoEn.heroAlt : 'Écran de connexion Holo MD : « Imagine a New Era of AI-Powered Psychiatric Care »'} />
         </div>
       </section>
 
       {/* Context */}
-      <section className="hc-intro" aria-label="Contexte du projet">
+      <section className="hc-intro" aria-label={t.contextAria}>
         <div>
-          <span className="hc-eyebrow">À propos</span>
+          <span className="hc-eyebrow">{t.aboutEyebrow}</span>
           <p className="hc-lead">
-            Projet d'innovation pour des leaders de la psychiatrie. HoloMD combine un assistant IA conversationnel (Dr. Holo™) pour le suivi
-            thérapeutique à distance (RTM) et un tableau de bord analytique permettant aux psychiatres d'ajuster les traitements et
-            d'automatiser la facturation médicale.
+            {en
+              ? holoEn.lead
+              : "Projet d'innovation pour des leaders de la psychiatrie. HoloMD combine un assistant IA conversationnel (Dr. Holo™) pour le suivi thérapeutique à distance (RTM) et un tableau de bord analytique permettant aux psychiatres d'ajuster les traitements et d'automatiser la facturation médicale."}
           </p>
         </div>
         <figure className="hc-photo">
-          <Pic k="woman" alt="Une femme assise dans un fauteuil, son téléphone à la main" />
+          <Pic k="woman" alt={en ? holoEn.photoAlt : 'Une femme assise dans un fauteuil, son téléphone à la main'} />
         </figure>
       </section>
 
       {/* 01 · 02 · 03 — the slides, rebuilt; they are the cards that stack */}
       <div className="hc-stack">
-        {slides.map((s) => (
+        {slides.map((s, si) => (
           <section className={`hc-slide hc-slide--card hc-slide--${s.id}`} key={s.id} aria-labelledby={`hc-${s.id}-title`}>
             <div className="hc-slide__copy">
               <span className="hc-slide__n">{s.n}</span>
               <div>
-                <h3 id={`hc-${s.id}-title`}>{s.title}</h3>
-                <p>{s.text}</p>
+                <h3 id={`hc-${s.id}-title`}>{en ? holoEn.slides[si].title : s.title}</h3>
+                <p>{en ? holoEn.slides[si].text : s.text}</p>
               </div>
             </div>
             <div className="hc-slide__stage">
@@ -278,7 +282,7 @@ export default function HoloCase() {
                   aria-hidden={l.alt ? undefined : true}
                 >
                   <div className="hl__s">
-                    <Pic k={l.k} alt={l.alt ?? ''} />
+                    <Pic k={l.k} alt={l.alt ? (en ? (holoEn.alts[l.k] ?? l.alt) : l.alt) : ''} />
                   </div>
                 </div>
               ))}

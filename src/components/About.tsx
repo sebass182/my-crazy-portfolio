@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
 import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
+import { useLang } from '../i18n/context'
+import { aboutEn } from '../i18n/content.en'
 
 const base = import.meta.env.BASE_URL
 
@@ -48,6 +50,8 @@ const tiltNeedsTap = () =>
   typeof (window.DeviceOrientationEvent as unknown as { requestPermission?: unknown } | undefined)?.requestPermission === 'function'
 
 export default function About() {
+  const { lang, t } = useLang()
+  const text = lang === 'en' ? aboutEn : { bio, columns, experience }
   const root = useRef<HTMLElement>(null)
   const [needsTilt, setNeedsTilt] = useState(tiltNeedsTap)
   const askTilt = useRef<(() => void) | null>(null)
@@ -211,10 +215,10 @@ export default function About() {
     <section className="about" ref={root} id="about">
       <div className="about__top">
         <div>
-          <span className="tag">À propos de moi</span>
-          <p className="about__text">{bio}</p>
+          <span className="tag">{t.aboutTag}</span>
+          <p className="about__text">{text.bio}</p>
         </div>
-        <figure className="about__photo" aria-label="Montage de photos de Sébastien : selfie en montagne, fat-bike, appareil photo, basse sur scène et skateboard">
+        <figure className="about__photo" aria-label={t.aboutPhotoAria}>
           <div className="aura" aria-hidden="true">
             <div className="aura__b" />
           </div>
@@ -228,22 +232,22 @@ export default function About() {
               >
                 <div className="cp__s">
                   <div className="cp__f">
-                    <img src={`${base}about/${p.f}.webp`} width={p.w} height={p.h} alt={p.alt} decoding="async" draggable={false} />
+                    <img src={`${base}about/${p.f}.webp`} width={p.w} height={p.h} alt={lang === 'en' ? aboutEn.photoAlts[p.f] : p.alt} decoding="async" draggable={false} />
                   </div>
                 </div>
               </div>
             ))}
           </div>
           {needsTilt && (
-            <button className="tilt" type="button" onClick={() => askTilt.current?.()} aria-label="Activer l’animation au mouvement de l’appareil">
-              Activer l’inclinaison
+            <button className="tilt" type="button" onClick={() => askTilt.current?.()} aria-label={t.tiltAria}>
+              {t.tilt}
             </button>
           )}
         </figure>
       </div>
 
       <div className="about__cols">
-        {columns.map((c) => (
+        {text.columns.map((c) => (
           <div className="about__col" key={c.title}>
             <h3 className="label">{c.title}</h3>
             <ul>
@@ -256,8 +260,8 @@ export default function About() {
       </div>
 
       <div className="xp">
-        <h3 className="label">Expérience</h3>
-        {experience.map((x) => (
+        <h3 className="label">{t.experience}</h3>
+        {text.experience.map((x) => (
           <div className="xp__row" key={x.company}>
             <span>{x.years}</span>
             <strong>{x.company}</strong>

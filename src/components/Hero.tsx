@@ -2,8 +2,10 @@ import { useRef, useState } from 'react'
 import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import { projects, mockupOf } from '../data/projects'
 import HeroShader from './HeroShader'
+import { useLang } from '../i18n/context'
 
 export default function Hero({ ready }: { ready: boolean }) {
+  const { t } = useLang()
   const root = useRef<HTMLElement>(null)
   const [shader, setShader] = useState(false) // true while the WebGL backdrop is drawing; the CSS blobs are the fallback
   const intro = useRef<gsap.core.Timeline | null>(null)
@@ -105,15 +107,15 @@ export default function Hero({ ready }: { ready: boolean }) {
           Lemyre
         </h1>
         <p className="hero__lede">
-          <strong>Designer UI/UX Senior.</strong> Design systems, direction artistique et IA générative — 15 ans à
-          transformer des produits complexes en interfaces simples.
+          <strong>{t.heroLedeStrong}</strong>
+          {t.heroLede}
         </p>
         <div className="hero__cta">
           <a className="btn" href="#work">
-            Voir les travaux <span aria-hidden="true">↓</span>
+            {t.heroSee} <span aria-hidden="true">↓</span>
           </a>
           <a className="btn btn--outline" href="#contact">
-            Me contacter
+            {t.heroContact}
           </a>
         </div>
       </div>

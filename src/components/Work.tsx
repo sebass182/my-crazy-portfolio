@@ -1,6 +1,8 @@
 import { useRef } from 'react'
 import { gsap, ScrollTrigger, prefersReducedMotion, useGSAP } from '../lib/gsap'
-import { projects, type Project } from '../data/projects'
+import type { Project } from '../data/projects'
+import { useProjects } from '../i18n/data'
+import { useLang } from '../i18n/context'
 import { jumpTo } from '../lib/jump'
 import Scene from './Scenes'
 
@@ -14,6 +16,8 @@ const DESKTOP = '(min-width: 801px) and (prefers-reduced-motion: no-preference)'
 const STACKED = '(max-width: 800px), (prefers-reduced-motion: reduce)'
 
 export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
+  const projects = useProjects()
+  const { t } = useLang()
   const root = useRef<HTMLElement>(null)
 
   useGSAP(
@@ -166,7 +170,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
               jumpTo('#about')
             }}
           >
-            Passer les travaux →
+            {t.skip}
           </a>
         </span>
       </div>
@@ -175,14 +179,14 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
       <div className="work__track">
         <div className="work__intro">
           <div>
-            <span className="label">Études de cas</span>
+            <span className="label">{t.workLabel}</span>
             <h2 id="work-title">
-              Travaux
+              {t.workTitleA}
               <br />
-              sélectionnés
+              {t.workTitleB}
             </h2>
           </div>
-          <p>{String(projects.length).padStart(2, '0')} projets</p>
+          <p>{String(projects.length).padStart(2, '0')} {t.projects}</p>
         </div>
 
         <div className="work__grid">
@@ -191,8 +195,8 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
               <button
                 className="card__open"
                 onClick={() => onOpen(p)}
-                aria-label={`Voir l'étude de cas : ${p.name}`}
-                data-cursor="Voir"
+                aria-label={t.cardAria(p.name)}
+                data-cursor={t.cardCursor}
                 style={{ ['--accent' as string]: p.accent }}
               >
                 <div className="card__frame">
@@ -203,7 +207,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
                   and focus goes to that button first so closing the case study lands back on the card */}
               <div
                 className="card__meta"
-                data-cursor="Voir"
+                data-cursor={t.cardCursor}
                 onClick={(e) => {
                   e.currentTarget.parentElement?.querySelector<HTMLElement>('.card__open')?.focus({ preventScroll: true })
                   onOpen(p)
@@ -215,7 +219,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
                 <h3>{p.name}</h3>
                 <p>{p.tags}</p>
                 <span className="card__cta" style={{ color: p.accent }} aria-hidden="true">
-                  Voir le projet <span className="card__arrow">→</span>
+                  {t.cardCta} <span className="card__arrow">→</span>
                 </span>
               </div>
             </article>
@@ -223,8 +227,8 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
         </div>
 
         <div className="work__outro">
-          <span className="label">Fin</span>
-          <a href="#contact">Travaillons ensemble →</a>
+          <span className="label">{t.end}</span>
+          <a href="#contact">{t.workTogether}</a>
         </div>
       </div>
     </section>

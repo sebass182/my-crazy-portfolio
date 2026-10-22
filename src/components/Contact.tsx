@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react'
 import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import HeroShader from './HeroShader'
+import { useLang } from '../i18n/context'
 
 export default function Contact({ ready }: { ready: boolean }) {
+  const { t } = useLang()
   const root = useRef<HTMLElement>(null)
   const [shader, setShader] = useState(false) // true while the WebGL backdrop is drawing; the CSS blobs are the fallback
 
@@ -74,8 +76,8 @@ export default function Contact({ ready }: { ready: boolean }) {
         <HeroShader ready={ready} onActive={setShader} variant="footer" />
       </div>
 
-      <span className="label">Contact</span>
-      <h2 className="contact__title">Travaillons ensemble.</h2>
+      <span className="label">{t.contact}</span>
+      <h2 className="contact__title">{t.contactTitle}</h2>
 
       <a className="magnetic magnetic--big" data-strength="0.6" href="mailto:sebasslemyre@gmail.com">
         sebasslemyre@gmail.com
@@ -88,15 +90,15 @@ export default function Contact({ ready }: { ready: boolean }) {
             href="https://www.linkedin.com/in/sebastien-lemyre/"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="LinkedIn (s’ouvre dans un nouvel onglet)"
+            aria-label={t.linkedinAria}
           >
             LinkedIn
           </a>
-          <a className="magnetic pill pill--outline" href="https://sebass182.github.io/sebasslemyre-site/index.html">
-            C.V.
+          <a className="magnetic pill pill--outline" href={t.cvHref}>
+            {t.cvLabel}
           </a>
         </div>
-        <span className="label">Sébastien Lemyre — Designer UI/UX Senior</span>
+        <span className="label">{t.footerLabel}</span>
       </div>
     </footer>
   )

@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { gsap, ScrollTrigger, prefersReducedMotion, useGSAP } from '../lib/gsap'
-import { others, othersTitle } from '../data/others'
+import { others } from '../data/others'
+import { useLang } from '../i18n/context'
 
 const base = import.meta.env.BASE_URL
 const NEAR = 0.5 // the nearest picture waits this many screen heights behind the screen (the stage's perspective is one screen height)
@@ -23,6 +24,7 @@ const place = (v: number, d: number, k: number) => 50 + (v - 50) * k * (1 + behi
    slowly behind it (parallax). The same on a phone or a tablet (the pictures are laid out again for a tall screen); reduced motion gets a
    plain grid. */
 export default function Others() {
+  const { t } = useLang()
   const root = useRef<HTMLElement>(null)
 
   useGSAP(
@@ -84,7 +86,7 @@ export default function Others() {
       <div className="others__stage">
         <div className="others__scene">
           <h2 className="others__title" id="others-title">
-            {othersTitle.split(' ').map((w, i) => (
+            {t.othersTitle.split(' ').map((w, i) => (
               <span className="w" key={i}>
                 {w}{' '}
               </span>

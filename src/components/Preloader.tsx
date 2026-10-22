@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { gsap, useGSAP } from '../lib/gsap'
+import { useLang } from '../i18n/context'
 
 type Props = { images: string[]; onDone: () => void }
 
@@ -11,6 +12,7 @@ const preload = (src: string) =>
   })
 
 export default function Preloader({ images, onDone }: Props) {
+  const { t } = useLang()
   const root = useRef<HTMLDivElement>(null)
   const count = useRef<HTMLSpanElement>(null)
 
@@ -61,7 +63,7 @@ export default function Preloader({ images, onDone }: Props) {
         <i className="blob blob--pink" />
         <i className="blob blob--lilac" />
       </div>
-      <span className="preloader__label">Revue de portfolio — Sébastien Lemyre</span>
+      <span className="preloader__label">{t.preloader}</span>
       <span className="preloader__count" ref={count}>
         00
       </span>

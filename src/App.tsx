@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { ScrollTrigger, prefersReducedMotion } from './lib/gsap'
-import { projects, mockupOf, type Project } from './data/projects'
+import { projects, mockupOf } from './data/projects'
+import { useLang } from './i18n/context'
+import { useProjects } from './i18n/data'
 import Cursor from './components/Cursor'
 import Nav from './components/Nav'
 import Preloader from './components/Preloader'
@@ -23,7 +25,10 @@ const shouldSkipPreloader = () => {
 
 export default function App() {
   const [ready, setReady] = useState(shouldSkipPreloader)
-  const [project, setProject] = useState<Project | null>(null)
+  const { lang } = useLang()
+  const localized = useProjects()
+  const [slug, setSlug] = useState<string | null>(null) // the open case study, by slug: it follows the language
+  const project = slug ? (localized.find((p) => p.slug === slug) ?? null) : null
 
   // Lock scrolling while loading; re-measure scroll triggers once released
   useEffect(() => {
@@ -35,21 +40,23 @@ export default function App() {
   useEffect(() => {
     const behind = document.querySelectorAll('main, .nav')
     behind.forEach((el) => (project ? el.setAttribute('inert', '') : el.removeAttribute('inert')))
-  }, [project])
+  }, [project, lang])
 
+  // The tree is keyed by the language: switching it rebuilds every section (the split text, the pinned scenes and the scroll
+  // triggers are all built from the words, so they are simply built again).
   return (
-    <>
+    <div key={lang} style={{ display: 'contents' }}>
       <Cursor />
       {!ready && <Preloader images={projects.map(mockupOf)} onDone={() => setReady(true)} />}
       <Nav ready={ready} />
       <main>
         <Hero ready={ready} />
-        <Work onOpen={setProject} />
+        <Work onOpen={(p) => setSlug(p.slug)} />
         <About />
         <Others />
         <Contact ready={ready} />
       </main>
-      {project && <ProjectView project={project} onClose={() => setProject(null)} onNavigate={setProject} />}
-    </>
+      {project && <ProjectView project={project} onClose={() => setSlug(null)} onNavigate={(p) => setSlug(p.slug)} />}
+    </div>
   )
 }

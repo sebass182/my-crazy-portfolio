@@ -2,6 +2,7 @@ import { useRef, type CSSProperties } from 'react'
 import { gsap, ScrollTrigger, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import type { CaseData, CaseLayer } from '../data/cases'
 import type { Project } from '../data/projects'
+import { useLang } from '../i18n/context'
 
 /* A case study built the way the Holo MD page is, from the Figma deck:
      the laptop → À propos (the paragraph and the photo, the three goals floating over it) → the three objective
@@ -27,6 +28,7 @@ const crossesOver = (layers: CaseLayer[]) => layers.some((l) => l.kind !== 'bg' 
 const LAPTOP = { f: 'cases/_shared/laptop.webp', iw: 2400, ih: 1500, x: 11.7, y: 7.4, w: 76.7 }
 
 export default function CaseStudy({ project, data }: { project: Project; data: CaseData }) {
+  const { t } = useLang()
   const root = useRef<HTMLDivElement>(null)
 
   useGSAP(
@@ -186,7 +188,7 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
   return (
     <div className="hc hc--x" ref={root}>
       {/* the laptop: the project's screen inside the deck's MacBook, on the same cream */}
-      <section className="hc-slide hc-slide--hero" aria-label={`Maquette principale — ${project.name}`}>
+      <section className="hc-slide hc-slide--hero" aria-label={t.mainMockup(project.name)}>
         <div className="hc-slide__stage" style={{ ['--stage' as string]: '#f7f6f2' }}>
           <div className="hl hl--device" data-depth={0.9} style={place(LAPTOP)}>
             <div className="hl__s">
@@ -200,16 +202,16 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
       </section>
 
       {/* À propos, as on the Holo MD page: the paragraph and the photo — and the three goals floating over the photo, as on the deck */}
-      <section className="hc-intro" aria-label="Contexte du projet">
+      <section className="hc-intro" aria-label={t.contextAria}>
         <div>
-          <span className="hc-eyebrow">À propos</span>
+          <span className="hc-eyebrow">{t.aboutEyebrow}</span>
           <p className="hc-lead">{intro.lead}</p>
         </div>
         <figure className="hc-photo" style={{ ['--chip' as string]: project.bg }}>
           <div className="hc-photo__frame">
             <Pic data={data} {...intro.photo} />
           </div>
-          <ol className="chips" aria-label="Les trois objectifs du projet">
+          <ol className="chips" aria-label={t.goalsAria}>
             {intro.chips.map((c, i) => (
               <li className="hl hl--chip" key={c.n} data-depth={1 + i * 0.35} style={{ top: `${c.y}%`, width: `${c.w}%`, zIndex: 3 + i, ['--x' as string]: c.x, ['--h' as string]: c.h }}>
                 <div className="hl__s">

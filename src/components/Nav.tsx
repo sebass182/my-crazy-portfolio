@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { gsap, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import { jumpTo } from '../lib/jump'
+import { useLang } from '../i18n/context'
 
-const links = [
-  { href: '#work', label: 'Travaux' },
-  { href: '#about', label: 'À propos' },
-  { href: '#contact', label: 'Contact' },
-]
+const hrefs = ['#work', '#about', '#contact'] as const
 
 const MOBILE = '(max-width: 800px)'
 const NAME = 'Sébastien Lemyre'
 
 export default function Nav({ ready }: { ready: boolean }) {
+  const { lang, setLang, t } = useLang()
+  const links = [t.navWork, t.navAbout, t.navContact].map((label, i) => ({ href: hrefs[i], label }))
+  const other = lang === 'fr' ? 'en' : 'fr'
   const root = useRef<HTMLDivElement>(null)
   const burger = useRef<HTMLButtonElement>(null)
   const panel = useRef<HTMLDivElement>(null)
@@ -190,7 +190,7 @@ export default function Nav({ ready }: { ready: boolean }) {
         <a
           className="nav__brand"
           href="#top"
-          aria-label="Retour en haut de la page — Sébastien Lemyre"
+          aria-label={t.homeAria}
           onClick={(e) => go(e, '#top')}
           onMouseEnter={() => typeTo(NAME.length)}
           onMouseLeave={() => typeTo(0)}
@@ -205,12 +205,15 @@ export default function Nav({ ready }: { ready: boolean }) {
           <span className="nav__caret" aria-hidden="true" />
         </a>
 
-        <nav className="nav__links" aria-label="Navigation principale">
+        <nav className="nav__links" aria-label={t.navAria}>
           {links.map((l) => (
             <a key={l.href} href={l.href} onClick={(e) => go(e, l.href)}>
               {l.label}
             </a>
           ))}
+          <button className="lang-switch" type="button" lang={other} aria-label={t.switchAria} onClick={() => setLang(other)}>
+            {other}
+          </button>
         </nav>
 
         <button
@@ -218,7 +221,7 @@ export default function Nav({ ready }: { ready: boolean }) {
           className="burger"
           aria-expanded={open}
           aria-controls="menu"
-          aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+          aria-label={open ? t.menuClose : t.menuOpen}
           onClick={() => setOpen((o) => !o)}
         >
           <span className="burger__line burger__line--top" />
@@ -234,7 +237,7 @@ export default function Nav({ ready }: { ready: boolean }) {
           <i className="blob blob--lilac" />
         </div>
 
-        <nav className="menu__nav" aria-label="Menu mobile">
+        <nav className="menu__nav" aria-label={t.menuAria}>
           {links.map((l, i) => (
             <a key={l.href} className="menu__link" href={l.href} onClick={(e) => go(e, l.href)}>
               <span className="menu__mask">
@@ -250,7 +253,10 @@ export default function Nav({ ready }: { ready: boolean }) {
 
         <div className="menu__foot">
           <a href="mailto:sebasslemyre@gmail.com">sebasslemyre@gmail.com</a>
-          <span>St-Jean-sur-Richelieu, QC</span>
+          <span>{t.location}</span>
+          <button className="lang-switch lang-switch--menu" type="button" lang={other} aria-label={t.switchAria} onClick={() => setLang(other)}>
+            {t.switchTo}
+          </button>
         </div>
       </div>
     </div>
