@@ -169,7 +169,7 @@
 .hc-slide--card { transform-origin: 50% 0%; }
 .hc-slide__shade { position: absolute; inset: 0; z-index: 30; background: var(--shade, #000131); opacity: 0; pointer-events: none; }
 @media (prefers-reduced-motion: no-preference) {
-  .hc-slide--card { position: sticky; top: 5.6rem; }
+  .hc-slide--card { position: sticky; top: 3.6rem; }
 }
 
 /* hover: the layer lifts, its neighbours step back */

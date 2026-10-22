@@ -151,7 +151,7 @@ export default function HoloCase() {
       const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
       const park = () =>
         stack.forEach((li, i) => {
-          const wanted = (phone ? 4.6 + i : 5.6 + i * 1.5) * rem
+          const wanted = (phone ? 4 + i * 0.75 : 3.6 + i * 1) * rem
           li.style.top = `${Math.min(wanted, scroller.clientHeight - li.offsetHeight - 14)}px`
         })
       park()
