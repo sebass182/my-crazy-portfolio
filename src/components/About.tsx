@@ -37,7 +37,7 @@ const experience = [
   { years: '2020—2022', company: 'Pigiste', role: 'Designer graphique et web' },
   { years: '2017—2020', company: 'Inovision Web', role: 'Designer Web UI/UX' },
   { years: '2012—2016', company: 'Empire Sport', role: 'Designer principal' },
-  { years: '', company: 'Antérieures', role: 'Graphiste et graphiste web' },
+  { years: '1999—2011', company: 'Antérieures', role: 'Graphiste et graphiste web' },
 ]
 
 // iOS 13+ only hands out the device's motion after a tap (and a yes); everywhere else it just flows.
