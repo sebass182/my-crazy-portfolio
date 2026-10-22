@@ -18,23 +18,26 @@ const photos = [
 const bio =
   "Avec plus de 20 ans d'expérience en design numérique, UI/UX et direction artistique, j'accompagne les entreprises, agences et grands comptes dans la création de produits digitaux performants, d'architectures d'information complexes et d'identités visuelles mémorables."
 
+// The same words as the CV (sebasslemyre-site): headings, lists, roles and years
 const columns = [
-  { title: 'Expertise', items: ['Figma', 'Suite Adobe CC', 'WordPress', 'Midjourney · Ideogram · Claude Code · Suno · Veo · Gemini · NotebookLM'] },
+  { title: 'Outils', items: ['Figma', 'Suite Adobe CC · WordPress', 'IA : Midjourney, Ideogram, Claude Code, Suno, Veo, Gemini, NotebookLM'] },
   {
     title: 'Compétences',
-    items: ['Design systems & composants', 'Prototypage haute fidélité', 'Direction créative & branding', "Architecture de l'information", 'IA générative'],
+    items: ['Bibliothèques de composants Figma', 'Prototypage haute fidélité', 'Direction créative & Branding', "Architecture de l'information", 'IA générative'],
   },
   {
     title: 'Intérêts',
-    items: ['Photographie & drone', 'Création musicale & audio génératif', 'Curation typographique & culture visuelle', 'Fat-bike & exploration plein air'],
+    items: ['Photographie & Drone', 'Création musicale & Audio génératif', 'Curation typographique & Culture visuelle', 'Fat-bike & Exploration plein air'],
   },
 ]
 
 const experience = [
-  { years: '2024—2026', company: 'SmartBug Media', role: 'Senior UI/UX & Lead Product Designer' },
-  { years: '2022—2024', company: 'Globalia', role: 'UI/UX Designer & Directeur artistique' },
-  { years: '2017—2021', company: 'Inovision Web', role: 'Designer UI/UX' },
-  { years: '2012—2016', company: 'Empire Sport', role: 'Directeur artistique & image de marque' },
+  { years: '2023—2026', company: 'SmartBug Media', role: 'Senior UI/UX Web Designer' },
+  { years: '2022—2023', company: 'Globalia', role: 'Senior UI/UX Web Designer & Directeur artistique' },
+  { years: '2020—2022', company: 'Pigiste', role: 'Designer graphique et web' },
+  { years: '2017—2020', company: 'Inovision Web', role: 'Designer Web UI/UX' },
+  { years: '2012—2016', company: 'Empire Sport', role: 'Designer principal' },
+  { years: '', company: 'Antérieures', role: 'Graphiste et graphiste web' },
 ]
 
 // iOS 13+ only hands out the device's motion after a tap (and a yes); everywhere else it just flows.
