@@ -8,6 +8,9 @@ const DEEP = 1.5 // each unit of depth adds this much
 const IN_X = 0.72 // the pictures start pulled this far towards the centre sideways...
 const IN_Y = 0.55 // ...and more so vertically (what flies upward would be cut by the top of the stage)
 const SIZE = 0.8
+// on a tall, narrow screen (a phone, a tablet held upright) the same scene is laid out again: less pull towards the centre sideways (the
+// width is scarce), more vertically (the height is not), and smaller pictures (their height is in screen heights, their width then follows)
+const NARROW = { inX: 0.5, inY: 0.78, size: 0.4 }
 const behind = (d: number) => NEAR + DEEP * d // how many screen heights behind the screen
 // x / y in the data are where a picture is first SEEN; perspective pulls a deep one towards the centre (by 1 / (1 + behind)), so its real
 // place is pushed out by the same factor
@@ -17,7 +20,8 @@ const place = (v: number, d: number, k: number) => 50 + (v - 50) * k * (1 + behi
    section peeks in, at different depths: the nearer, the bigger. As the section comes up the camera starts moving forward and keeps
    going once the stage is pinned: every picture comes to it and passes it, the deep ones having the furthest to go, so they zoom the
    most. The title's words light up meanwhile. At the end the footer rises over the stage, full screen, while the stage drifts up more
-   slowly behind it (parallax). Phones and reduced motion get a plain grid. */
+   slowly behind it (parallax). The same on a phone or a tablet (the pictures are laid out again for a tall screen); reduced motion gets a
+   plain grid. */
 export default function Others() {
   const root = useRef<HTMLElement>(null)
 
@@ -26,7 +30,7 @@ export default function Others() {
       if (prefersReducedMotion()) return
       const mm = gsap.matchMedia()
 
-      mm.add('(min-width: 801px)', () => {
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
         const section = root.current!
         const stage = section.querySelector<HTMLElement>('.others__stage')!
         const scene = section.querySelector<HTMLElement>('.others__scene')!
@@ -69,18 +73,6 @@ export default function Others() {
         })
       })
 
-      // phones: the grid rises in picture by picture
-      mm.add('(max-width: 800px)', () => {
-        gsap.from('.others__img', {
-          y: 40,
-          opacity: 0,
-          duration: 0.8,
-          ease: 'power3.out',
-          stagger: 0.06,
-          scrollTrigger: { trigger: '.others__stage', start: 'top 70%', end: 'bottom top', toggleActions: 'play reverse play reverse' },
-        })
-      })
-
       return () => mm.revert()
     },
     { scope: root },
@@ -112,6 +104,9 @@ export default function Others() {
                 ['--x' as string]: place(o.x, o.d, IN_X),
                 ['--y' as string]: place(o.y, o.d, IN_Y),
                 ['--h' as string]: o.sh * SIZE * (1 + behind(o.d)),
+                ['--nx' as string]: place(o.x, o.d, NARROW.inX),
+                ['--ny' as string]: place(o.y, o.d, NARROW.inY),
+                ['--nh' as string]: o.sh * NARROW.size * (1 + behind(o.d)),
                 ['--ar' as string]: `${o.w} / ${o.h}`,
               }}
             >
