@@ -10,7 +10,7 @@ export const others: OtherShot[] = [
   { f: 'xma.png', name: 'XMA', w: 490, h: 638, x: 42, y: 90, sh: 18, d: 0.95, delay: 0.12, len: 0.85, reach: 0.95 },
   { f: 'altanora.png', name: 'Altanora', w: 551, h: 333, x: 52, y: 8, sh: 9, d: 0.9, delay: 0, len: 0.75, reach: 0.9 },
   { f: 'cqcd-mobile.png', name: 'CQCD (mobile)', w: 253, h: 1033, x: 17, y: 58, sh: 24, d: 0.85, delay: 0.28, len: 0.72, reach: 0.97 },
-  { f: 'giftjoy.png', name: 'Giftjoy', w: 493, h: 306, x: 80, y: 52, sh: 11, d: 0.75, delay: 0.05, len: 0.7, reach: 0.85 },
+  { f: 'giftjoy.png', name: 'Giftjoy', w: 493, h: 306, x: 32, y: 94, sh: 11, d: 0.75, delay: 0.05, len: 0.7, reach: 0.85 },
   { f: 'cqcd.png', name: 'CQCD', w: 491, h: 668, x: 77, y: 81, sh: 26, d: 0.7, delay: 0.2, len: 0.8, reach: 0.92 },
   { f: 'forum.png', name: 'Forum', w: 448, h: 518, x: 30, y: 12, sh: 22, d: 0.55, delay: 0.1, len: 0.6, reach: 0.8 },
   { f: 'hedhofis.png', name: 'Hedhofis', w: 573, h: 754, x: 72, y: 14, sh: 25, d: 0.4, delay: 0.32, len: 0.65, reach: 0.97 },
