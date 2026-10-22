@@ -151,7 +151,7 @@ export default function Work({ onOpen }: { onOpen: (p: Project) => void }) {
   )
 
   return (
-    <section className="work" ref={root} id="work" aria-labelledby="work-title">
+    <section className="work" ref={root} id="work" data-nav="dark" aria-labelledby="work-title">
       <div className="work__hud">
         <span className="work__count" aria-hidden="true">
           00 / {String(projects.length).padStart(2, '0')}

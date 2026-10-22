@@ -85,7 +85,7 @@ export default function Nav({ ready }: { ready: boolean }) {
     if (!ready) return
     const el = header.current
     if (!el) return
-    const work = document.getElementById('work')
+    const darks = [...document.querySelectorAll('[data-nav=dark]')]
     let last = window.scrollY
     let raf = 0
     const onScroll = () => {
@@ -95,8 +95,7 @@ export default function Nav({ ready }: { ready: boolean }) {
         const y = window.scrollY
         const dy = y - last
         el.classList.toggle('nav--bar', y > 90)
-        const w = work?.getBoundingClientRect()
-        el.classList.toggle('nav--dark', !!w && w.top <= 40 && w.bottom > 40)
+        el.classList.toggle('nav--dark', darks.some((s) => { const r = s.getBoundingClientRect(); return r.top <= 40 && r.bottom > 40 }))
         if (y <= 90 || dy < -6) setShown(true)
         else if (dy > 6 && !document.body.classList.contains('is-locked')) setShown(false)
         if (Math.abs(dy) > 6) last = y

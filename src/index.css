@@ -440,3 +440,42 @@ a:focus-visible, button:focus-visible { outline: 2px solid #fff; outline-offset:
 .pv__meta dt { font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
 .pv__meta dd { margin-top: 0.4rem; font-size: 0.98rem; line-height: 1.45; opacity: 0.9; }
 @media (max-width: 800px) { .pv__meta { grid-template-columns: 1fr 1fr; } .pv__meta div:nth-child(3) { grid-column: 1 / -1; } }
+
+/* ───────── Autres projets: the zoom-through scroll section ───────── */
+.others { position: relative; background: var(--ink); color: #fff; }
+.others__stage { position: relative; height: 100svh; overflow: hidden; perspective: 100svh; perspective-origin: 50% 50%; }
+.others__title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  width: min(62%, 60rem);
+  text-align: center;
+  font-size: clamp(2.2rem, 5.4vw, 6.4rem);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+.others__img {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  width: calc(var(--w) * 1%);
+  aspect-ratio: 3 / 4;
+  translate: -50% -50%;
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+  will-change: transform, opacity;
+}
+.others__img img { width: 100%; height: 100%; object-fit: cover; object-position: left top; }
+.others__hero { aspect-ratio: 16 / 10; border-radius: 0; }
+.others__hero img { object-position: center top; }
+
+@media (max-width: 800px), (prefers-reduced-motion: reduce) {
+  .others__stage { height: auto; overflow: visible; perspective: none; padding: 18vh var(--pad) 12vh; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .others__hero { display: none; }
+  .others__title { position: static; translate: none; width: auto; grid-column: 1 / -1; margin-bottom: 2rem; text-align: left; }
+  .others__img { position: static; translate: none; width: 100%; border-radius: 12px; }
+}

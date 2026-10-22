@@ -6,6 +6,7 @@ import Nav from './components/Nav'
 import Preloader from './components/Preloader'
 import Hero from './components/Hero'
 import Work from './components/Work'
+import Others from './components/Others'
 import About from './components/About'
 import Contact from './components/Contact'
 import ProjectView from './components/ProjectView'
@@ -44,6 +45,7 @@ export default function App() {
       <main>
         <Hero ready={ready} />
         <Work onOpen={setProject} />
+        <Others />
         <About />
         <Contact ready={ready} />
       </main>
