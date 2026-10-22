@@ -131,6 +131,9 @@
 
 /* 1 · the laptop: the project's screen inside the deck's laptop, on the same cream */
 .hc-slide--hero { grid-template-columns: 1fr; }
+/* the cream ground is its own layer so it can blur and fade; the slide itself clips nothing and carries no shadow */
+.hc-slide--hero { position: relative; overflow: visible; box-shadow: none; }
+.hc-slide__ground { position: absolute; inset: 0; border-radius: inherit; background: #f7f6f2; box-shadow: 0 60px 110px -50px rgba(0, 0, 8, 0.9); will-change: filter, opacity; }
 .hc--x .hc-slide--hero .hc-slide__stage { aspect-ratio: 16 / 9; }
 .hc-slide--hero .hc-slide__stage::before { display: none; }
 .hc--x .dev { position: relative; filter: drop-shadow(0 38px 42px rgba(30, 30, 20, 0.22)); will-change: transform; }
