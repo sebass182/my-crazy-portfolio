@@ -76,14 +76,19 @@ export default function About() {
         },
       })
 
-      gsap.from('.about__col, .xp__row', {
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.08,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: '.about__cols', start: 'top 85%', end: 'bottom top', toggleActions: 'play reverse play reverse' },
-      })
+      // each group is revealed (and rewound) by its own trigger: the experience rows sit below the columns, so tying them
+      // to the columns made them fade out as soon as the columns left the top of the screen
+      const reveal = (targets: string, trigger: string) =>
+        gsap.from(targets, {
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.08,
+          ease: 'power3.out',
+          scrollTrigger: { trigger, start: 'top 85%', end: 'bottom top', toggleActions: 'play reverse play reverse' },
+        })
+      reveal('.about__col', '.about__cols')
+      reveal('.xp__row', '.xp')
 
       /* Montage.
          Channels per layer, so nothing fights: .aura = entrance; .aura__b = scroll swirl;
