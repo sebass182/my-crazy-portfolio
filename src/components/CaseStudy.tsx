@@ -74,13 +74,13 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
       })
 
       /* The three objective slides are the stacking cards: each one is sticky, the next slides over it while the
-         covered slide steps back (scale + a shade towards the page's own ground). The sticky offset is clamped so a
-         slide taller than the screen (phones) parks with its bottom edge in view instead of being cut off. */
+         covered slide steps back (scale + a shade towards the page's own ground). Each one parks centred in the window. */
       const stack = all<HTMLElement>('.hc-slide--card')
-      // a sticky offset is measured inside the scroller's own top padding, so that padding is taken off to land 30px from the screen's top
+      // Every card parks vertically centred in the window, whatever its size (a card taller than the window parks at 12px from the
+      // top instead). A sticky offset is measured inside the scroller's own top padding, so that padding is taken off.
       const park = () => {
         const pad = parseFloat(getComputedStyle(scroller).paddingTop) || 0
-        stack.forEach((li) => li.style.setProperty('top', `${Math.min(30 - pad, scroller.clientHeight - li.offsetHeight - 14 - pad)}px`))
+        stack.forEach((li) => li.style.setProperty('top', `${Math.max(12, (scroller.clientHeight - li.offsetHeight) / 2) - pad}px`))
       }
       park()
       ScrollTrigger.addEventListener('refreshInit', park)

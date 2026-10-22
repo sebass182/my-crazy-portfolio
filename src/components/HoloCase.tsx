@@ -136,10 +136,11 @@ export default function HoloCase() {
          its bottom edge in view instead of being cut off. (Same as CaseStudy.tsx.) */
       const phone = window.matchMedia('(max-width: 800px)').matches
       const stack = all<HTMLElement>('.hc-slide--card')
-      // a sticky offset is measured inside the scroller's own top padding, so that padding is taken off to land 30px from the screen's top
+      // Every card parks vertically centred in the window, whatever its size (a card taller than the window parks at 12px from the
+      // top instead). A sticky offset is measured inside the scroller's own top padding, so that padding is taken off.
       const park = () => {
         const pad = parseFloat(getComputedStyle(scroller).paddingTop) || 0
-        stack.forEach((li) => li.style.setProperty('top', `${Math.min(30 - pad, scroller.clientHeight - li.offsetHeight - 14 - pad)}px`))
+        stack.forEach((li) => li.style.setProperty('top', `${Math.max(12, (scroller.clientHeight - li.offsetHeight) / 2) - pad}px`))
       }
       park()
       ScrollTrigger.addEventListener('refreshInit', park)
