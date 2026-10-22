@@ -16,7 +16,7 @@ const photos = [
 ]
 
 const bio =
-  "Avec plus de 20 ans d'expérience en design numérique, UI/UX et direction artistique, j'accompagne les entreprises, agences et grands comptes dans la création de produits digitaux performants, d'architectures d'information complexes et d'identités visuelles mémorables."
+  "Avec plus de 15 ans d'expérience en design numérique, UI/UX et direction artistique, j'accompagne les entreprises, agences et grands comptes dans la création de produits digitaux performants, d'architectures d'information complexes et d'identités visuelles mémorables."
 
 // The same words as the CV (sebasslemyre-site): headings, lists, roles and years
 const columns = [
