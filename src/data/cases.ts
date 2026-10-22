@@ -238,7 +238,7 @@ export const cases: Record<string, CaseData> = {
    "role": "Créateur & D.A.",
    "agency": "Projet personnel",
    "scope": "Production musicale IA · Identité visuelle · Vidéo · Distribution",
-   "tools": "Midjourney · Ideogram · Suno · ChatGPT · Figma"
+   "tools": "Midjourney · Ideogram · Suno · ChatGPT · Claude Code · Figma"
   },
   "hero": {
    "f": "hero.webp",

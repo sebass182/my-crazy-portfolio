@@ -74,9 +74,9 @@ img { display: block; max-width: 100%; }
 .hero > *:not(.hero__bg) { position: relative; z-index: 1; }
 /* the shader draws the backdrop; the blobs are only the fallback (no WebGL, reduced motion, lost context) */
 .hero__shader { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.hero.has-shader .blob { display: none; }
+.hero.has-shader .blob, .contact.has-shader .blob { display: none; }
 /* grain: a static tile at full screen resolution (the canvas underneath is drawn small, so grain can't live in the shader) */
-.hero.has-shader .hero__bg::after {
+.hero.has-shader .hero__bg::after, .contact.has-shader .hero__bg::after {
   content: '';
   position: absolute;
   inset: 0;

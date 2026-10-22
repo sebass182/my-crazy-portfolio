@@ -251,7 +251,6 @@ export default function Nav({ ready }: { ready: boolean }) {
 
         <div className="menu__foot">
           <a href="mailto:sebasslemyre@gmail.com">sebasslemyre@gmail.com</a>
-          <a href="tel:5144428885">514.442.8885</a>
           <span>St-Jean-sur-Richelieu, QC</span>
         </div>
       </div>

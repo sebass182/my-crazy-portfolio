@@ -105,7 +105,7 @@ export default function Hero({ ready }: { ready: boolean }) {
           Lemyre
         </h1>
         <p className="hero__lede">
-          <strong>Designer UI/UX Senior.</strong> Design systems, direction artistique et IA générative — 15 ans à
+          <strong>Designer UI/UX Senior.</strong> Design systems, direction artistique et IA générative — 20 ans à
           transformer des produits complexes en interfaces simples.
         </p>
         <div className="hero__cta">

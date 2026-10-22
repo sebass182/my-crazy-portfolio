@@ -1,12 +1,27 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
+import HeroShader from './HeroShader'
 
-export default function Contact() {
+export default function Contact({ ready }: { ready: boolean }) {
   const root = useRef<HTMLElement>(null)
+  const [shader, setShader] = useState(false) // true while the WebGL backdrop is drawing; the CSS blobs are the fallback
 
   useGSAP(
     (_, contextSafe) => {
       if (prefersReducedMotion()) return // headline shows as-is, buttons stay put
+
+      // Fallback backdrop (no WebGL): the gradient blobs drift forever, like the hero's
+      gsap.utils.toArray<HTMLElement>('.contact .blob').forEach((b, i) => {
+        gsap.to(b, {
+          x: () => gsap.utils.random(-18, 18) + 'vw',
+          y: () => gsap.utils.random(-14, 14) + 'vh',
+          duration: gsap.utils.random(7, 11),
+          ease: 'sine.inOut',
+          repeat: -1,
+          yoyo: true,
+          delay: -i * 2,
+        })
+      })
 
       SplitText.create('.contact__title', {
         type: 'words',
@@ -51,11 +66,12 @@ export default function Contact() {
   )
 
   return (
-    <footer className="contact" ref={root} id="contact">
+    <footer className={shader ? 'contact has-shader' : 'contact'} ref={root} id="contact">
       <div className="hero__bg" aria-hidden="true">
         <i className="blob blob--yellow" />
         <i className="blob blob--cyan" />
         <i className="blob blob--pink" />
+        <HeroShader ready={ready} onActive={setShader} variant="footer" />
       </div>
 
       <span className="label">Contact</span>
@@ -67,11 +83,8 @@ export default function Contact() {
 
       <div className="contact__bottom">
         <div className="contact__links">
-          <a className="magnetic pill" href="tel:5144428885">
-            514.442.8885
-          </a>
           <a
-            className="magnetic pill pill--outline"
+            className="magnetic pill"
             href="https://www.linkedin.com/in/sebastien-lemyre/"
             target="_blank"
             rel="noopener noreferrer"
@@ -80,7 +93,7 @@ export default function Contact() {
             LinkedIn
           </a>
           <a className="magnetic pill pill--outline" href="https://sebass182.github.io/sebasslemyre-site/index.html">
-            Portfolio
+            C.V.
           </a>
         </div>
         <span className="label">Sébastien Lemyre — Designer UI/UX Senior</span>

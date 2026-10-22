@@ -33,6 +33,7 @@ uniform vec2 uRes;
 uniform float uTime;
 uniform float uScroll;
 uniform float uIntro;
+uniform float uLilac;   // 1 on the hero (the lilac field at the bottom), 0 on the footer (it never had one)
 uniform float uCount;
 uniform vec4 uSeg[N];   // a stroke segment: from (xy) to (zw), in screen-height units
 uniform vec2 uInfo[N];  // birth time, strength
@@ -117,7 +118,7 @@ void main() {
   vec3 lilac = vec3(0.827, 0.784, 1.000);  // #d3c8ff
 
   vec3 col = base;
-  col = mix(col, lilac, clamp(field(w, lHome, 0.62 * k) * 0.95, 0.0, 1.0));
+  col = mix(col, lilac, clamp(field(w, lHome, 0.62 * k) * 0.95, 0.0, 1.0) * uLilac);
   col = mix(col, peach, clamp(field(w, pHome, 0.60 * k) * 0.95, 0.0, 1.0));
   col = mix(col, yellow, clamp(field(w, yHome, 0.5 * k) * 0.98, 0.0, 1.0));
   col = mix(col, cyan, clamp(field(w, cHome, 0.6 * k) * 0.97, 0.0, 1.0)); // on top, so the corner stays cyan
@@ -137,11 +138,13 @@ const LIFE = 1.5 // seconds a stroke lives — keep in step with LIFE in the sha
 type Props = {
   /** the preloader is done: the colour swells in */
   ready: boolean
+  /** the hero's backdrop, or the footer's (no lilac field; the flow slides as the footer passes through the screen) */
+  variant?: 'hero' | 'footer'
   /** true while the shader is drawing (the CSS blobs step aside), false if it can't or stops */
   onActive: (on: boolean) => void
 }
 
-export default function HeroShader({ ready, onActive }: Props) {
+export default function HeroShader({ ready, onActive, variant = 'hero' }: Props) {
   const ref = useRef<HTMLCanvasElement>(null)
   const intro = useRef({ v: 0 })
 
@@ -164,7 +167,7 @@ export default function HeroShader({ ready, onActive }: Props) {
 
     let program: WebGLProgram | null = null
     let buffer: WebGLBuffer | null = null
-    type Loc = Record<'res' | 'time' | 'scroll' | 'intro' | 'count' | 'seg' | 'info', WebGLUniformLocation | null>
+    type Loc = Record<'res' | 'time' | 'scroll' | 'intro' | 'lilac' | 'count' | 'seg' | 'info', WebGLUniformLocation | null>
     let loc: Loc | null = null
 
     const compile = (type: number, src: string) => {
@@ -201,7 +204,7 @@ export default function HeroShader({ ready, onActive }: Props) {
       gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0)
 
       const u = (n: string) => gl.getUniformLocation(program!, n)
-      loc = { res: u('uRes'), time: u('uTime'), scroll: u('uScroll'), intro: u('uIntro'), count: u('uCount'), seg: u('uSeg'), info: u('uInfo') }
+      loc = { res: u('uRes'), time: u('uTime'), scroll: u('uScroll'), intro: u('uIntro'), lilac: u('uLilac'), count: u('uCount'), seg: u('uSeg'), info: u('uInfo') }
       return true
     }
 
@@ -239,11 +242,11 @@ export default function HeroShader({ ready, onActive }: Props) {
       count = Math.min(count + 1, N)
       lastDrop = now
     }
-    // pointer → the shader's space: x in screen-height units (0..aspect), y 0 (bottom) .. 1 (top)
-    const toLocal = (e: PointerEvent) => ({
-      x: (e.clientX / cssW) * (cssW / cssH),
-      y: 1 - (e.clientY + window.scrollY) / cssH, // the hero is the top of the page
-    })
+    // pointer → the shader's space: x in screen-height units (0..aspect), y 0 (bottom) .. 1 (top), measured on the canvas itself
+    const toLocal = (e: PointerEvent) => {
+      const r = canvas.getBoundingClientRect()
+      return { x: (e.clientX - r.left) / cssH, y: 1 - (e.clientY - r.top) / cssH }
+    }
     // the pen's pacing uses the event clock (exact); a stroke's birth uses the ticker's, the one the shader reads
     const eventClock = () => performance.now() / 1000
     const onMove = (e: PointerEvent) => {
@@ -302,8 +305,12 @@ export default function HeroShader({ ready, onActive }: Props) {
 
       gl.uniform2f(loc.res, canvas.width, canvas.height)
       gl.uniform1f(loc.time, time)
-      gl.uniform1f(loc.scroll, Math.min(1, Math.max(0, window.scrollY / cssH)))
+      // the hero: how far the page has scrolled past its top; the footer: how far it has travelled up through the screen
+      const top = canvas.getBoundingClientRect().top
+      const flow = variant === 'footer' ? (window.innerHeight - top) / (window.innerHeight + cssH) : -top / cssH
+      gl.uniform1f(loc.scroll, Math.min(1, Math.max(0, flow)))
       gl.uniform1f(loc.intro, intro.current.v)
+      gl.uniform1f(loc.lilac, variant === 'footer' ? 0 : 1)
       gl.uniform1f(loc.count, drawing ? count : 0) // no live ripple: the shader skips the whole loop
       if (drawing) {
         gl.uniform4fv(loc.seg, segs)
@@ -342,7 +349,7 @@ export default function HeroShader({ ready, onActive }: Props) {
       if (buffer) gl.deleteBuffer(buffer)
       onActive(false)
     }
-  }, [onActive])
+  }, [onActive, variant])
 
   // the colour swells in once the preloader hands over
   useEffect(() => {
