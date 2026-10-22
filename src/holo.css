@@ -42,12 +42,6 @@
   box-shadow: 0 60px 110px -50px rgba(0, 0, 8, 0.9);
 }
 
-/* on a wide screen a 16:9 slide must still fit the window (the cards park one under another): its width is capped by the
-   height left under the nav, and it is centred in the column */
-@media (min-width: 801px) {
-  .hc-slide { width: min(100%, calc((100dvh - 8rem) * 16 / 9)); margin-inline: auto; }
-}
-
 /* copy panel — the cream is the panel's own, not the slide's: behind the stage there is nothing light left to show through
    as a hairline where the stage's edge falls between two device pixels (or along the slide's rounded corners) */
 .hc-slide__copy { background: #f7f6f2; display: grid; grid-template-rows: auto 1fr; align-content: stretch; padding: 7.2% 11% 6% 11%; min-width: 0; }
@@ -55,6 +49,21 @@
 .hc-slide__copy > div { align-self: center; display: grid; gap: clamp(1rem, 2.4vw, 2rem); }
 .hc-slide__copy h3 { font-size: clamp(1.25rem, 2.05vw, 1.95rem); font-weight: 700; line-height: 1.16; letter-spacing: -0.025em; }
 .hc-slide__copy p { font-size: clamp(0.92rem, 1.5vw, 1.4rem); line-height: 1.55; color: rgba(10, 10, 15, 0.82); letter-spacing: -0.005em; }
+
+/* Desktop: a slide is a card sized to the window — as large as fits in 90vw x 90vh at 16:9 — and everything in it scales with it
+   (the type is in cqw of the card, with a floor so it stays readable). The column that holds the text sections stays
+   at --case-w; only the cards are wider than it. */
+@media (min-width: 801px) {
+  .hc { max-width: none; }
+  .hc > :not(.hc-slide):not(.hc-stack) { width: 100%; max-width: var(--case-w, 1160px); margin-inline: auto; }
+  .hc-stack { justify-items: center; }
+  .hc-slide { container-type: inline-size; width: min(100%, 90vw, calc(90dvh * 16 / 9)); margin-inline: auto; }
+  .hc-slide__n { font-size: max(1.5rem, 2.3cqw); }
+  .hc-slide__copy > div { gap: max(1rem, 2cqw); }
+  .hc-slide__copy h3 { font-size: max(1.2rem, 2cqw); }
+  .hc-slide__copy p { font-size: max(0.95rem, 1.45cqw); }
+  .hc-zoom { font-size: max(var(--text-xs), 0.85cqw); min-height: max(44px, 3cqw); }
+}
 
 /* composition panel */
 .hc-slide__stage {
