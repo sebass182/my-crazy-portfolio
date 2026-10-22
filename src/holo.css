@@ -5,6 +5,7 @@
    with reduced motion the compositions are simply static. */
 .hc {
   --gap: clamp(4.5rem, 12vh, 8rem);
+  --card-pad: clamp(1rem, 1.8vw, 2rem); /* desktop: the same padding round every card */
   max-width: var(--case-w, 1160px);
   margin: 0 auto;
   display: grid;
@@ -50,14 +51,24 @@
 .hc-slide__copy h3 { font-size: clamp(1.25rem, 2.05vw, 1.95rem); font-weight: 700; line-height: 1.16; letter-spacing: -0.025em; }
 .hc-slide__copy p { font-size: clamp(0.92rem, 1.5vw, 1.4rem); line-height: 1.55; color: rgba(10, 10, 15, 0.82); letter-spacing: -0.005em; }
 
-/* Desktop: a slide is a card sized to the window — as large as fits in 90vw x 90vh at 16:9 — and everything in it scales with it
-   (the type is in cqw of the card, with a floor so it stays readable). The column that holds the text sections stays
-   at --case-w; only the cards are wider than it. */
+/* Desktop: a slide is a card that fills the window with the same padding all the way round (--card-pad, even under the
+   Fermer button). Its height is the window's minus that padding twice, the picture side keeps its 839:1080 ratio and the copy
+   panel takes whatever width is left, so the margin is equal on every side at any window shape. Everything in the card
+   scales with it (type in cqw, with a floor). Cards park at the same offset: each covers the one before. The text sections
+   keep their column (--case-w); only the cards are wider than it. */
 @media (min-width: 801px) {
   .hc { max-width: none; }
   .hc > :not(.hc-slide):not(.hc-stack) { width: 100%; max-width: var(--case-w, 1160px); margin-inline: auto; }
-  .hc-stack { justify-items: center; }
-  .hc-slide { container-type: inline-size; width: min(100%, 90vw, calc(90dvh * 16 / 9)); margin-inline: auto; }
+  .hc-slide {
+    container-type: inline-size;
+    height: calc(100dvh - 2 * var(--card-pad));
+    aspect-ratio: auto;
+    margin-inline: calc(var(--card-pad) - var(--pad)); /* out to the card's own padding, past the page's side margin */
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .hc-slide:not(.hc-slide--hero) .hc-slide__stage { height: 100%; aspect-ratio: 839 / 1080; }
+  .hc--x .hc-slide--hero .hc-slide__stage { aspect-ratio: auto; height: 100%; }
+  .hc-slide--card { top: var(--card-pad); }
   .hc-slide__n { font-size: max(1.5rem, 2.3cqw); }
   .hc-slide__copy > div { gap: max(1rem, 2cqw); }
   .hc-slide__copy h3 { font-size: max(1.2rem, 2cqw); }
@@ -178,7 +189,7 @@
 .hc-slide--card { transform-origin: 50% 0%; }
 .hc-slide__shade { position: absolute; inset: 0; z-index: 30; background: var(--shade, #000131); opacity: 0; pointer-events: none; }
 @media (prefers-reduced-motion: no-preference) {
-  .hc-slide--card { position: sticky; top: 3.6rem; }
+  .hc-slide--card { position: sticky; top: var(--card-pad); }
 }
 
 /* hover: the layer lifts, its neighbours step back */
