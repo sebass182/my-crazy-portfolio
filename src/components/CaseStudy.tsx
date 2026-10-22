@@ -65,6 +65,16 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
         gsap.from(targets, { y: 28, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, scrollTrigger: view(trigger, start, sticky), ...extra })
       const phone = window.matchMedia('(max-width: 800px)').matches
 
+      /* The laptop slide's cream ground (and the slide's shadow) fades away as you scroll down, leaving the laptop on the page's
+         own colour; scrolling back up brings it back. */
+      const heroSlide = el.querySelector<HTMLElement>('.hc-slide--hero')
+      const heroStage = heroSlide?.querySelector<HTMLElement>('.hc-slide__stage')
+      if (heroSlide && heroStage) {
+        const fade = { trigger: heroSlide, scroller, start: 'top 25%', end: 'bottom 45%', scrub: true }
+        gsap.to(heroStage, { backgroundColor: 'rgba(247, 246, 242, 0)', ease: 'none', scrollTrigger: fade })
+        gsap.to(heroSlide, { boxShadow: '0 60px 110px -50px rgba(0, 0, 8, 0)', ease: 'none', scrollTrigger: fade })
+      }
+
       /* À propos: the paragraph reads in line by line, the photo opens, the goals settle over it and drift at their own pace */
       SplitText.create('.hc-lead', {
         type: 'lines',
