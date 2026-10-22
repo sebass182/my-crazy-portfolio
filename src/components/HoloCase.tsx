@@ -1,6 +1,5 @@
-import { useMemo, useRef, useState } from 'react'
+import { useRef } from 'react'
 import { gsap, ScrollTrigger, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
-import Lightbox, { type LightboxItem } from './Lightbox'
 
 const base = import.meta.env.BASE_URL
 const src = (file: string) => `${base}cards/holo-md/${file}`
@@ -84,20 +83,9 @@ const slides = [
   },
 ]
 
-// what can be enlarged on a slide: the modules (the diamond, gems and swoosh are decoration)
-const zoomable = (layers: Layer[]) => layers.filter((l) => l.kind !== 'free')
 
 export default function HoloCase() {
   const root = useRef<HTMLDivElement>(null)
-
-  // Enlarging (the Agrandir button under each text): one group per slide, its modules in order
-  const [zoom, setZoom] = useState<{ g: number; i: number } | null>(null)
-  const groups = useMemo<LightboxItem[][]>(() => {
-    const item = (k: Key, alt: string, round = false): LightboxItem => ({ src: src(IMG[k][0]), alt, w: IMG[k][1], h: IMG[k][2], round })
-    return [
-      ...slides.map((s) => zoomable(s.layers).map((l, i) => item(l.k, l.alt ?? `${s.title} : maquette ${i + 1}`, l.kind === 'page'))),
-    ]
-  }, [])
 
   useGSAP(
     () => {
@@ -148,12 +136,11 @@ export default function HoloCase() {
          its bottom edge in view instead of being cut off. (Same as CaseStudy.tsx.) */
       const phone = window.matchMedia('(max-width: 800px)').matches
       const stack = all<HTMLElement>('.hc-slide--card')
-      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
-      const park = () =>
-        stack.forEach((li, i) => {
-          const wanted = (phone ? 4 + i * 0.75 : 3.6 + i * 1) * rem
-          li.style.top = `${Math.min(wanted, scroller.clientHeight - li.offsetHeight - 14)}px`
-        })
+      // a sticky offset is measured inside the scroller's own top padding, so that padding is taken off to land 30px from the screen's top
+      const park = () => {
+        const pad = parseFloat(getComputedStyle(scroller).paddingTop) || 0
+        stack.forEach((li) => li.style.setProperty('top', `${Math.min(30 - pad, scroller.clientHeight - li.offsetHeight - 14 - pad)}px`))
+      }
       park()
       ScrollTrigger.addEventListener('refreshInit', park)
       stack.forEach((li, i) => {
@@ -271,16 +258,13 @@ export default function HoloCase() {
 
       {/* 01 · 02 · 03 — the slides, rebuilt; they are the cards that stack */}
       <div className="hc-stack">
-        {slides.map((s, si) => (
+        {slides.map((s) => (
           <section className={`hc-slide hc-slide--card hc-slide--${s.id}`} key={s.id} aria-labelledby={`hc-${s.id}-title`}>
             <div className="hc-slide__copy">
               <span className="hc-slide__n">{s.n}</span>
               <div>
                 <h3 id={`hc-${s.id}-title`}>{s.title}</h3>
                 <p>{s.text}</p>
-                <button className="hc-zoom" onClick={() => setZoom({ g: si, i: 0 })} aria-label={`Agrandir les maquettes : ${s.title}`}>
-                  Agrandir <span aria-hidden="true">⤢</span>
-                </button>
               </div>
             </div>
             <div className="hc-slide__stage">
@@ -302,16 +286,6 @@ export default function HoloCase() {
           </section>
         ))}
       </div>
-
-      {zoom && (
-        <Lightbox
-          items={groups[zoom.g]}
-          index={zoom.i}
-          label={slides[zoom.g].title}
-          onIndex={(i) => setZoom({ g: zoom.g, i })}
-          onClose={() => setZoom(null)}
-        />
-      )}
     </div>
   )
 }

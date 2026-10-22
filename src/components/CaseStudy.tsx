@@ -1,8 +1,7 @@
-import { useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useRef, type CSSProperties } from 'react'
 import { gsap, ScrollTrigger, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import type { CaseData, CaseLayer } from '../data/cases'
 import type { Project } from '../data/projects'
-import Lightbox, { type LightboxItem } from './Lightbox'
 
 /* A case study built the way the Holo MD page is, from the Figma deck:
      the laptop → À propos (the paragraph and the photo, the three goals floating over it) → the three objective
@@ -23,23 +22,12 @@ const place = (l: Pick<CaseLayer, 'x' | 'y' | 'w'>): CSSProperties => ({ left: `
 // A module that starts left of its panel crosses onto the cream copy panel: on a wide screen that edge is a real one (ov-l → rounded again)
 const cuts = (l: CaseLayer) => (l.cut ? ' ' + [...l.cut].map((c) => `cut-${c}`).join(' ') : '') + (l.x < 0 ? ' ov-l' : '')
 const crossesOver = (layers: CaseLayer[]) => layers.some((l) => l.kind !== 'bg' && l.x < 0)
-// what can be enlarged on a slide: every module (the full-panel ground is just a ground)
-const zoomable = (layers: CaseLayer[]) => layers.filter((l) => l.kind !== 'bg')
 
 // the laptop of every hero slide: same image, same spot (x, y, w in % of the slide)
 const LAPTOP = { f: 'cases/_shared/laptop.webp', iw: 2400, ih: 1500, x: 11.7, y: 7.4, w: 76.7 }
 
 export default function CaseStudy({ project, data }: { project: Project; data: CaseData }) {
   const root = useRef<HTMLDivElement>(null)
-
-  // Enlarging (the Agrandir button under each text): one group per objective slide, its modules in order
-  const [zoom, setZoom] = useState<{ g: number; i: number } | null>(null)
-  const groups = useMemo<LightboxItem[][]>(() => {
-    const url = (f: string) => `${base}${data.base}${f}`
-    return [
-      ...data.slides.map((s) => zoomable(s.layers).map((l, i) => ({ src: url(l.f), alt: l.alt ?? `${s.title} : maquette ${i + 1}`, w: l.iw, h: l.ih, round: l.kind === 'mod' }))),
-    ]
-  }, [data])
 
   useGSAP(
     () => {
@@ -89,12 +77,11 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
          covered slide steps back (scale + a shade towards the page's own ground). The sticky offset is clamped so a
          slide taller than the screen (phones) parks with its bottom edge in view instead of being cut off. */
       const stack = all<HTMLElement>('.hc-slide--card')
-      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
-      const park = () =>
-        stack.forEach((li, i) => {
-          const wanted = (phone ? 4 + i * 0.75 : 3.6 + i * 1) * rem
-          li.style.top = `${Math.min(wanted, scroller.clientHeight - li.offsetHeight - 14)}px`
-        })
+      // a sticky offset is measured inside the scroller's own top padding, so that padding is taken off to land 30px from the screen's top
+      const park = () => {
+        const pad = parseFloat(getComputedStyle(scroller).paddingTop) || 0
+        stack.forEach((li) => li.style.setProperty('top', `${Math.min(30 - pad, scroller.clientHeight - li.offsetHeight - 14 - pad)}px`))
+      }
       park()
       ScrollTrigger.addEventListener('refreshInit', park)
       stack.forEach((li, i) => {
@@ -248,9 +235,6 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
               <div>
                 <h3 id={`hc-s${si}-title`}>{s.title}</h3>
                 <p>{s.text}</p>
-                <button className="hc-zoom" onClick={() => setZoom({ g: si, i: 0 })} aria-label={`Agrandir les maquettes : ${s.title}`}>
-                  Agrandir <span aria-hidden="true">⤢</span>
-                </button>
               </div>
             </div>
             <div className="hc-slide__stage" style={{ ['--stage' as string]: s.stage }}>
@@ -272,16 +256,6 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
           </section>
         ))}
       </div>
-
-      {zoom && (
-        <Lightbox
-          items={groups[zoom.g]}
-          index={zoom.i}
-          label={data.slides[zoom.g].title}
-          onIndex={(i) => setZoom({ g: zoom.g, i })}
-          onClose={() => setZoom(null)}
-        />
-      )}
     </div>
   )
 }
