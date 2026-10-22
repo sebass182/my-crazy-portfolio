@@ -444,7 +444,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #fff; outline-offset:
 /* ───────── Autres projets: the zoom-through scroll section (before the footer) ───────── */
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .others { position: relative; background: var(--paper); color: var(--ink); }
-.others__stage { position: relative; height: 100svh; overflow: hidden; }
+.others__stage { position: relative; height: 100svh; overflow-x: clip; overflow-y: visible; } /* sideways it clips; upwards and downwards a picture is never cut at the stage's edge */
 .others__scene { position: absolute; inset: 0; perspective: 100svh; perspective-origin: 50% 50%; }
 .others__title {
   position: absolute;

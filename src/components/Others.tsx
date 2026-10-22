@@ -5,12 +5,13 @@ import { others, othersTitle } from '../data/others'
 const base = import.meta.env.BASE_URL
 const NEAR = 0.5 // the nearest picture waits this many screen heights behind the screen (the stage's perspective is one screen height)
 const DEEP = 1.5 // each unit of depth adds this much
-const IN = 0.78 // the pictures start pulled this far towards the centre, and smaller
+const IN_X = 0.72 // the pictures start pulled this far towards the centre sideways...
+const IN_Y = 0.55 // ...and more so vertically (what flies upward would be cut by the top of the stage)
 const SIZE = 0.8
 const behind = (d: number) => NEAR + DEEP * d // how many screen heights behind the screen
 // x / y in the data are where a picture is first SEEN; perspective pulls a deep one towards the centre (by 1 / (1 + behind)), so its real
 // place is pushed out by the same factor
-const place = (v: number, d: number) => 50 + (v - 50) * IN * (1 + behind(d))
+const place = (v: number, d: number, k: number) => 50 + (v - 50) * k * (1 + behind(d))
 
 /* "Zoom through" scroll: the stage has a real perspective and the screenshots are scattered over it, in sight from the first moment the
    section peeks in, at different depths: the nearer, the bigger. As the section comes up the camera starts moving forward and keeps
@@ -32,7 +33,7 @@ export default function Others() {
         const shots = gsap.utils.toArray<HTMLElement>('.others__img', section)
         const words = gsap.utils.toArray<HTMLElement>('.others__title .w', section)
         const P = () => stage.clientHeight // the perspective: one screen height
-        const PIN = () => 5 * P() // how long the stage stays pinned while the pictures fly
+        const PIN = () => 3.3 * P() // how long the stage stays pinned while the pictures fly
         const RISE = () => P() // the last screen height of the pin: the footer rises over it
 
         gsap.set(words, { opacity: 0.16 })
@@ -45,22 +46,14 @@ export default function Others() {
           scrollTrigger: { trigger: section, start: 'top bottom', end: () => `+=${P() + PIN()}`, scrub: 0.7, invalidateOnRefresh: true },
         })
 
-        // each picture comes to the camera and passes it. A picture is out of sight once it has grown to about 2.2x, so its journey is
-        // timed backwards from the moment it should leave: the leaving moments are spread over the whole scroll, in a shuffled order,
-        // so there are always pictures in view. The deep ones have the furthest to go: they zoom the most.
-        const rank = [5, 0, 8, 3, 11, 6, 1, 9, 4, 12, 2, 10, 7] // leaving order, per picture (the list is back to front)
-        shots.forEach((el, i) => {
-          const b = behind(others[i].d)
-          const leave = 0.3 + (rank[i % rank.length] / (rank.length - 1)) * 0.75
-          const share = (0.55 + b) / (0.97 + b) // how much of the journey is done when it leaves
-          const start = Math.max(0, leave - share * 0.9)
-          tl.to(el, { z: () => 0.97 * P(), duration: (leave - start) / share }, start)
-        })
+        // every picture makes the same journey at the same pace, from its depth to just in front of the camera: the one with the
+        // furthest to go (the deepest) moves fastest, so it zooms the most, and each one leaves the screen on its own side when it has grown
+        // enough, the ones near the edges first, left and right alike (the perspective is centred and symmetrical)
+        shots.forEach((el) => tl.to(el, { z: () => 0.97 * P(), duration: 1 }, 0))
         // the title lights up word by word, then steps aside before the last pictures go
         tl.to(words, { opacity: 1, duration: 0.04, stagger: 0.035 }, 0.04)
-        tl.to('.others__title', { opacity: 0, y: -40, duration: 0.12 }, 0.9)
-        tl.to({}, { duration: 0 }, 1.2)
-
+        tl.to('.others__title', { opacity: 0, y: -40, duration: 0.12 }, 0.6)
+        
         // the stage stays pinned for the whole zoom and one screen more, during which the footer (pulled up over it, see the CSS)
         // comes up the screen while the stage drifts up more slowly behind it
         ScrollTrigger.create({ trigger: section, start: 'top top', end: () => `+=${PIN() + RISE()}`, pin: stage, invalidateOnRefresh: true })
@@ -111,8 +104,8 @@ export default function Others() {
               key={o.f}
               aria-hidden="true"
               style={{
-                ['--x' as string]: place(o.x, o.d),
-                ['--y' as string]: place(o.y, o.d),
+                ['--x' as string]: place(o.x, o.d, IN_X),
+                ['--y' as string]: place(o.y, o.d, IN_Y),
                 ['--h' as string]: o.sh * SIZE * (1 + behind(o.d)),
                 ['--ar' as string]: `${o.w} / ${o.h}`,
               }}
