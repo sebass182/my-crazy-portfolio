@@ -312,19 +312,29 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
   justify-content: space-between;
   align-items: center;
   padding: 0.6rem var(--pad);
-  color: #fff;
-  mix-blend-mode: difference; /* stays legible over paper, gradient and every project colour */
+  color: var(--ink); /* flips to white over the dark Travaux section (.nav--dark, set by Nav.tsx) */
+  transition: color 0.4s;
   opacity: 0;
   visibility: hidden; /* GSAP fades it in once the preloader hands over */
 }
-/* away from the top (set by Nav.tsx): a frosted dark bar instead of the blend, so the links read over photos and headlines too */
-.nav.nav--bar {
-  mix-blend-mode: normal;
-  background: rgba(10, 10, 15, 0.78);
-  -webkit-backdrop-filter: blur(16px) saturate(1.25);
-  backdrop-filter: blur(16px) saturate(1.25);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
-}
+.nav:has(.burger[aria-expanded='true']) { color: var(--ink); } /* the open mobile menu is paper-coloured */
+
+/* progressive blur: five layers, each blurring what is behind it (and the layers before it); the stronger the blur, the
+   shorter its mask, so the blur is strongest at the top edge and fades out downwards — no edge, no stroke. A tint of
+   the page's own tone under it keeps the links readable over photos. Shown once the page has scrolled (.nav--bar). */
+.nav { --tint: rgba(244, 242, 238, 0.55); }
+.nav.nav--dark { color: #fff; --tint: rgba(10, 10, 15, 0.5); }
+.nav__fx { position: absolute; left: 0; right: 0; top: 0; height: 190%; z-index: -1; pointer-events: none; }
+.nav__fx > * { position: absolute; inset: 0; opacity: 0; transition: opacity 0.5s; }
+.nav--bar .nav__fx > *, .nav:focus-within .nav__fx > * { opacity: 1; }
+.nav:has(.burger[aria-expanded='true']) .nav__fx { display: none; }
+.nav__tint { background: linear-gradient(to bottom, var(--tint) 0%, transparent 100%); }
+.nav__fx i:nth-of-type(1) { -webkit-backdrop-filter: blur(1px); backdrop-filter: blur(1px); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 100%); }
+.nav__fx i:nth-of-type(2) { -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 32%, transparent 82%); mask-image: linear-gradient(to bottom, #000 0%, #000 32%, transparent 82%); }
+.nav__fx i:nth-of-type(3) { -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 20%, transparent 66%); mask-image: linear-gradient(to bottom, #000 0%, #000 20%, transparent 66%); }
+.nav__fx i:nth-of-type(4) { -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 8%, transparent 50%); mask-image: linear-gradient(to bottom, #000 0%, #000 8%, transparent 50%); }
+.nav__fx i:nth-of-type(5) { -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 34%); mask-image: linear-gradient(to bottom, #000 0%, transparent 34%); }
+
 .nav a { font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; }
 .nav nav { display: flex; gap: clamp(0.25rem, 2vw, 1.5rem); margin-right: calc(-0.6rem - 0.14em); } /* link text (not its 44px hit area) lines up with the page margin, mirroring the icon on the left */
 .nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.6rem; }

@@ -32,12 +32,11 @@ const LAPTOP = { f: 'cases/_shared/laptop.webp', iw: 2400, ih: 1500, x: 11.7, y:
 export default function CaseStudy({ project, data }: { project: Project; data: CaseData }) {
   const root = useRef<HTMLDivElement>(null)
 
-  // Enlarging: group 0 is the project's main screen, groups 1-3 are the modules of each objective slide
+  // Enlarging (the Agrandir button under each text): one group per objective slide, its modules in order
   const [zoom, setZoom] = useState<{ g: number; i: number } | null>(null)
   const groups = useMemo<LightboxItem[][]>(() => {
     const url = (f: string) => `${base}${data.base}${f}`
     return [
-      [{ src: url(data.hero.f), alt: data.hero.alt, w: data.hero.iw, h: data.hero.ih, round: true }],
       ...data.slides.map((s) => zoomable(s.layers).map((l, i) => ({ src: url(l.f), alt: l.alt ?? `${s.title} : maquette ${i + 1}`, w: l.iw, h: l.ih, round: l.kind === 'mod' }))),
     ]
   }, [data])
@@ -202,23 +201,7 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
       {/* the laptop: the project's screen inside the deck's MacBook, on the same cream */}
       <section className="hc-slide hc-slide--hero" aria-label={`Maquette principale — ${project.name}`}>
         <div className="hc-slide__stage" style={{ ['--stage' as string]: '#f7f6f2' }}>
-          <div
-            className="hl hl--device"
-            data-depth={0.9}
-            data-zoom
-            data-cursor="Agrandir"
-            style={place(LAPTOP)}
-            role="button"
-            tabIndex={0}
-            aria-label="Agrandir la maquette principale"
-            onClick={() => setZoom({ g: 0, i: 0 })}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                setZoom({ g: 0, i: 0 })
-              }
-            }}
-          >
+          <div className="hl hl--device" data-depth={0.9} style={place(LAPTOP)}>
             <div className="hl__s">
               <div className="dev">
                 <Pic data={data} f={hero.f} iw={hero.iw} ih={hero.ih} alt={hero.alt} className="dev__screen" style={{ left: `${hero.x}%`, top: `${hero.y}%`, width: `${hero.w}%` }} />
@@ -265,7 +248,7 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
               <div>
                 <h3 id={`hc-s${si}-title`}>{s.title}</h3>
                 <p>{s.text}</p>
-                <button className="hc-zoom" onClick={() => setZoom({ g: si + 1, i: 0 })} aria-label={`Agrandir les maquettes : ${s.title}`}>
+                <button className="hc-zoom" onClick={() => setZoom({ g: si, i: 0 })} aria-label={`Agrandir les maquettes : ${s.title}`}>
                   Agrandir <span aria-hidden="true">⤢</span>
                 </button>
               </div>
@@ -276,11 +259,8 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
                   className={`hl hl--${l.kind}${cuts(l)}`}
                   key={l.f}
                   data-depth={l.d}
-                  data-zoom={l.kind === 'bg' ? undefined : ''}
-                  data-cursor={l.kind === 'bg' ? undefined : 'Agrandir'}
                   style={l.kind === 'bg' ? { zIndex: 0 } : { ...place(l), zIndex: l.z }}
                   aria-hidden={l.alt ? undefined : true}
-                  onClick={l.kind === 'bg' ? undefined : () => setZoom({ g: si + 1, i: zoomable(s.layers).indexOf(l) })}
                 >
                   <div className="hl__s">
                     <Pic data={data} f={l.f} iw={l.iw} ih={l.ih} alt={l.alt} lazy />
@@ -297,7 +277,7 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
         <Lightbox
           items={groups[zoom.g]}
           index={zoom.i}
-          label={zoom.g === 0 ? `Maquette principale — ${project.name}` : data.slides[zoom.g - 1].title}
+          label={data.slides[zoom.g].title}
           onIndex={(i) => setZoom({ g: zoom.g, i })}
           onClose={() => setZoom(null)}
         />
