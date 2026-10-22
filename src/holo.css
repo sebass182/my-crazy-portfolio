@@ -139,9 +139,6 @@
 .hc--x .hl--device img { transition: none; }
 .hc--x .hl--device:hover img { transform: none; }
 
-/* 1b · a finished laptop picture (transparent, with its own shadow): the full width of the column, no panel behind it */
-.hc-herofull img { width: 100%; height: auto; }
-
 /* 2 · À propos: as on Holo MD (the paragraph, the photo), with the three goals floating over the photo as on the deck.
    The photo's box is not clipped — a chip crosses its edge — the picture inside it is. */
 .hc--x .hc-photo { position: relative; overflow: visible; border-radius: 0; aspect-ratio: auto; container-type: inline-size; }

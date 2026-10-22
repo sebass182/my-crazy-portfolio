@@ -14,8 +14,6 @@ export type CaseData = {
   meta: CaseMeta
   // the project's screen; x / y / w place it inside the laptop (% of the laptop's box)
   hero: CaseImg & { x: number; y: number; w: number }
-  // a finished laptop picture (transparent background) shown at the full width of the column instead of the cream hero slide
-  heroFull?: CaseImg
   intro: { lead: string; photo: CaseImg; chips: CaseChip[] }
   slides: CaseSlide[]
 }
@@ -232,13 +230,7 @@ export const cases: Record<string, CaseData> = {
      }
     ]
    }
-  ],
-  "heroFull": {
-   "f": "hero-laptop.webp",
-   "iw": 2000,
-   "ih": 1250,
-   "alt": "Site Camping Québec : la page d’accueil sur un portable"
-  }
+  ]
  },
  "essll": {
   "base": "cases/esslll/",

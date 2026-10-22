@@ -65,9 +65,6 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
         gsap.from(targets, { y: 28, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, scrollTrigger: view(trigger, start, sticky), ...extra })
       const phone = window.matchMedia('(max-width: 800px)').matches
 
-      // a finished laptop picture rises into place
-      if (el.querySelector('.hc-herofull')) gsap.from(q('.hc-herofull img'), { y: 50, opacity: 0, duration: 1.2, ease: 'expo.out', scrollTrigger: view(q('.hc-herofull'), 'top 90%') })
-
       /* À propos: the paragraph reads in line by line, the photo opens, the goals settle over it and drift at their own pace */
       SplitText.create('.hc-lead', {
         type: 'lines',
@@ -201,14 +198,7 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
 
   return (
     <div className="hc hc--x" ref={root}>
-      {data.heroFull && (
-        <section className="hc-herofull" aria-label={`Maquette principale — ${project.name}`}>
-          <Pic data={data} {...data.heroFull} />
-        </section>
-      )}
-
       {/* the laptop: the project's screen inside the deck's MacBook, on the same cream */}
-      {!data.heroFull && (
       <section className="hc-slide hc-slide--hero" aria-label={`Maquette principale — ${project.name}`}>
         <div className="hc-slide__stage" style={{ ['--stage' as string]: '#f7f6f2' }}>
           <div className="hl hl--device" data-depth={0.9} style={place(LAPTOP)}>
@@ -221,7 +211,6 @@ export default function CaseStudy({ project, data }: { project: Project; data: C
           </div>
         </div>
       </section>
-      )}
 
       {/* À propos, as on the Holo MD page: the paragraph and the photo — and the three goals floating over the photo, as on the deck */}
       <section className="hc-intro" aria-label="Contexte du projet">
