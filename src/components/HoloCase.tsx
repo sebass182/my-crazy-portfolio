@@ -151,8 +151,7 @@ export default function HoloCase() {
       const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
       const park = () =>
         stack.forEach((li, i) => {
-          if (!phone) return li.style.removeProperty('top') // desktop: CSS parks every card at the same --card-pad
-          const wanted = (4 + i * 0.75) * rem
+          const wanted = (phone ? 4 + i * 0.75 : 3.6 + i * 1) * rem
           li.style.top = `${Math.min(wanted, scroller.clientHeight - li.offsetHeight - 14)}px`
         })
       park()
@@ -160,7 +159,7 @@ export default function HoloCase() {
       stack.forEach((li, i) => {
         const next = stack[i + 1]
         if (!next) return
-        const cover = { trigger: next, scroller, start: 'top bottom', end: () => `top ${parseFloat(getComputedStyle(next).top) || 0}px`, scrub: true, invalidateOnRefresh: true }
+        const cover = { trigger: next, scroller, start: 'top bottom', end: () => `top ${parseFloat(next.style.top) || 0}px`, scrub: true, invalidateOnRefresh: true }
         gsap.to(li, { scale: 0.93, ease: 'none', scrollTrigger: cover })
         gsap.to(li.querySelector('.hc-slide__shade'), { opacity: 0.66, ease: 'none', scrollTrigger: cover })
       })
