@@ -45,8 +45,8 @@ export default function App() {
       <main>
         <Hero ready={ready} />
         <Work onOpen={setProject} />
-        <Others />
         <About />
+        <Others />
         <Contact ready={ready} />
       </main>
       {project && <ProjectView project={project} onClose={() => setProject(null)} onNavigate={setProject} />}
