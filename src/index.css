@@ -347,10 +347,8 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 .hero__lede { max-width: 46ch; margin-top: var(--hero-gap); font-size: clamp(1.05rem, 1.5vw, 1.45rem); line-height: 1.4; }
 .hero__lede strong { font-weight: 700; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: var(--hero-gap); }
-.btn { display: inline-flex; align-items: center; gap: 0.6rem; min-height: 48px; padding: 0 1.6rem; border-radius: 999px; background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink); font-weight: 600; transition: background-color 0.3s, color 0.3s; }
-.btn:hover { background: transparent; color: var(--ink); }
+.btn { display: inline-flex; align-items: center; gap: 0.6rem; min-height: 48px; padding: 0 1.6rem; border-radius: 999px; background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink); font-weight: 600; }
 .btn--outline { background: transparent; color: var(--ink); }
-.btn--outline:hover { background: var(--ink); color: var(--paper); }
 
 /* ───────── Cards: caption action + hover image ───────── */
 .card__cta { grid-column: 2; margin-top: 1rem; font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; }
