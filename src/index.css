@@ -153,17 +153,17 @@ img { display: block; max-width: 100%; }
 }
 
 /* ───────── Project overlay ───────── */
-.pv { position: fixed; inset: 0; z-index: 90; overflow: hidden; color: #fff; } /* never scrolls itself — GSAP transforms it, which would drag a fixed child along */
+.pv { --case-w: 1560px; /* the case study column: header, pictures and next link share it */ position: fixed; inset: 0; z-index: 90; overflow: hidden; color: #fff; } /* never scrolls itself — GSAP transforms it, which would drag a fixed child along */
 .pv__scroll { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding: calc(var(--pad) * 0.8) var(--pad) 0; }
 .pv__close { position: absolute; top: 1.25rem; right: 1.25rem; z-index: 2; display: flex; gap: 0.6rem; align-items: center; padding: 0.7rem 1.1rem; border-radius: 999px; background: #fff; color: var(--ink); font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; }
-.pv__head { max-width: 1160px; margin: 8vh auto 7vh; }
+.pv__head { max-width: var(--case-w); margin: 8vh auto 7vh; }
 .pv__n { font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; color: var(--accent); }
 .pv__head h2 { margin: 1rem 0 0.8rem; font-size: clamp(2.8rem, 9vw, 9rem); font-weight: 700; line-height: 0.92; letter-spacing: -0.05em; }
 .pv__tags { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
 .pv__summary { margin-top: 1.6rem; max-width: 52ch; font-size: clamp(1.1rem, 1.8vw, 1.5rem); line-height: 1.4; opacity: 0.85; }
-.pv__slides { max-width: 1160px; margin: 0 auto; display: grid; gap: clamp(1rem, 2.5vw, 2rem); }
+.pv__slides { max-width: var(--case-w); margin: 0 auto; display: grid; gap: clamp(1rem, 2.5vw, 2rem); }
 .pv__slide { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; border-radius: var(--radius); background: rgba(255, 255, 255, 0.05); }
-.pv__next { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; width: 100%; max-width: 1100px; margin: 12vh auto 0; padding: 4rem 0 6rem; border-top: 1px solid rgba(255, 255, 255, 0.25); text-align: left; }
+.pv__next { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; width: 100%; max-width: var(--case-w); margin: 12vh auto 0; padding: 4rem 0 6rem; border-top: 1px solid rgba(255, 255, 255, 0.25); text-align: left; }
 .pv__next span { font-family: var(--mono); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.7; }
 .pv__next strong { font-size: clamp(2rem, 6vw, 6rem); font-weight: 700; letter-spacing: -0.045em; line-height: 1; transition: color 0.3s; }
 .pv__next:hover strong { color: var(--accent); }
