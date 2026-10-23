@@ -3,6 +3,7 @@ import { gsap, SplitText, prefersReducedMotion, useGSAP } from '../lib/gsap'
 import HeroShader from './HeroShader'
 import { useLang } from '../i18n/context'
 import { magnetic } from '../lib/magnetic'
+import { track } from '../lib/track'
 
 export default function Contact({ ready }: { ready: boolean }) {
   const { t } = useLang()
@@ -72,7 +73,7 @@ export default function Contact({ ready }: { ready: boolean }) {
           >
             LinkedIn
           </a>
-          <a className="magnetic pill pill--outline" href={t.cvHref}>
+          <a className="magnetic pill pill--outline" href={t.cvHref} onClick={() => track('click-cv')}>
             {t.cvLabel}
           </a>
         </div>

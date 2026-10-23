@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ui, type Lang } from './ui'
 import { LangContext } from './context'
+import { track } from '../lib/track'
 
 /* The site's language: ?lang=fr|en in the address wins (so a link can pick it), then what the visitor chose last time, then their
    browser's own language. The <html lang>, the tab title and the description follow it. */
@@ -22,6 +23,7 @@ export function LangProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(detect)
   const setLang = useCallback((l: Lang) => {
     setLangState(l)
+    track('lang-' + l)
     try {
       localStorage.setItem(STORAGE, l)
       const url = new URL(window.location.href)
